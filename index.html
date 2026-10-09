@@ -589,7 +589,7 @@ function render(sel){
       return `<tr class="${h.inBite ? "biterow" : ""}">` +
         `<td><b>${fmtT12(h.time).replace(":00 ", " ")}</b></td>` +
         `<td><span style="display:inline-flex;align-items:center;gap:4px">${pompano(c, 16)}<b style="color:${c}">${h.score}</b></span></td>` +
-        `<td>${hx.e} ${arrow(h.wdir)} ${h.wind}</td>` +
+        `<td>${hx.e} ${arrow(h.wdir)} ${h.wind} ${compass(h.wdir)}</td>` +
         `<td>${h.rain}%</td>` +
         `<td>${h.temp}°</td></tr>`;
     }).join("") + `</table>` +
