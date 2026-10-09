@@ -697,6 +697,18 @@ function tideSVG(day) {
     svg += '<text x="' + X(bt).toFixed(1) + '" y="' + (Y(bv) - 9.5).toFixed(1) +
       '" text-anchor="middle" font-size="10">🎣</text>';
   }
+  // fishing line: connects the live rod to the active-or-next Major fish (drawn under the markers)
+  if (now >= d0 && now <= d1) {
+    var tm0 = majorTargetMid(d0, now);
+    if (tm0 != null) {
+      var rx0 = X(now), ry0 = Y(tideAt(now));
+      var tx0 = X(tm0), ty0 = Y(tideAt(tm0));
+      var cx0 = (rx0 + tx0) / 2, cy0 = (ry0 + ty0) / 2 + 12;
+      svg += '<path id="fishline" d="M' + rx0.toFixed(1) + "," + ry0.toFixed(1) +
+        " Q" + cx0.toFixed(1) + "," + cy0.toFixed(1) + " " + tx0.toFixed(1) + "," + ty0.toFixed(1) +
+        '" fill="none" stroke="#8a7a5c" stroke-width="1.5" opacity="0.65" stroke-linecap="round"/>';
+    }
+  }
   // Major bite markers: small rating-colored fish on the curve at each Major window's midpoint
   var fcol = ratingColor(day.score);
   state.moon.forEach(function(w) {
@@ -905,17 +917,54 @@ function tick() {
   // move the live tide-chart rod every 30s so it rides the curve with the real time
   if (++__tfN % 30 === 0) moveTideFish();
 }
-// repositions the #tidefish marker along the tide curve to the current time
+// midpoint (ms) of the active Major window, else the next upcoming Major, on the displayed day;
+// null when no Major is active or upcoming (line is then hidden)
+function majorTargetMid(d0, now) {
+  var d1 = d0 + 86400000, target = null, i, w;
+  for (i = 0; i < state.moon.length; i++) {
+    w = state.moon[i];
+    if (w.type !== "major" || w.end < d0 || w.start > d1) continue;
+    if (now >= w.start && now <= w.end) { target = w; break; }
+  }
+  if (!target) {
+    for (i = 0; i < state.moon.length; i++) {
+      w = state.moon[i];
+      if (w.type !== "major" || w.start <= now || w.start >= d1 || w.end <= d0) continue;
+      if (!target || w.start < target.start) target = w;
+    }
+  }
+  return target ? (target.start + target.end) / 2 : null;
+}
+// repositions the #tiderod marker along the tide curve to the current time,
+// and redraws the fishing line to the active-or-next Major fish
 var __tfN = 0;
 function moveTideFish() {
-  var g = document.getElementById("tidefish"), sc = state.tideScale;
-  if (!g || !sc || !state.ready) return;
+  var t = document.getElementById("tiderod"), sc = state.tideScale;
+  if (!t || !sc || !state.ready) return;
   var now = Date.now(), d1 = sc.d0 + 86400000;
-  if (now < sc.d0 || now > d1) { g.style.display = "none"; return; }
-  g.style.display = "";
+  var ln = document.getElementById("fishline");
+  if (now < sc.d0 || now > d1) {
+    t.style.display = "none";
+    if (ln) ln.style.display = "none";
+    return;
+  }
+  t.style.display = "";
   var fx = sc.pL + (now - sc.d0) / 86400000 * (sc.W - sc.pL - sc.pR);
   var fy = sc.pT + (1 - (tideAt(now) - sc.mn) / (sc.mx - sc.mn)) * (sc.H - sc.pT - sc.pB);
-  g.setAttribute("transform", "translate(" + (fx - 15).toFixed(1) + "," + (fy - 15).toFixed(1) + ")");
+  t.setAttribute("x", fx.toFixed(1));
+  t.setAttribute("y", (fy + 10).toFixed(1));
+  if (ln) {
+    var tm = majorTargetMid(sc.d0, now);
+    if (tm == null) { ln.style.display = "none"; }
+    else {
+      ln.style.display = "";
+      var tx = sc.pL + (tm - sc.d0) / 86400000 * (sc.W - sc.pL - sc.pR);
+      var ty = sc.pT + (1 - (tideAt(tm) - sc.mn) / (sc.mx - sc.mn)) * (sc.H - sc.pT - sc.pB);
+      var cx = (fx + tx) / 2, cy = (fy + ty) / 2 + 12;
+      ln.setAttribute("d", "M" + fx.toFixed(1) + "," + fy.toFixed(1) +
+        " Q" + cx.toFixed(1) + "," + cy.toFixed(1) + " " + tx.toFixed(1) + "," + ty.toFixed(1));
+    }
+  }
 }
 function showError() {
   var S = STR[state.lang];
