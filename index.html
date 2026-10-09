@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#06121f">
+<title>Fishing Forecast — Jupiter, FL</title>
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: #06121f; color: #eaf2fa;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+    max-width: 430px; margin: 0 auto; padding: 12px 12px 32px;
+  }
+  h1 { font-size: 20px; margin: 4px 0 2px; }
+  .sub { color: #8fa8bd; font-size: 12px; margin-bottom: 12px; }
+  .verdict {
+    border-radius: 16px; padding: 16px; text-align: center; margin-bottom: 12px;
+    background: linear-gradient(160deg, #0e2a44, #0a1c30);
+    border: 1px solid #1d3a56;
+  }
+  .verdict .word { font-size: 34px; font-weight: 800; letter-spacing: 1px; }
+  .verdict.good .word { color: #4ade80; }
+  .verdict.bad .word { color: #f87171; }
+  .verdict .score { color: #8fa8bd; font-size: 13px; margin-top: 4px; }
+  .verdict .bite { font-size: 13px; margin-top: 8px; color: #cfe3f5; }
+  .card {
+    background: #0b1d31; border: 1px solid #1d3a56; border-radius: 14px;
+    padding: 12px; margin-bottom: 10px;
+  }
+  .day { cursor: pointer; }
+  .day.active { border-color: #38bdf8; }
+  .day-head { display: flex; justify-content: space-between; align-items: center; }
+  .day-name { font-weight: 700; font-size: 15px; }
+  .pill { font-size: 11px; font-weight: 800; padding: 3px 10px; border-radius: 999px; letter-spacing: .5px; }
+  .pill.good { background: #14532d; color: #4ade80; }
+  .pill.bad { background: #450a0a; color: #f87171; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 12px; margin-top: 10px; font-size: 13px; }
+  .grid .k { color: #8fa8bd; font-size: 11px; text-transform: uppercase; letter-spacing: .4px; }
+  .grid .v { font-weight: 600; font-size: 14px; }
+  .detail { display: none; margin-top: 10px; border-top: 1px solid #1d3a56; padding-top: 10px; }
+  .day.active .detail { display: block; }
+  .hours { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 8px; }
+  .hours th { color: #8fa8bd; font-weight: 600; text-align: left; padding: 4px 6px 4px 0; font-size: 11px; }
+  .hours td { padding: 4px 6px 4px 0; border-top: 1px solid #14293f; }
+  .tide-svg { width: 100%; height: 120px; display: block; margin-top: 6px; }
+  .tide-legend { font-size: 11px; color: #8fa8bd; margin-top: 4px; }
+  .err { color: #f87171; font-size: 13px; }
+  .loading { color: #8fa8bd; text-align: center; padding: 40px 0; }
+  .foot { color: #5b7186; font-size: 11px; text-align: center; margin-top: 16px; }
+</style>
+</head>
+<body>
+<h1>🎣 Fishing Forecast</h1>
+<div class="sub" id="loc">Jupiter, FL (26.92, −80.06) · <span id="updated">loading…</span></div>
+<div id="app"><div class="loading">Loading forecast…</div></div>
+<div class="foot">Live data: Open-Meteo · Tides: NOAA 8722495 Jupiter Inlet · Fish rating is an estimate from conditions, not a guarantee.</div>
+
+<script>
+const LAT = 26.9166, LON = -80.0642, TZ = "America/New_York";
+const STATION = "8722495";
+
+const COMPASS = ["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSW","SW","WSW","W","WNW","NW","NNW"];
+const compass = d => COMPASS[Math.round(d/22.5)%16];
+
+function rainLabel(prob, amt) {
+  if (prob < 20 || amt <= 0) return "Dry";
+  if (amt < 0.05) return "Light";
+  if (amt < 0.25) return "Moderate";
+  if (amt < 0.5) return "Heavy";
+  return "Downpour";
+}
+
+function fishScore(d) {
+  let s = 0;
+  const w = d.windMax;
+  s += w <= 10 ? 30 : w <= 15 ? 22 : w <= 20 ? 12 : 4;
+  const r = d.rainMax;
+  s += r < 20 ? 20 : r < 40 ? 14 : r < 60 ? 8 : 3;
+  const t = d.waterTemp;
+  s += (t >= 65 && t <= 80) ? 20 : (t >= 60 && t <= 85) ? 14 : 8;
+  s += d.waveMax < 1.5 ? 15 : d.waveMax < 3 ? 10 : 5;
+  s += (d.tideRange >= 2) ? 15 : 8;
+  return Math.min(100, Math.round(s));
+}
+
+const fmtT = iso => {
+  const d = new Date(iso);
+  let h = d.getHours(), m = d.getMinutes();
+  const ap = h >= 12 ? "p" : "a"; h = h % 12 || 12;
+  return h + ":" + String(m).padStart(2,"0") + ap;
+};
+const fmtDay = iso => new Date(iso + "T12:00:00").toLocaleDateString("en-US",{weekday:"short",month:"numeric",day:"numeric",timeZone:TZ});
+
+function dayKey(iso){ return iso.slice(0,10); }
+
+async function load() {
+  const fUrl = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}` +
+    `&hourly=temperature_2m,precipitation,precipitation_probability,wind_speed_10m,wind_direction_10m` +
+    `&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,wind_speed_10m_max,wind_direction_10m_dominant` +
+    `&timezone=${encodeURIComponent(TZ)}&wind_speed_unit=mph&temperature_unit=fahrenheit&forecast_days=7`;
+  const mUrl = `https://marine-api.open-meteo.com/v1/marine?latitude=${LAT}&longitude=${LON}` +
+    `&hourly=sea_surface_temperature,wave_height&timezone=${encodeURIComponent(TZ)}` +
+    `&temperature_unit=fahrenheit&forecast_days=7`;
+  const now = new Date();
+  const bd = now.toISOString().slice(0,10).replace(/-/g,"");
+  const ed = new Date(now.getTime() + 7*864e5).toISOString().slice(0,10).replace(/-/g,"");
+  const tUrl = `https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?product=predictions&datum=MLLW` +
+    `&station=${STATION}&time_zone=lst_ldt&units=english&interval=hilo&format=json&begin_date=${bd}&end_date=${ed}`;
+
+  const [f, m, t] = await Promise.all([
+    fetch(fUrl).then(r => r.json()),
+    fetch(mUrl).then(r => r.json()),
+    fetch(tUrl).then(r => r.json()).catch(() => ({predictions: []}))
+  ]);
+
+  const days = f.daily.time.map((date, i) => {
+    const key = date;
+    const hrs = f.hourly.time.map((t2, j) => ({t: t2, j})).filter(x => dayKey(x.t) === key).map(x => x.j);
+    let waveMax = 0, waterNoon = null;
+    const mh = m.hourly.time.map((t2, j) => ({t: t2, j})).filter(x => dayKey(x.t) === key);
+    mh.forEach(({j}) => {
+      const wv = (m.hourly.wave_height[j] || 0) * 3.28084;
+      if (wv > waveMax) waveMax = wv;
+      const hr = new Date(m.hourly.time[j]).getHours();
+      if (Math.abs(hr - 12) < 2 && waterNoon === null) waterNoon = m.hourly.sea_surface_temperature[j];
+    });
+    const tides = (t.predictions || []).filter(p => dayKey(p.t) === key);
+    const hs = tides.map(p => parseFloat(p.v));
+    const tideRange = hs.length ? Math.max(...hs) - Math.min(...hs) : 0;
+    const d = {
+      date, i,
+      tMax: Math.round(f.daily.temperature_2m_max[i]),
+      tMin: Math.round(f.daily.temperature_2m_min[i]),
+      rainMax: f.daily.precipitation_probability_max[i] ?? 0,
+      windMax: Math.round(f.daily.wind_speed_10m_max[i] ?? 0),
+      windDir: compass(f.daily.wind_direction_10m_dominant[i] ?? 0),
+      waterTemp: waterNoon !== null ? Math.round(waterNoon) : null,
+      waveMax: Math.round(waveMax * 10) / 10,
+      tideRange: Math.round(tideRange * 10) / 10,
+      tides, hrs, f, m
+    };
+    d.score = fishScore(d);
+    d.good = d.score >= 60;
+    return d;
+  });
+
+  render(days);
+}
+
+function tideSVG(day) {
+  const pts = day.tides.map(p => ({ t: new Date(p.t), v: parseFloat(p.v), type: p.type }));
+  if (pts.length < 2) return `<div class="tide-legend">Tide data unavailable.</div>`;
+  const W = 340, H = 110, P = 8;
+  const vs = pts.map(p => p.v), vMin = Math.min(...vs), vMax = Math.max(...vs), vR = (vMax - vMin) || 1;
+  const t0 = pts[0].t.getTime(), t1 = pts[pts.length-1].t.getTime(), tR = (t1 - t0) || 1;
+  const X = t => P + (t - t0) / tR * (W - 2*P);
+  const Y = v => H - P - (v - vMin) / vR * (H - 2*P);
+  // smooth curve via cosine interpolation between extrema
+  let d = "";
+  const N = 120;
+  for (let k = 0; k <= N; k++) {
+    const tt = t0 + tR * k / N;
+    let seg = 0;
+    while (seg < pts.length - 2 && pts[seg+1].t.getTime() < tt) seg++;
+    const a = pts[seg], b = pts[seg+1];
+    const f = (tt - a.t.getTime()) / ((b.t.getTime() - a.t.getTime()) || 1);
+    const v = a.v + (b.v - a.v) * (0.5 - 0.5 * Math.cos(Math.PI * Math.min(1, Math.max(0, f))));
+    d += (k ? "L" : "M") + X(tt).toFixed(1) + "," + Y(v).toFixed(1);
+  }
+  // bite windows: ±90 min around each extremum
+  let shades = "";
+  pts.forEach(p => {
+    const c = p.t.getTime(), w = 90*60*1000;
+    const x1 = X(Math.max(t0, c - w)), x2 = X(Math.min(t1, c + w));
+    shades += `<rect x="${x1.toFixed(1)}" y="${P}" width="${(x2-x1).toFixed(1)}" height="${H-2*P}" fill="#14532d" opacity="0.45" rx="4"/>`;
+  });
+  let marks = "";
+  pts.forEach(p => {
+    const x = X(p.t.getTime()), y = Y(p.v);
+    marks += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4" fill="${p.type==="H"?"#38bdf8":"#fbbf24"}"/>` +
+      `<text x="${x.toFixed(1)}" y="${(y-9).toFixed(1)}" fill="#eaf2fa" font-size="10" text-anchor="middle">${p.type} ${fmtT(p.t)}</text>`;
+  });
+  // now-line
+  const nowX = X(Date.now());
+  const nowLine = (nowX > P && nowX < W-P) ? `<line x1="${nowX.toFixed(1)}" y1="${P}" x2="${nowX.toFixed(1)}" y2="${H-P}" stroke="#f87171" stroke-width="1.5"/>` : "";
+  return `<svg class="tide-svg" viewBox="0 0 ${W} ${H}">${shades}<path d="${d}" fill="none" stroke="#38bdf8" stroke-width="2"/>${marks}${nowLine}</svg>
+    <div class="tide-legend">🟢 shaded = prime bite window (±90 min around tide change) · 🔴 = now</div>`;
+}
+
+function render(days) {
+  const app = document.getElementById("app");
+  const today = days[0];
+  const biteToday = today.tides.map(p => `${p.type==="H"?"High":"Low"} ${fmtT(p.t)}`).join(" · ") || "n/a";
+  let html = `<div class="verdict ${today.good?"good":"bad"}">
+      <div class="word">${today.good ? "GOOD" : "BAD"}</div>
+      <div class="score">Score ${today.score}/100 · Today</div>
+      <div class="bite">🎣 Bite windows today: ${biteToday}</div>
+    </div>`;
+  days.forEach((d, i) => {
+    const label = i === 0 ? "Today" : fmtDay(d.date);
+    html += `<div class="card day${i===0?" active":""}" data-i="${i}">
+      <div class="day-head"><span class="day-name">${label}</span>
+        <span class="pill ${d.good?"good":"bad"}">${d.good?"GOOD":"BAD"} ${d.score}</span></div>
+      <div class="grid">
+        <div><div class="k">Wind</div><div class="v">${d.windMax} mph ${d.windDir}</div></div>
+        <div><div class="k">Air</div><div class="v">${d.tMax}° / ${d.tMin}°F</div></div>
+        <div><div class="k">Water</div><div class="v">${d.waterTemp!==null?d.waterTemp+"°F":"—"}</div></div>
+        <div><div class="k">Rain</div><div class="v">${d.rainMax}%</div></div>
+      </div>
+      <div class="detail">
+        <div class="k" style="color:#8fa8bd;font-size:11px;text-transform:uppercase;letter-spacing:.4px">Tide — Jupiter Inlet</div>
+        ${tideSVG(d)}
+        <table class="hours"><tr><th>Time</th><th>Air</th><th>Wind</th><th>Rain</th></tr>
+        ${d.hrs.filter((_,k)=>k%3===0).map(j => {
+          const hh = d.f.hourly, prob = hh.precipitation_probability[j] ?? 0, amt = hh.precipitation[j] ?? 0;
+          return `<tr><td>${fmtT(hh.time[j])}</td><td>${Math.round(hh.temperature_2m[j])}°F</td>` +
+            `<td>${Math.round(hh.wind_speed_10m[j])} ${compass(hh.wind_direction_10m[j])}</td>` +
+            `<td>${prob}% ${rainLabel(prob, amt)}</td></tr>`;
+        }).join("")}</table>
+      </div>
+    </div>`;
+  });
+  app.innerHTML = html;
+  document.getElementById("updated").textContent = "updated " + new Date().toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit",timeZone:TZ});
+  app.querySelectorAll(".day").forEach(el => el.addEventListener("click", () => {
+    el.classList.toggle("active");
+  }));
+}
+
+load().catch(e => {
+  document.getElementById("app").innerHTML = `<div class="err">Couldn't load forecast data. Check your connection and reopen.</div>`;
+});
+setInterval(load, 3600e3);
+document.addEventListener("visibilitychange", () => { if (!document.hidden) load(); });
+</script>
+</body>
+</html>
