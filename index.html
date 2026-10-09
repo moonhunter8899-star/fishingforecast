@@ -5,77 +5,83 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#06121f">
+<meta name="theme-color" content="#f2f5f9">
 <title>Fishing Forecast — Tien Huynh</title>
 <style>
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body { margin: 0; padding: 0; }
   body {
-    background: #06121f; color: #eaf2fa;
+    background: #eef2f7; color: #16202b;
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
     max-width: 430px; margin: 0 auto; padding: 12px 12px 32px;
   }
   h1 { font-size: 19px; margin: 4px 0 2px; }
-  h1 .name { color: #38bdf8; font-weight: 600; font-size: 15px; }
-  .sub { color: #8fa8bd; font-size: 12px; margin-bottom: 12px; }
+  h1 .name { color: #0284c7; font-weight: 600; font-size: 15px; }
+  .sub { color: #66788a; font-size: 12px; margin-bottom: 12px; }
   .card {
-    background: #0b1d31; border: 1px solid #1d3a56; border-radius: 14px;
-    padding: 12px; margin-bottom: 10px;
+    background: #fff; border: 1px solid #e2e8f0; border-radius: 14px;
+    padding: 12px; margin-bottom: 10px; box-shadow: 0 1px 2px rgba(15,30,45,.05);
   }
   .verdict { text-align: center; padding: 14px; }
   .verdict .row { display: flex; align-items: center; justify-content: center; gap: 10px; }
   .verdict .word { font-size: 30px; font-weight: 800; letter-spacing: 1px; }
-  .verdict.good .word { color: #4ade80; }
-  .verdict.bad .word { color: #f87171; }
-  .verdict .score { color: #8fa8bd; font-size: 12px; margin-top: 2px; }
-  .verdict .counts { font-size: 13px; margin-top: 8px; color: #cfe3f5; font-weight: 600; }
-  .bite { display: flex; align-items: center; gap: 8px; padding: 7px 0; font-size: 13px; border-top: 1px solid #14293f; }
+  .verdict.good .word { color: #16a34a; }
+  .verdict.bad .word { color: #dc2626; }
+  .verdict .score { color: #66788a; font-size: 12px; margin-top: 2px; }
+  .strips { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+  .strip { background: #f1f5f9; border-radius: 10px; padding: 8px; text-align: center; }
+  .strip .k { font-size: 10px; text-transform: uppercase; letter-spacing: .5px; color: #66788a; }
+  .strip .v { font-size: 14px; font-weight: 800; margin-top: 2px; }
+  .strip .c { font-size: 12px; color: #0284c7; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .hero { display: flex; justify-content: space-between; font-size: 13px; margin-top: 10px; }
+  .hero .k { color: #66788a; font-size: 10px; text-transform: uppercase; letter-spacing: .4px; }
+  .hero .v { font-weight: 700; font-size: 15px; margin-top: 1px; }
+  .sec-t { color: #66788a; font-size: 11px; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; }
+  .bite { display: flex; align-items: center; gap: 8px; padding: 7px 0; font-size: 13px; border-top: 1px solid #eef2f7; }
   .bite:first-child { border-top: none; }
   .bite .t { font-weight: 700; }
-  .bite .tag { color: #8fa8bd; font-size: 11px; margin-left: auto; }
-  .bite.next { background: #0e2a44; margin: 0 -12px; padding: 7px 12px; border-top: none; border-radius: 8px; }
-  .conds { display: flex; justify-content: space-between; font-size: 13px; margin-top: 8px; }
-  .conds .k { color: #8fa8bd; font-size: 10px; text-transform: uppercase; letter-spacing: .4px; }
-  .conds .v { font-weight: 700; font-size: 15px; margin-top: 1px; }
-  .sec-t { color: #8fa8bd; font-size: 11px; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; }
+  .bite .tag { color: #66788a; font-size: 11px; margin-left: auto; text-align: right; }
+  .bite.next { background: #f0fdf4; margin: 0 -12px; padding: 7px 12px; border-top: none; }
   .tide-svg { width: 100%; height: 110px; display: block; }
-  .legend { font-size: 11px; color: #8fa8bd; margin-top: 4px; }
+  .legend { font-size: 11px; color: #66788a; margin-top: 4px; }
+  .sol { font-size: 12px; color: #475569; padding: 3px 0; display: flex; gap: 6px; }
   .day { cursor: pointer; padding: 10px 12px; }
   .day.active { border-color: #38bdf8; }
   .day-head { display: flex; align-items: center; gap: 8px; }
-  .day-name { font-weight: 700; font-size: 14px; flex: 1; }
-  .day-meta { color: #8fa8bd; font-size: 12px; }
-  .pill { font-size: 11px; font-weight: 800; padding: 3px 10px; border-radius: 999px; }
-  .pill.good { background: #14532d; color: #4ade80; }
-  .pill.bad { background: #450a0a; color: #f87171; }
-  .detail { display: none; margin-top: 10px; border-top: 1px solid #1d3a56; padding-top: 10px; }
+  .day-name { font-weight: 700; font-size: 14px; }
+  .pill { font-size: 11px; font-weight: 800; padding: 3px 10px; border-radius: 999px; margin-left: auto; }
+  .pill.good { background: #dcfce7; color: #16a34a; }
+  .pill.bad { background: #fee2e2; color: #dc2626; }
+  .day-meta { color: #66788a; font-size: 12px; margin-top: 3px; margin-left: 28px; }
+  .detail { display: none; margin-top: 10px; border-top: 1px solid #eef2f7; padding-top: 10px; }
   .day.active .detail { display: block; }
   .hours { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 6px; }
-  .hours th { color: #8fa8bd; font-weight: 600; text-align: left; padding: 4px 4px 4px 0; font-size: 11px; }
-  .hours td { padding: 4px 4px 4px 0; border-top: 1px solid #14293f; }
-  .err { color: #f87171; font-size: 13px; }
-  .loading { color: #8fa8bd; text-align: center; padding: 40px 0; }
-  .foot { color: #5b7186; font-size: 11px; text-align: center; margin-top: 16px; }
+  .hours th { color: #66788a; font-weight: 600; text-align: left; padding: 4px 4px 4px 0; font-size: 11px; }
+  .hours td { padding: 4px 4px 4px 0; border-top: 1px solid #f1f5f9; }
+  .err { color: #dc2626; font-size: 13px; }
+  .loading { color: #66788a; text-align: center; padding: 40px 0; }
+  .foot { color: #94a3b8; font-size: 11px; text-align: center; margin-top: 16px; }
+  .foot a { color: #0284c7; }
 </style>
 </head>
 <body>
 <h1>🎣 Fishing Forecast <span class="name">· Tien Huynh</span></h1>
-<div class="sub">Jupiter, FL (26.92, −80.06) · <span id="updated">loading…</span></div>
+<div class="sub">Jupiter Inlet, FL · <span id="updated">loading…</span></div>
 <div id="app"><div class="loading">Loading forecast…</div></div>
-<div class="foot">Live: Open-Meteo · Tides: NOAA 8722495 · Moon: USNO · Rating is an estimate, not a guarantee.</div>
+<div class="foot">Data: Open-Meteo · NOAA tides · USNO moon · Compare: <a href="https://tides4fishing.com/us/florida-east-coast/jupiter-inlet-south-jetty">tides4fishing</a><br>Rating is an estimate, not a guarantee.</div>
 
 <script>
 const LAT = 26.9166, LON = -80.0642, TZ = "America/New_York", STATION = "8722495";
 const COMPASS = ["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSW","SW","WSW","W","WNW","NW","NNW"];
 const compass = d => COMPASS[Math.round(d / 22.5) % 16];
 
-function fishColor(s){ return s >= 60 ? "#4ade80" : s >= 40 ? "#facc15" : "#f87171"; }
+function fishColor(s){ return s >= 60 ? "#22c55e" : s >= 40 ? "#eab308" : "#ef4444"; }
 function fishIcon(s, size){
   size = size || 22;
   const c = fishColor(s);
   return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" style="vertical-align:-5px;flex:none">` +
     `<path d="M2.5 12C5.3 7.8 8.8 5.8 12.6 5.8c2.7 0 5.2 1.5 7.2 4.2l1.7 2-1.7 2c-2 2.7-4.5 4.2-7.2 4.2-3.8 0-7.3-2-10.1-6.2z" fill="${c}"/>` +
-    `<circle cx="15.8" cy="10.6" r="1.2" fill="#06121f"/></svg>`;
+    `<circle cx="15.8" cy="10.6" r="1.2" fill="#fff"/></svg>`;
 }
 
 function fishScore(d){
@@ -88,10 +94,27 @@ function fishScore(d){
   return Math.min(100, Math.round(s));
 }
 
+const MOON_EMOJI = { "New Moon": "🌑", "Waxing Crescent": "🌒", "First Quarter": "🌓", "Waxing Gibbous": "🌔",
+  "Full Moon": "🌕", "Waning Gibbous": "🌖", "Last Quarter": "🌗", "Waning Crescent": "🌘" };
+const moonEmoji = p => MOON_EMOJI[p] || "🌙";
+
+function moonActivity(moon){
+  if (!moon || !moon.closest) return null;
+  const c = moon.closest;
+  const cd = new Date(c.year, c.month - 1, c.day);
+  const diff = Math.abs((cd - Date.now()) / 864e5);
+  if (!/New|Full/i.test(c.phase)) return "Average";
+  if (diff <= 1.5) return "Very high";
+  if (diff <= 3) return "High";
+  if (diff <= 5) return "Average";
+  return "Low";
+}
+
+const p2 = n => String(n).padStart(2, "0");
 const fmtT = iso => {
   const d = new Date(iso);
   let h = d.getHours(); const ap = h >= 12 ? "p" : "a"; h = h % 12 || 12;
-  return h + ":" + String(d.getMinutes()).padStart(2, "0") + ap;
+  return h + ":" + p2(d.getMinutes()) + ap;
 };
 const fmtTRange = (a, b) => fmtT(a) + "–" + fmtT(b);
 const fmtDay = iso => new Date(iso + "T12:00:00")
@@ -101,8 +124,11 @@ const dayKey = iso => iso.slice(0, 10);
 function biteWindows(tides){
   return tides.map(p => {
     const c = new Date(p.t).getTime(), w = 90 * 60 * 1000;
-    return { start: new Date(c - w), end: new Date(c + w), peak: new Date(p.t), type: p.type };
+    return { start: new Date(c - w), end: new Date(c + w), peak: new Date(p.t), type: p.type, hv: parseFloat(p.v) };
   });
+}
+function overlaps(a, b){
+  return a.start.getTime() < b.end.getTime() && b.start.getTime() < a.end.getTime();
 }
 function bestWindow(wins){
   const now = Date.now();
@@ -112,16 +138,13 @@ function bestWindow(wins){
   return bm.length ? bm[0] : up[0];
 }
 
-function overlaps(a, b){
-  return a.start.getTime() < b.end.getTime() && b.start.getTime() < a.end.getTime();
-}
-
 async function moonInfo(dateStr){
   try{
     const tzH = -new Date(dateStr + "T12:00:00").getTimezoneOffset() / 60;
     const r = await fetch(`https://aa.usno.navy.mil/api/rstt/oneday?date=${dateStr}&coords=${LAT},${LON}&tz=${tzH}`);
     const j = await r.json();
-    const md = (j.properties.data.moondata) || [];
+    const data = j.properties.data;
+    const md = data.moondata || [];
     const get = phen => ((md.find(x => x.phen === phen) || {}).time);
     const toD = hm => {
       const [h, m] = hm.split(":").map(Number);
@@ -130,14 +153,14 @@ async function moonInfo(dateStr){
     const H = 36e5, majors = [], minors = [];
     const upper = get("Upper Transit"), rise = get("Rise"), set = get("Set");
     if (upper){
-      const u = toD(upper).getTime();
-      majors.push({ start: new Date(u - 2 * H), end: new Date(u + 2 * H) });
-      const l = u + 12.42 * H;
-      majors.push({ start: new Date(l - 2 * H), end: new Date(l + 2 * H) });
+      const u = toD(upper);
+      majors.push({ start: new Date(u.getTime() - 2 * H), end: new Date(u.getTime() + 2 * H), label: "Moon overhead" });
+      const l = new Date(u.getTime() + 12.42 * H);
+      majors.push({ start: new Date(l.getTime() - 2 * H), end: new Date(l.getTime() + 2 * H), label: "Moon underfoot" });
     }
-    if (rise){ const t = toD(rise).getTime(); minors.push({ start: new Date(t - H), end: new Date(t + H) }); }
-    if (set){ const t = toD(set).getTime(); minors.push({ start: new Date(t - H), end: new Date(t + H) }); }
-    return { phase: j.properties.data.curphase, illum: j.properties.data.fracillum, majors, minors };
+    if (rise){ const t = toD(rise); minors.push({ start: new Date(t.getTime() - H), end: new Date(t.getTime() + H), label: "Moonrise" }); }
+    if (set){ const t = toD(set); minors.push({ start: new Date(t.getTime() - H), end: new Date(t.getTime() + H), label: "Moonset" }); }
+    return { phase: data.curphase, illum: data.fracillum, closest: data.closestphase, majors, minors };
   }catch(e){ return null; }
 }
 
@@ -170,13 +193,11 @@ async function load(){
       if (Math.abs(new Date(m.hourly.time[j]).getHours() - 12) < 2 && waterNoon === null)
         waterNoon = m.hourly.sea_surface_temperature[j];
     });
-    if (i === 0) {
-      let best = 1e15, bj = hrs[0];
-      hrs.forEach(j => {
+    if (i === 0){
+      let best = 1e15; hrs.forEach(j => {
         const diff = Math.abs(new Date(f.hourly.time[j]).getTime() - Date.now());
-        if (diff < best) { best = diff; bj = j; }
+        if (diff < best){ best = diff; airNow = Math.round(f.hourly.temperature_2m[j]); }
       });
-      airNow = Math.round(f.hourly.temperature_2m[bj]);
     }
     const tides = (t.predictions || []).filter(p => dayKey(p.t) === date);
     const hs = tides.map(p => parseFloat(p.v));
@@ -236,34 +257,30 @@ function tideSVG(day, highlight){
   day.wins.forEach(w => {
     const isBest = highlight && w.peak.getTime() === highlight.peak.getTime();
     const x1 = X(Math.max(t0, w.start.getTime())), x2 = X(Math.min(t1, w.end.getTime()));
+    if (x2 <= x1) return;
     shades += `<rect x="${x1.toFixed(1)}" y="${P}" width="${(x2 - x1).toFixed(1)}" height="${H - 2 * P}"` +
-      ` fill="${isBest ? "#4ade80" : "#14532d"}" opacity="${isBest ? "0.5" : "0.35"}" rx="4"/>`;
+      ` fill="${isBest ? "#22c55e" : "#bbf7d0"}" opacity="${isBest ? "0.45" : "0.5"}" rx="4"/>`;
   });
   let marks = "";
   pts.forEach(p => {
     const x = X(p.t.getTime()), y = Y(p.v);
-    marks += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3.5" fill="${p.type === "H" ? "#38bdf8" : "#fbbf24"}"/>` +
-      `<text x="${x.toFixed(1)}" y="${(y - 8).toFixed(1)}" fill="#eaf2fa" font-size="10" text-anchor="middle">${p.type} ${fmtT(p.t)}</text>`;
+    marks += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3.5" fill="${p.type === "H" ? "#0284c7" : "#d97706"}"/>` +
+      `<text x="${x.toFixed(1)}" y="${(y - 8).toFixed(1)}" fill="#334155" font-size="10" text-anchor="middle">${p.type} ${fmtT(p.t)}</text>`;
   });
   let fish = "";
   if (highlight){
     const hx = X(highlight.peak.getTime());
-    let seg = 0;
-    while (seg < pts.length - 2 && pts[seg + 1].t.getTime() < highlight.peak.getTime()) seg++;
-    const a = pts[seg], b = pts[seg + 1];
-    const fr = (highlight.peak.getTime() - a.t.getTime()) / ((b.t.getTime() - a.t.getTime()) || 1);
-    const v = a.v + (b.v - a.v) * (0.5 - 0.5 * Math.cos(Math.PI * Math.min(1, Math.max(0, fr))));
-    const hy = Y(v), c = fishColor(day.score);
-    fish = `<g transform="translate(${hx.toFixed(1)},${(hy - 16).toFixed(1)})">` +
+    const c = fishColor(day.score);
+    fish = `<g transform="translate(${hx.toFixed(1)},${P + 14})">` +
       `<path d="M-11,0C-7,-4.5 -3.5,-6.5 0.5,-6.5c2.7,0 5.2,1.5 7.2,4.2l1.8,2.3-1.8,2.3c-2,2.7-4.5,4.2-7.2,4.2-3.8,0-7.5,-2-11,-6.5z" fill="${c}"/>` +
-      `<circle cx="4" cy="-1.5" r="1.1" fill="#06121f"/></g>`;
+      `<circle cx="4" cy="-1.5" r="1.1" fill="#fff"/></g>`;
   }
   const nowX = X(Date.now());
   const nowLine = (nowX > P && nowX < W - P)
-    ? `<line x1="${nowX.toFixed(1)}" y1="${P}" x2="${nowX.toFixed(1)}" y2="${H - P}" stroke="#f87171" stroke-width="1.5"/>` : "";
+    ? `<line x1="${nowX.toFixed(1)}" y1="${P}" x2="${nowX.toFixed(1)}" y2="${H - P}" stroke="#ef4444" stroke-width="1.5"/>` : "";
   return `<svg class="tide-svg" viewBox="0 0 ${W} ${H}">${shades}` +
-    `<path d="${dAttr}" fill="none" stroke="#38bdf8" stroke-width="2"/>${marks}${fish}${nowLine}</svg>` +
-    `<div class="legend">🐟 = best bite · green band = prime window · 🔴 = now</div>`;
+    `<path d="${dAttr}" fill="none" stroke="#0284c7" stroke-width="2"/>${marks}${fish}${nowLine}</svg>` +
+    `<div class="legend">🐟 = best bite · green = prime window · 🔴 = now</div>`;
 }
 
 function inWin(timeISO, wins){
@@ -271,77 +288,89 @@ function inWin(timeISO, wins){
   return wins.some(w => tt >= w.start.getTime() && tt <= w.end.getTime());
 }
 
-let countTimer = null;
-function fmtDur(ms){
-  const m = Math.max(0, Math.round(ms / 60000));
-  const h = Math.floor(m / 60);
-  return h ? h + "h " + (m % 60) + "m" : m + "m";
+let tickTimer = null;
+function fmtCountdown(ms){
+  const s = Math.max(0, Math.floor(ms / 1000));
+  const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), ss = s % 60;
+  return h ? `${h}h ${p2(m)}m ${p2(ss)}s` : `${m}m ${p2(ss)}s`;
 }
-function startCountdowns(today){
-  const el = document.getElementById("counts");
-  if (!el) return;
-  if (countTimer) clearInterval(countTimer);
+function startTicks(today){
+  if (tickTimer) clearInterval(tickTimer);
+  const tideV = document.getElementById("cd-tide-v"), tideC = document.getElementById("cd-tide-c");
+  const biteV = document.getElementById("cd-bite-v"), biteC = document.getElementById("cd-bite-c");
+  if (!tideV) return;
   function tick(){
     const now = Date.now();
-    const parts = [];
     const nx = today.tides
-      .map(p => ({ t: new Date(p.t).getTime(), type: p.type }))
+      .map(p => ({ t: new Date(p.t).getTime(), type: p.type, v: parseFloat(p.v) }))
       .filter(p => p.t > now)[0];
-    if (nx) parts.push(`⏳ ${nx.type === "H" ? "High" : "Low"} tide in ${fmtDur(nx.t - now)}`);
+    if (nx){
+      tideV.textContent = `${nx.type === "H" ? "High" : "Low"} ${fmtT(new Date(nx.t))} · ${nx.v.toFixed(1)}ft`;
+      tideC.textContent = "in " + fmtCountdown(nx.t - now);
+    } else { tideV.textContent = "—"; tideC.textContent = ""; }
     const bw = today.wins.length ? bestWindow(today.wins) : null;
     if (bw){
-      if (now >= bw.start.getTime() && now <= bw.end.getTime()) parts.push("🐟 Best bite NOW");
-      else if (bw.start.getTime() > now) parts.push(`🐟 Best bite in ${fmtDur(bw.start.getTime() - now)}`);
+      biteV.innerHTML = `${fishIcon(today.score, 18)} ${fmtTRange(bw.start, bw.end)} · ${today.score}`;
+      if (now >= bw.start.getTime() && now <= bw.end.getTime())
+        biteC.textContent = "Biting NOW · ends in " + fmtCountdown(bw.end.getTime() - now);
+      else
+        biteC.textContent = "in " + fmtCountdown(bw.start.getTime() - now);
     }
-    el.innerHTML = parts.join(" &nbsp;·&nbsp; ");
   }
   tick();
-  countTimer = setInterval(tick, 30000);
+  tickTimer = setInterval(tick, 1000);
 }
 
 function render(days){
   const app = document.getElementById("app");
   const today = days[0];
   const best = today.wins.length ? bestWindow(today.wins) : null;
+  const mAct = moonActivity(today.moon);
 
   let html = `<div class="card verdict ${today.good ? "good" : "bad"}">
       <div class="row">${fishIcon(today.score, 34)}<span class="word">${today.good ? "GOOD" : "BAD"}</span></div>
       <div class="score">${today.score}/100 · Today</div>
-      <div class="counts" id="counts"></div>
+      <div class="strips">
+        <div class="strip"><div class="k">Next tide</div><div class="v" id="cd-tide-v">—</div><div class="c" id="cd-tide-c"></div></div>
+        <div class="strip"><div class="k">Next bite</div><div class="v" id="cd-bite-v">—</div><div class="c" id="cd-bite-c"></div></div>
+      </div>
+      <div class="hero">
+        <div><div class="k">Air</div><div class="v">${today.airNow !== null ? today.airNow + "°" : today.tMax + "°"}</div></div>
+        <div><div class="k">Water</div><div class="v">${today.waterTemp !== null ? today.waterTemp + "°" : "—"}</div></div>
+        <div><div class="k">Rain</div><div class="v">${today.rainMax}%</div></div>
+        <div><div class="k">Wind</div><div class="v">${today.windMax} ${today.windDir}</div></div>
+      </div>
     </div>`;
 
   html += `<div class="card"><div class="sec-t">🐟 Fish bite times today</div>`;
   if (today.wins.length){
     today.wins.forEach(w => {
       const isBest = best && w.peak.getTime() === best.peak.getTime();
-      const mtag = w.moonMajor ? " · 🌙 Moon" : w.moonMinor ? " · 🌙 minor" : "";
+      const mtag = w.moonMajor ? " · 🌙" : w.moonMinor ? " · 🌙-" : "";
       html += `<div class="bite${isBest ? " next" : ""}">${fishIcon(today.score, 20)}` +
         `<span class="t">${fmtTRange(w.start, w.end)}</span>` +
-        `<span class="tag">${w.type === "H" ? "around high tide" : "around low tide"}${mtag}${isBest ? " · BEST" : ""}</span></div>`;
+        `<span class="tag">${w.type === "H" ? "high tide" : "low tide"}${mtag}${isBest ? " · BEST" : ""}</span></div>`;
     });
-  } else {
-    html += `<div class="bite">Tide data unavailable.</div>`;
-  }
-  html += `<div class="conds">
-      <div><div class="k">Air</div><div class="v">${today.airNow !== null ? today.airNow + "°F" : today.tMax + "°F"}</div></div>
-      <div><div class="k">Water</div><div class="v">${today.waterTemp !== null ? today.waterTemp + "°F" : "—"}</div></div>
-      <div><div class="k">Rain</div><div class="v">${today.rainMax}%</div></div>
-      <div><div class="k">Wind</div><div class="v">${today.windMax} ${today.windDir}</div></div>
-    </div></div>`;
+  } else html += `<div class="bite">Tide data unavailable.</div>`;
+  html += `</div>`;
 
-  html += `<div class="card"><div class="sec-t">Tide — Jupiter Inlet${today.moon ? ` · 🌙 ${today.moon.phase} ${today.moon.illum}` : ""}</div>${tideSVG(today, best)}</div>`;
+  html += `<div class="card"><div class="sec-t">Tide — Jupiter Inlet` +
+    (today.moon ? ` · ${moonEmoji(today.moon.phase)} ${today.moon.phase}${mAct ? ` · Moon bite: ${mAct}` : ""}` : "") +
+    `</div>${tideSVG(today, best)}</div>`;
 
   days.forEach((d, i) => {
     const label = i === 0 ? "Today" : fmtDay(d.date);
     const bw = d.wins.length ? bestWindow(d.wins) : null;
     html += `<div class="card day${i === 0 ? " active" : ""}">
       <div class="day-head">${fishIcon(d.score, 20)}<span class="day-name">${label}</span>
-        <span class="day-meta">${d.tMax}°/${d.tMin}° · ${d.rainMax}% · ${d.windMax} ${d.windDir}</span>
         <span class="pill ${d.good ? "good" : "bad"}">${d.good ? "GOOD" : "BAD"}</span></div>
+      <div class="day-meta">Air ${d.tMax}°/${d.tMin}° · Water ${d.waterTemp !== null ? d.waterTemp + "°" : "—"} · Rain ${d.rainMax}% · Wind ${d.windMax} ${d.windDir}</div>
       <div class="detail">
-        ${bw ? `<div class="bite">${fishIcon(d.score, 18)}<span class="t">${fmtTRange(bw.start, bw.end)}</span><span class="tag">best bite${bw.moonMajor ? " · 🌙 Moon" : bw.moonMinor ? " · 🌙 minor" : ""}</span></div>` : ""}
+        ${bw ? `<div class="bite">${fishIcon(d.score, 18)}<span class="t">${fmtTRange(bw.start, bw.end)}</span><span class="tag">best bite${bw.moonMajor ? " · 🌙" : ""}</span></div>` : ""}
         ${tideSVG(d, bw)}
-        ${d.moon ? `<div class="legend">🌙 ${d.moon.phase} · ${d.moon.illum} lit</div>` : ""}
+        ${d.moon && (d.moon.majors.length || d.moon.minors.length) ? `<div class="sec-t" style="margin-top:8px">🌙 Solunar</div>` +
+          d.moon.majors.map(mm => `<div class="sol">⭐ Major · ${fmtTRange(mm.start, mm.end)} · ${mm.label}</div>`).join("") +
+          d.moon.minors.map(mm => `<div class="sol">▫️ Minor · ${fmtTRange(mm.start, mm.end)} · ${mm.label}</div>`).join("") : ""}
         <table class="hours"><tr><th></th><th>Time</th><th>Air</th><th>Wind</th><th>Rain</th></tr>
         ${d.hrs.filter((_, k) => k % 3 === 0).map(j => {
           const hh = d.f.hourly, bite = inWin(hh.time[j], d.wins);
@@ -358,7 +387,7 @@ function render(days){
   document.getElementById("updated").textContent =
     "updated " + new Date().toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", timeZone: TZ });
   app.querySelectorAll(".day").forEach(el => el.addEventListener("click", () => el.classList.toggle("active")));
-  startCountdowns(today);
+  startTicks(today);
 }
 
 load().catch(() => {
