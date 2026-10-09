@@ -377,8 +377,10 @@ function tideCountdowns() {
 }
 /* Compact tide chart for today: cosine-interpolated curve (same as the main
    page), sea-teal with soft gradient fill, high/low dots, a small cartoon rod
-   riding the curve at the current time, and small Major fish markers at each
-   Major window's midpoint. Nearly text-free so EN/VI need no changes. */
+   riding the curve at the current time with the day's rating number and the
+   live time above it, and small Major fish markers at each Major window's
+   midpoint. Number-only rating + 12h clock need no translation, so EN/VI
+   both work unchanged. */
 function tideChartSVG() {
   var T = state.tides;
   if (!T.length) return "";
@@ -396,7 +398,7 @@ function tideChartSVG() {
     }
     return T[T.length - 1].v;
   }
-  var W = 380, H = 118, pL = 6, pR = 6, pT = 12, pB = 8;
+  var W = 380, H = 118, pL = 6, pR = 6, pT = 30, pB = 8;
   var pts = [], t;
   for (t = d0; t <= d1; t += 900000) pts.push([t, tideAt(t)]);
   var vs = pts.map(function(p) { return p[1]; });
@@ -436,9 +438,15 @@ function tideChartSVG() {
     if (mid < d0 || mid > d1) return;
     svg += '<g transform="translate(' + (X(mid) - 7.5).toFixed(1) + "," + (Y(tideAt(mid)) - 7.5).toFixed(1) + ')">' + fishSVG(nc, 15) + "</g>";
   });
-  // small cartoon rod riding the curve at the current time
+  // small cartoon rod riding the curve at the current time, with the day's
+  // rating number (rating color) above and the live time between rod and number
   if (now >= d0 && now <= d1 && state.today) {
-    svg += '<g transform="translate(' + X(now).toFixed(1) + "," + Y(tideAt(now)).toFixed(1) + ')">' +
+    var nx = X(now), ny = Y(tideAt(now));
+    // keep the labels inside the chart horizontally (rod itself stays exact)
+    var lx = (Math.min(Math.max(nx, 28), W - 28) - nx).toFixed(1);
+    svg += '<g transform="translate(' + nx.toFixed(1) + "," + ny.toFixed(1) + ')">' +
+      '<text x="' + lx + '" y="-23" text-anchor="middle" font-size="10.5" font-weight="700" fill="' + nc + '">' + state.today.score + "</text>" +
+      '<text x="' + lx + '" y="-13.5" text-anchor="middle" font-size="8" fill="#8a7a5f">' + clockStr(state.lang) + "</text>" +
       '<g transform="scale(0.45)">' +
       '<path d="M-17.5,17.5 L-9.5,9.5" stroke="#161616" stroke-width="8.6" stroke-linecap="round"/>' +
       '<path d="M-17.5,17.5 L-9.5,9.5" stroke="#7c4f30" stroke-width="6.2" stroke-linecap="round"/>' +
