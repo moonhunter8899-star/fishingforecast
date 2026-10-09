@@ -62,7 +62,7 @@
 <h1>🎣 Fishing Forecast <span class="name">· Tien Huynh</span></h1>
 <div class="sub">Jupiter, FL (26.92, −80.06) · <span id="updated">loading…</span></div>
 <div id="app"><div class="loading">Loading forecast…</div></div>
-<div class="foot">Live: Open-Meteo · Tides: NOAA 8722495 Jupiter Inlet · Rating is an estimate, not a guarantee.</div>
+<div class="foot">Live: Open-Meteo · Tides: NOAA 8722495 · Moon: USNO · Rating is an estimate, not a guarantee.</div>
 
 <script>
 const LAT = 26.9166, LON = -80.0642, TZ = "America/New_York", STATION = "8722495";
@@ -107,7 +107,38 @@ function biteWindows(tides){
 function bestWindow(wins){
   const now = Date.now();
   const up = wins.filter(w => w.end.getTime() > now);
-  return up.length ? up[0] : wins[0];
+  if (!up.length) return wins[0];
+  const bm = up.filter(w => w.moonMajor);
+  return bm.length ? bm[0] : up[0];
+}
+
+function overlaps(a, b){
+  return a.start.getTime() < b.end.getTime() && b.start.getTime() < a.end.getTime();
+}
+
+async function moonInfo(dateStr){
+  try{
+    const tzH = -new Date(dateStr + "T12:00:00").getTimezoneOffset() / 60;
+    const r = await fetch(`https://aa.usno.navy.mil/api/rstt/oneday?date=${dateStr}&coords=${LAT},${LON}&tz=${tzH}`);
+    const j = await r.json();
+    const md = (j.properties.data.moondata) || [];
+    const get = phen => ((md.find(x => x.phen === phen) || {}).time);
+    const toD = hm => {
+      const [h, m] = hm.split(":").map(Number);
+      const d = new Date(dateStr + "T12:00:00"); d.setHours(h, m, 0, 0); return d;
+    };
+    const H = 36e5, majors = [], minors = [];
+    const upper = get("Upper Transit"), rise = get("Rise"), set = get("Set");
+    if (upper){
+      const u = toD(upper).getTime();
+      majors.push({ start: new Date(u - 2 * H), end: new Date(u + 2 * H) });
+      const l = u + 12.42 * H;
+      majors.push({ start: new Date(l - 2 * H), end: new Date(l + 2 * H) });
+    }
+    if (rise){ const t = toD(rise).getTime(); minors.push({ start: new Date(t - H), end: new Date(t + H) }); }
+    if (set){ const t = toD(set).getTime(); minors.push({ start: new Date(t - H), end: new Date(t + H) }); }
+    return { phase: j.properties.data.curphase, illum: j.properties.data.fracillum, majors, minors };
+  }catch(e){ return null; }
 }
 
 async function load(){
@@ -166,6 +197,17 @@ async function load(){
     d.good = d.score >= 60;
     d.wins = biteWindows(tides);
     return d;
+  });
+
+  const moons = await Promise.all(days.map(d => moonInfo(d.date)));
+  days.forEach((d, i) => {
+    d.moon = moons[i];
+    d.wins.forEach(w => {
+      w.moonMajor = d.moon ? d.moon.majors.some(mm => overlaps(w, mm)) : false;
+      w.moonMinor = !w.moonMajor && d.moon ? d.moon.minors.some(mm => overlaps(w, mm)) : false;
+    });
+    if (d.wins.some(w => w.moonMajor)) d.score = Math.min(100, d.score + 10);
+    d.good = d.score >= 60;
   });
 
   render(days);
@@ -272,9 +314,10 @@ function render(days){
   if (today.wins.length){
     today.wins.forEach(w => {
       const isBest = best && w.peak.getTime() === best.peak.getTime();
+      const mtag = w.moonMajor ? " · 🌙 Moon" : w.moonMinor ? " · 🌙 minor" : "";
       html += `<div class="bite${isBest ? " next" : ""}">${fishIcon(today.score, 20)}` +
         `<span class="t">${fmtTRange(w.start, w.end)}</span>` +
-        `<span class="tag">${w.type === "H" ? "around high tide" : "around low tide"}${isBest ? " · BEST" : ""}</span></div>`;
+        `<span class="tag">${w.type === "H" ? "around high tide" : "around low tide"}${mtag}${isBest ? " · BEST" : ""}</span></div>`;
     });
   } else {
     html += `<div class="bite">Tide data unavailable.</div>`;
@@ -286,7 +329,7 @@ function render(days){
       <div><div class="k">Wind</div><div class="v">${today.windMax} ${today.windDir}</div></div>
     </div></div>`;
 
-  html += `<div class="card"><div class="sec-t">Tide — Jupiter Inlet</div>${tideSVG(today, best)}</div>`;
+  html += `<div class="card"><div class="sec-t">Tide — Jupiter Inlet${today.moon ? ` · 🌙 ${today.moon.phase} ${today.moon.illum}` : ""}</div>${tideSVG(today, best)}</div>`;
 
   days.forEach((d, i) => {
     const label = i === 0 ? "Today" : fmtDay(d.date);
@@ -296,8 +339,9 @@ function render(days){
         <span class="day-meta">${d.tMax}°/${d.tMin}° · ${d.rainMax}% · ${d.windMax} ${d.windDir}</span>
         <span class="pill ${d.good ? "good" : "bad"}">${d.good ? "GOOD" : "BAD"}</span></div>
       <div class="detail">
-        ${bw ? `<div class="bite">${fishIcon(d.score, 18)}<span class="t">${fmtTRange(bw.start, bw.end)}</span><span class="tag">best bite</span></div>` : ""}
+        ${bw ? `<div class="bite">${fishIcon(d.score, 18)}<span class="t">${fmtTRange(bw.start, bw.end)}</span><span class="tag">best bite${bw.moonMajor ? " · 🌙 Moon" : bw.moonMinor ? " · 🌙 minor" : ""}</span></div>` : ""}
         ${tideSVG(d, bw)}
+        ${d.moon ? `<div class="legend">🌙 ${d.moon.phase} · ${d.moon.illum} lit</div>` : ""}
         <table class="hours"><tr><th></th><th>Time</th><th>Air</th><th>Wind</th><th>Rain</th></tr>
         ${d.hrs.filter((_, k) => k % 3 === 0).map(j => {
           const hh = d.f.hourly, bite = inWin(hh.time[j], d.wins);
