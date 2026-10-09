@@ -165,6 +165,22 @@
 
   .loading { text-align: center; color: #8a7a5f; padding: 60px 0; font-size: 14px; }
   .err { color: #c93a2e; text-align: center; padding: 40px 0; }
+  .gofish {
+    background: #bc5a1e; color: #fff; border-radius: 14px; padding: 14px;
+    font-size: 16px; font-weight: 700; text-align: center; margin-bottom: 14px;
+  }
+  .gofish b { font-size: 21px; letter-spacing: .02em; }
+  details.more {
+    background: #fffaf0; border: 1.5px solid #e3d5b3; border-radius: 16px;
+    padding: 12px 16px; margin-bottom: 14px;
+  }
+  details.more summary {
+    font-family: "Fraunces", serif; font-weight: 800; font-size: 15px;
+    cursor: pointer; color: #9a4a16; list-style: none;
+  }
+  details.more summary::-webkit-details-marker { display: none; }
+  details.more summary::after { content: " ▾"; font-size: 12px; }
+  details.more[open] summary::after { content: " ▴"; }
 </style>
 </head>
 <body>
@@ -496,9 +512,6 @@ function render(sel){
   ].sort((a, b) => a.start - b.start);
   const nextSol = allSol.find(mm => mm.end.getTime() > nowMs) || null;
 
-  /* best hour */
-  const bh = d.hrs.reduce((a, h) => h.score > a.score ? h : a, d.hrs[0] || { score: 0 });
-
   /* top card */
   const dt = new Date(d.date + "T12:00:00");
   const dayName = sel === 0 ? "TODAY" : dt.toLocaleDateString("en-US", { weekday: "long" }).toUpperCase();
@@ -536,11 +549,10 @@ function render(sel){
   /* day summary card */
   html += `<div class="card" style="border-color:${rc}">` +
     `<h3>${sel === 0 ? "Today" : dt.toLocaleDateString("en-US", { weekday: "long" })} <span class="dt">${dt.toLocaleDateString("en-US", { month: "short", day: "numeric" })}</span></h3>` +
-    `<div class="sub2">Best hour ${fmtT12(bh.time).replace(":00 ", " ")} · <b style="color:#9a4a16">Go at ${best ? fmtT12(best.peak).replace(":00 ", " ") : "—"}</b></div>` +
-    `<div class="ratingpill" style="background:${rc}"><span class="wc">${pompano(rc, 22)}</span>${d.score} ${word.toUpperCase()}</div>`;
+    `<div class="ratingpill" style="background:${rc};margin-top:8px"><span class="wc">${pompano(rc, 22)}</span>${d.score} ${word.toUpperCase()}</div>` +
+    (best ? `<div class="gofish">🎣 GO FISH<br><b>${fmtRange(best.start, best.end)}</b>${best.moonMajor ? " 🌙" : ""}</div>` : "");
 
-  /* bite chips */
-  html += `<div style="font-size:10px;font-weight:800;letter-spacing:.1em;color:#9a4a16;margin-bottom:6px">🐟 BITE WINDOWS · MOVING WATER</div><div class="chips">` + d.wins.map(w => {
+  const chipsHtml = `<div style="font-size:10px;font-weight:800;letter-spacing:.1em;color:#9a4a16;margin:12px 0 6px">🐟 ALL BITE WINDOWS</div><div class="chips">` + d.wins.map(w => {
     const isBest = best && w.peak.getTime() === best.peak.getTime();
     const wsc = Math.max(0, Math.min(100, d.score + (w.moonMajor ? 8 : 0) + (isBest ? 5 : 0)));
     return `<span class="chip${isBest ? " best" : ""}">${pompano(isBest ? "#ffffff" : rc, 18)}` +
@@ -557,9 +569,7 @@ function render(sel){
     `<div class="wxbox"><div class="k">Wind ${compass(d.windDir)}</div><div class="v">${arrow(d.windDir)} ${d.windMax} <span style="font-size:13px">mph</span></div><div class="s">Gust ${Math.max(...d.hrs.map(h => h.gust), 0)} mph</div></div>` +
     `</div>`;
 
-  /* major & minor list */
-  html += `<div class="mmhead"><div class="t">🌙 Moon bite times</div><div class="n">${allSol.length} windows</div></div>` +
-    `<div style="font-size:11px;color:#8a7a5f;margin:-2px 0 8px;line-height:1.5">MAJOR = moon overhead, strongest pull · MINOR = moonrise / moonset · when a 🐟 window overlaps the moon, the score jumps</div>` +
+  const moonHtml = `<div class="mmhead"><div class="t">🌙 Moon bite times</div><div class="n">${allSol.length} windows</div></div>` +
     allSol.map(mm => {
       const isNext = nextSol && mm.start.getTime() === nextSol.start.getTime() && mm.kind === nextSol.kind;
       return `<div class="mmrow${isNext ? " next" : ""}">` +
@@ -574,14 +584,17 @@ function render(sel){
     const ms = sky.sunset - sky.sunrise;
     dayLen = `${Math.floor(ms / 36e5)}h ${Math.round(ms % 36e5 / 6e4)}m`;
   }
-  html += `<div class="footnote">` +
+  const footHtml = `<div class="footnote">` +
     `☀️ ${sky && sky.sunrise ? fmtT12(sky.sunrise).replace(" ", "") : "—"} – ${sky && sky.sunset ? fmtT12(sky.sunset).replace(" ", "") : "—"} (${dayLen}) · ` +
     `🌊 Surf to ${d.waveMax} ft · 🎯 Pompano sweet spot: moving water, 65–76°F<br>` +
     `🌙 ${sky ? sky.phase : "—"} · ${sky ? sky.illum : "—"} lit` +
-    `</div></div>`;
+    `</div>`;
+  html += `<div class="card">${moonHtml}</div>`;
 
-  /* hour by hour */
-  html += `<div class="hcard"><h3>Hour by hour</h3>` +
+  /* more details (collapsed) */
+  html += `<details class="more"><summary>More details</summary>` +
+    chipsHtml + footHtml +
+    `<div style="font-size:10px;font-weight:800;letter-spacing:.1em;color:#9a4a16;margin:12px 0 6px">🕐 HOUR BY HOUR</div>` +
     `<div class="legend">${pompano("#1d9e6c", 16)} Good &nbsp;${pompano("#d98a16", 16)} Fair &nbsp;${pompano("#c93a2e", 16)} Bad</div>` +
     `<table class="htable"><tr><th>Hour</th><th>Pompano</th><th>Sky · Wind</th><th>Rain</th><th>Air/Wtr</th></tr>` +
     d.hrs.map(h => {
@@ -593,7 +606,7 @@ function render(sel){
         `<td>${h.rain}%</td>` +
         `<td>${h.temp}°</td></tr>`;
     }).join("") + `</table>` +
-    `<div class="hfoot">Green-tinted rows fall inside a moving-tide bite window — prime pompano time. Scores weigh water temp, wind, rain, tide movement and moon overlap.</div></div>`;
+    `<div class="hfoot">Green-tinted rows fall inside a moving-tide bite window — prime pompano time.</div></details>`;
 
   /* tide card */
   const nx = d.tides.map(p => ({ t: new Date(p.t).getTime(), type: p.type, v: parseFloat(p.v) }))
