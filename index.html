@@ -31,11 +31,6 @@
     font-size: 11px; font-weight: 800; padding: 7px 10px; cursor: pointer; color: #8a7a5f;
   }
   .langbtn b { color: #9a4a16; }
-  .locbtn {
-    width: 34px; height: 34px; border-radius: 50%; background: #fffaf0;
-    border: 1.5px solid #d9c9a3; font-size: 16px; cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-  }
   .refresh {
     background: #bc5a1e; color: #fff; border: none; border-radius: 999px;
     font-family: "Fraunces", serif; font-weight: 800; font-size: 13px;
@@ -105,6 +100,11 @@
   }
   .card h3 { margin: 0; font-size: 19px; font-weight: 900; }
   .card h3 .dt { font-family: "Public Sans", sans-serif; font-size: 12px; font-weight: 600; color: #8a7a5f; }
+  .card h3 .tday { color: #fff; font-size: 12px; font-weight: 900; letter-spacing: .06em;
+    padding: 4px 11px; border-radius: 999px; vertical-align: 3px; white-space: nowrap; }
+  .card h3 .drate { display: inline-flex; align-items: center; gap: 4px; margin-left: 8px;
+    font-family: "Public Sans", sans-serif; font-size: 14px; font-weight: 800; white-space: nowrap; }
+  .card h3 .drate svg { vertical-align: -4px; }
 
   /* GO FISH band */
   .gofish {
@@ -119,6 +119,7 @@
   }
   .gofish .gl { font-size: 15px; letter-spacing: .04em; }
   .gofish .gt { margin-left: 2px; }
+  .gofish .gs { margin-left: auto; font-size: 17px; white-space: nowrap; }
 
   /* 4 weather tiles */
   .tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 16px; }
@@ -173,7 +174,6 @@
     </div>
     <div class="hdBtns">
       <button class="langbtn" id="langBtn" title="Language / Ngôn ngữ"></button>
-      <button class="locbtn" id="locBtn" title="Use my location">📍</button>
       <button class="refresh" id="refBtn">Refresh</button>
     </div>
   </div>
@@ -184,41 +184,6 @@
 "use strict";
 /* ================= constants ================= */
 var PIN = { lat: 26.9166, lon: -80.0642, name: "Jupiter Inlet, FL", station: "8722495" };
-var SHORE_KM = 3.2; // ~2 miles from the FL east coast shoreline = "near the beach"
-
-var STATIONS = [
-  { id: "8720030", lat: 30.61, lon: -81.47 },
-  { id: "8720218", lat: 30.40, lon: -80.66 },
-  { id: "8720587", lat: 29.86, lon: -81.29 },
-  { id: "8721120", lat: 29.23, lon: -81.01 },
-  { id: "8721604", lat: 28.42, lon: -80.59 },
-  { id: "8722495", lat: 26.94, lon: -80.07 },
-  { id: "8722670", lat: 26.61, lon: -80.03 },
-  { id: "8723214", lat: 25.73, lon: -80.16 }
-];
-// Simplified Florida east-coast shoreline polyline, Jacksonville -> Miami [lat, lon]
-var SHORE = [
-  [30.61,-81.43],[30.40,-81.40],[30.10,-81.33],[29.86,-81.28],[29.60,-81.18],
-  [29.40,-81.10],[29.23,-80.99],[29.05,-80.88],[28.90,-80.78],[28.70,-80.70],
-  [28.57,-80.62],[28.42,-80.58],[28.20,-80.57],[28.00,-80.55],[27.80,-80.45],
-  [27.60,-80.35],[27.40,-80.27],[27.25,-80.20],[27.05,-80.12],[26.94,-80.07],
-  [26.77,-80.03],[26.60,-80.03],[26.45,-80.03],[26.30,-80.06],[26.10,-80.10],
-  [25.95,-80.12],[25.75,-80.13],[25.60,-80.15]
-];
-var TOWNS = [
-  ["Fernandina Beach, FL",30.61,-81.47],["Jacksonville Beach, FL",30.29,-81.39],
-  ["St. Augustine, FL",29.89,-81.31],["Daytona Beach, FL",29.21,-81.02],
-  ["New Smyrna Beach, FL",29.03,-80.90],["Titusville, FL",28.61,-80.81],
-  ["Cocoa Beach, FL",28.32,-80.61],["Melbourne, FL",28.08,-80.60],
-  ["Sebastian, FL",27.82,-80.47],["Vero Beach, FL",27.64,-80.36],
-  ["Fort Pierce, FL",27.44,-80.30],["Stuart, FL",27.20,-80.22],
-  ["Jupiter, FL",26.93,-80.09],["Juno Beach, FL",26.87,-80.06],
-  ["North Palm Beach, FL",26.82,-80.06],["West Palm Beach, FL",26.71,-80.05],
-  ["Lake Worth, FL",26.61,-80.06],["Boynton Beach, FL",26.53,-80.06],
-  ["Boca Raton, FL",26.37,-80.08],["Pompano Beach, FL",26.24,-80.10],
-  ["Fort Lauderdale, FL",26.12,-80.12],["Hollywood, FL",26.01,-80.13],
-  ["Miami Beach, FL",25.79,-80.13],["Miami, FL",25.76,-80.19]
-];
 /* ================= i18n ================= */
 var STR = {
   en: {
@@ -231,7 +196,6 @@ var STR = {
     retry: "Try again", loadFail: "Could not load live data. Check your connection.",
     great: "Great", good: "Good", fair: "Fair", poor: "Poor",
     updated: function(d, t) { return "Updated " + d + " at " + t; },
-    miAway: function(mi) { return mi + " mi away"; },
     dur: function(h, m) { return h > 0 ? h + "h " + m + "m" : m + "m"; },
     nextMajor: function(d) { return "Next Major in " + d; },
     nextMinor: function(d) { return "Next Minor in " + d; },
@@ -261,7 +225,6 @@ var STR = {
     retry: "Thử lại", loadFail: "Không tải được dữ liệu. Kiểm tra kết nối mạng.",
     great: "Tuyệt vời", good: "Tốt", fair: "Trung bình", poor: "Tệ",
     updated: function(d, t) { return "Cập nhật " + d + " lúc " + t; },
-    miAway: function(mi) { return "cách " + mi + " dặm"; },
     dur: function(h, m) { return h > 0 ? h + " giờ " + m + " phút" : m + " phút"; },
     nextMajor: function(d) { return "Cá cắn mạnh sau " + d; },
     nextMinor: function(d) { return "Cá cắn nhẹ sau " + d; },
@@ -286,44 +249,6 @@ var STR = {
 /* ================= helpers ================= */
 function $(id) { return document.getElementById(id); }
 function pad(n) { return (n < 10 ? "0" : "") + n; }
-function havKm(a, b, c, d) {
-  var R = 6371, r1 = a * Math.PI / 180, r2 = c * Math.PI / 180;
-  var h = Math.sin((c - a) * Math.PI / 360), k = Math.sin((d - b) * Math.PI / 360);
-  var x = h * h + Math.cos(r1) * Math.cos(r2) * k * k;
-  return 2 * R * Math.asin(Math.sqrt(x));
-}
-// distance (km) from point to FL east-coast shoreline polyline (equirectangular approx)
-function distToShore(lat, lon) {
-  var best = 1e9, kx = 111.32 * Math.cos(lat * Math.PI / 180), ky = 110.57;
-  for (var i = 0; i < SHORE.length - 1; i++) {
-    var ax = SHORE[i][1] * kx, ay = SHORE[i][0] * ky;
-    var bx = SHORE[i+1][1] * kx, by = SHORE[i+1][0] * ky;
-    var px = lon * kx, py = lat * ky;
-    var dx = bx - ax, dy = by - ay;
-    var t = ((px - ax) * dx + (py - ay) * dy) / (dx * dx + dy * dy);
-    t = Math.max(0, Math.min(1, t));
-    var ex = ax + t * dx - px, ey = ay + t * dy - py;
-    var d = Math.sqrt(ex * ex + ey * ey);
-    if (d < best) best = d;
-  }
-  return best;
-}
-function nearestStation(lat, lon) {
-  var best = STATIONS[0], bd = 1e9;
-  for (var i = 0; i < STATIONS.length; i++) {
-    var d = havKm(lat, lon, STATIONS[i].lat, STATIONS[i].lon);
-    if (d < bd) { bd = d; best = STATIONS[i]; }
-  }
-  return best.id;
-}
-function nearestTown(lat, lon) {
-  var best = TOWNS[0][0], bd = 1e9;
-  for (var i = 0; i < TOWNS.length; i++) {
-    var d = havKm(lat, lon, TOWNS[i][1], TOWNS[i][2]);
-    if (d < bd) { bd = d; best = TOWNS[i][0]; }
-  }
-  return best;
-}
 function compass(deg) {
   var dirs = ["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSW","SW","WSW","W","WNW","NW","NNW"];
   return dirs[Math.round(deg / 22.5) % 16];
@@ -342,13 +267,19 @@ function clockStr(lang) {
   h = h % 12; if (h === 0) h = 12;
   return h + ":" + pad(d.getMinutes()) + " " + ap;
 }
-function dayTitle(date, idx, lang) {
+function dayTitle(date, idx, lang, score) {
   var S = STR[lang];
+  var c = ratingColor(score);
   var dw = idx === 0 ? S.todayWord : S.days[date.getDay()];
   var md = lang === "vi"
     ? date.getDate() + " " + S.months[date.getMonth()]
     : S.months[date.getMonth()] + " " + date.getDate();
-  return dw + " " + md + ", " + date.getFullYear() + ' <span class="dt">· <span id="clock">' + clockStr(lang) + "</span></span>";
+  var dwHtml = idx === 0
+    ? '<span class="tday" style="background:' + c + '">' + dw.toUpperCase() + "</span>"
+    : "<b>" + dw + "</b>";
+  return dwHtml + " " + md + ", " + date.getFullYear() +
+    ' <span class="dt">· <span id="clock">' + clockStr(lang) + "</span></span>" +
+    ' <span class="drate">' + fishSVG(c, 18) + "<b>" + score + "</b></span>";
 }
 function ratingColor(s) { return s >= 60 ? "#1d9e6c" : (s >= 40 ? "#d9a441" : "#c0392b"); }
 function ratingWord(s, lang) {
@@ -370,7 +301,7 @@ function fishSVG(color, size) {
 var state = {
   lang: localStorage.getItem("pf_lang") || "en",
   ready: false, sel: 0, days: [], moon: [], tides: [],
-  loc: { mode: "pin", name: PIN.name, distMi: null, lat: PIN.lat, lon: PIN.lon, station: PIN.station },
+  loc: { name: PIN.name, lat: PIN.lat, lon: PIN.lon, station: PIN.station },
   updatedAt: null
 };
 
@@ -433,16 +364,6 @@ function loadMoonDay(lat, lon, date) {
     return wins;
   }).catch(function() { return []; });
 }
-function loadPlaceName(lat, lon) {
-  var u = "https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=" + lat +
-    "&longitude=" + lon + "&localityLanguage=en";
-  return fetchJSON(u).then(function(j) {
-    var city = j.city || j.locality || j.principalSubdivision || "";
-    if (city) return city + ", FL";
-    return nearestTown(lat, lon);
-  }).catch(function() { return nearestTown(lat, lon); });
-}
-
 function atHourly(hourly, isoIdx, key) { return hourly[key][isoIdx]; }
 function hourlyIndex(hourly, ms) {
   // hourly.time entries "2026-10-09T14:00" local
@@ -607,8 +528,29 @@ function tideSVG(day) {
   if (mx - mn < 0.3) { mx += 0.15; mn -= 0.15; }
   function X(t) { return pL + (t - d0) / 86400000 * (W - pL - pR); }
   function Y(v) { return pT + (1 - (v - mn) / (mx - mn)) * (H - pT - pB); }
-  var line = "M" + pts.map(function(p) { return X(p[0]).toFixed(1) + "," + Y(p[1]).toFixed(1); }).join(" L");
+  // Catmull-Rom -> cubic Bezier for a smooth tide curve
+  function smoothPath() {
+    var d = "M" + X(pts[0][0]).toFixed(1) + "," + Y(pts[0][1]).toFixed(1);
+    for (var i = 0; i < pts.length - 1; i++) {
+      var p0 = pts[Math.max(0, i - 1)], p1 = pts[i],
+          p2 = pts[i + 1], p3 = pts[Math.min(pts.length - 1, i + 2)];
+      var c1x = X(p1[0]) + (X(p2[0]) - X(p0[0])) / 6,
+          c1y = Y(p1[1]) + (Y(p2[1]) - Y(p0[1])) / 6;
+      var c2x = X(p2[0]) - (X(p3[0]) - X(p1[0])) / 6,
+          c2y = Y(p2[1]) - (Y(p3[1]) - Y(p1[1])) / 6;
+      d += "C" + c1x.toFixed(1) + "," + c1y.toFixed(1) + " " +
+           c2x.toFixed(1) + "," + c2y.toFixed(1) + " " +
+           X(p2[0]).toFixed(1) + "," + Y(p2[1]).toFixed(1);
+    }
+    return d;
+  }
+  var line = smoothPath();
   var svg = '<svg class="tidechart" viewBox="0 0 ' + W + " " + H + '">';
+  svg += '<defs><linearGradient id="tideg" x1="0" y1="0" x2="0" y2="1">' +
+    '<stop offset="0" stop-color="#14b8a6" stop-opacity=".42"/>' +
+    '<stop offset=".55" stop-color="#14b8a6" stop-opacity=".16"/>' +
+    '<stop offset="1" stop-color="#14b8a6" stop-opacity=".04"/>' +
+    "</linearGradient></defs>";
   // shade bite windows
   (day.windows || []).forEach(function(w, i) {
     var isBest = day.best && w.start.getTime() === day.best.start.getTime();
@@ -617,8 +559,8 @@ function tideSVG(day) {
       '" fill="' + (isBest ? "rgba(13,148,136,.28)" : "rgba(13,148,136,.12)") + '" rx="4"/>';
   });
   svg += '<path d="' + line + " L" + X(d1).toFixed(1) + "," + (H - pB) + " L" + X(d0).toFixed(1) + "," + (H - pB) +
-    ' Z" fill="rgba(13,148,136,.15)" stroke="none"/>';
-  svg += '<path d="' + line + '" fill="none" stroke="#0f766e" stroke-width="2.5" stroke-linejoin="round"/>';
+    ' Z" fill="url(#tideg)" stroke="none"/>';
+  svg += '<path d="' + line + '" fill="none" stroke="#0d9488" stroke-width="2.5" stroke-linecap="round"/>';
   // high / low dots
   state.tides.forEach(function(e) {
     if (e.t < d0 || e.t > d1) return;
@@ -663,8 +605,7 @@ function tideChipsHTML(day) {
 }
 function renderHeader() {
   var S = STR[state.lang], L = state.loc;
-  var name = (L.mode === "live" ? "📍 " : "📌 ") + L.name;
-  if (L.mode === "pin" && L.distMi != null) name += " · " + S.miAway(L.distMi);
+  var name = "📌 " + L.name;
   $("locName").textContent = name;
   var d = new Date();
   var ds = state.lang === "vi"
@@ -723,11 +664,12 @@ function renderAll() {
   var day = state.days[state.sel];
   var dc = ratingColor(day.score);
   html += '<div class="card" style="border-color:' + dc + '">' +
-    "<h3>" + dayTitle(day.date, state.sel, state.lang) + "</h3>";
+    "<h3>" + dayTitle(day.date, state.sel, state.lang, day.score) + "</h3>";
   if (day.best) {
+    var bsc = day.best.score;
     html += '<div class="gofish"><span class="fic">' + fishSVG(dc, 24) + "</span>" +
       '<span class="gl">🎣 ' + S.goFish + '</span><span class="gt">' +
-      trange(day.best.start, day.best.end, state.lang) + "</span></div>";
+      trange(day.best.start, day.best.end, state.lang) + '</span><span class="gs">· 🐟 ' + bsc + "</span></div>";
   }
   var ci = S.condIcon[day.condCode] || "🌤️";
   var cn = S.condName[day.condCode] || S.condName[2];
@@ -790,12 +732,12 @@ function dedupeMoon(wins) {
   });
   return out;
 }
-function startLoad(lat, lon, mode, distMi) {
+// Always pinned to Jupiter Inlet — no GPS, no location prompt.
+function startLoad() {
+  var lat = PIN.lat, lon = PIN.lon, station = PIN.station;
   state.loading = true;
-  var station = mode === "live" ? nearestStation(lat, lon) : PIN.station;
   state.loc = {
-    mode: mode, name: mode === "live" ? "…" : PIN.name, distMi: distMi,
-    lat: lat, lon: lon, station: station
+    name: PIN.name, lat: lat, lon: lon, station: station
   };
   renderHeader();
   var fromD = new Date(); fromD.setDate(fromD.getDate() - 1);
@@ -805,15 +747,13 @@ function startLoad(lat, lon, mode, distMi) {
     var dt = new Date(); dt.setDate(dt.getDate() + i);
     moonPs.push(loadMoonDay(lat, lon, dt));
   }
-  var placeP = mode === "live" ? loadPlaceName(lat, lon) : Promise.resolve(PIN.name);
   // Each source is independent: weather+marine are essential, but tides and moon
   // degrade gracefully (quiet note instead of a full-page error).
   Promise.all([
       loadWeather(lat, lon).catch(function(e) { return { _err: e }; }),
       loadMarine(lat, lon).catch(function(e) { return { _err: e }; }),
       loadTides(station, fromD, toD).catch(function() { return []; }),
-      Promise.all(moonPs),
-      placeP
+      Promise.all(moonPs)
     ])
     .then(function(r) {
       try {
@@ -824,7 +764,6 @@ function startLoad(lat, lon, mode, distMi) {
         var all = [];
         r[3].forEach(function(arr) { arr.forEach(function(w) { all.push(w); }); });
         state.moon = dedupeMoon(all);
-        state.loc.name = r[4];
         state.days = buildDays(wx, mar);
         state.sel = 0;
         state.ready = true; state.loading = false;
@@ -834,34 +773,13 @@ function startLoad(lat, lon, mode, distMi) {
     })
     .catch(function() { state.loading = false; showError(); });
 }
-function onGeo(pos) {
-  var lat = pos.coords.latitude, lon = pos.coords.longitude;
-  if (distToShore(lat, lon) <= SHORE_KM) {
-    startLoad(lat, lon, "live", null);
-  } else {
-    var mi = Math.round(havKm(lat, lon, PIN.lat, PIN.lon) * 0.621371);
-    startLoad(PIN.lat, PIN.lon, "pin", mi);
-  }
-}
-function onGeoFail() {
-  startLoad(PIN.lat, PIN.lon, "pin", null);
-}
-function boot(force) {
+function boot() {
   state.ready = false; state.sel = 0; state.days = [];
   var S = STR[state.lang];
   document.documentElement.lang = state.lang;
   $("app").innerHTML = '<div class="loading">' + S.loading + "</div>";
   renderHeader();
-  if (force) { onGeoFail(); return; }
-  var got = false;
-  function once(fn) { return function(a) { if (!got) { got = true; fn(a); } }; }
-  if (navigator.geolocation) {
-    try {
-      navigator.geolocation.getCurrentPosition(once(onGeo), once(onGeoFail),
-        { timeout: 9000, maximumAge: 600000 });
-    } catch (e) { onGeoFail(); got = true; }
-  }
-  setTimeout(function() { if (!got) { got = true; onGeoFail(); } }, 10000);
+  startLoad(); // always pinned to Jupiter Inlet — no GPS
 }
 $("langBtn").addEventListener("click", function() {
   state.lang = state.lang === "en" ? "vi" : "en";
@@ -869,13 +787,7 @@ $("langBtn").addEventListener("click", function() {
   document.documentElement.lang = state.lang;
   if (state.ready) renderAll(); else boot();
 });
-$("refBtn").addEventListener("click", function() { boot(true); });
-$("locBtn").addEventListener("click", function() {
-  if (navigator.geolocation) {
-    try { navigator.geolocation.getCurrentPosition(onGeo, onGeoFail, { timeout: 9000 }); }
-    catch (e) { onGeoFail(); }
-  } else onGeoFail();
-});
+$("refBtn").addEventListener("click", function() { boot(); });
 boot();
 setInterval(tick, 1000);
 </script>
