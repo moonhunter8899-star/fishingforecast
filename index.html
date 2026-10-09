@@ -682,9 +682,12 @@ function tideSVG(day) {
   });
   // now line
   var now = Date.now();
+  state.tideScale = null;
   if (now >= d0 && now <= d1) {
     svg += '<line x1="' + X(now).toFixed(1) + '" y1="' + (pT - 6) + '" x2="' + X(now).toFixed(1) + '" y2="' + (H - pB) +
       '" stroke="#d9a441" stroke-width="1.75" stroke-dasharray="5,4" stroke-linecap="round"/>';
+    // remember the chart scale so the live fish marker can be repositioned as time passes
+    state.tideScale = { d0: d0, mn: mn, mx: mx, W: W, H: H, pL: pL, pR: pR, pT: pT, pB: pB };
   }
   // best-bite marker
   if (day.best) {
@@ -693,6 +696,25 @@ function tideSVG(day) {
       '" r="9.5" fill="#fff" stroke="#bc5a1e" stroke-width="2"/>';
     svg += '<text x="' + X(bt).toFixed(1) + '" y="' + (Y(bv) - 9.5).toFixed(1) +
       '" text-anchor="middle" font-size="10">🎣</text>';
+  }
+  // Major bite markers: small rating-colored fish on the curve at each Major window's midpoint
+  var fcol = ratingColor(day.score);
+  state.moon.forEach(function(w) {
+    if (w.type !== "major") return;
+    if (w.end < d0 || w.start > d1) return;
+    var mid = (w.start + w.end) / 2;
+    var mx = X(mid), my = Y(tideAt(mid));
+    if (now >= w.start && now <= w.end) {
+      svg += '<circle cx="' + mx.toFixed(1) + '" cy="' + my.toFixed(1) + '" r="15" fill="none" stroke="' + fcol +
+        '" stroke-width="2" opacity="0.55"/>';
+    }
+    svg += '<g transform="translate(' + (mx - 10).toFixed(1) + "," + (my - 10).toFixed(1) + ')">' + fishSVG(fcol, 20) + "</g>";
+  });
+  // live fish marker riding the tide curve at the current time, in the day's rating color
+  if (state.tideScale) {
+    var fxx = X(now), fyy = Y(tideAt(now));
+    svg += '<g id="tidefish" transform="translate(' + (fxx - 15).toFixed(1) + "," + (fyy - 15).toFixed(1) + ')">' +
+      fishSVG(fcol, 30) + "</g>";
   }
   // x labels — 12h style in both languages
   var S = STR[state.lang];
@@ -871,6 +893,20 @@ function tick() {
   var mr = $("moonRows");
   if (mr && state.days[state.sel]) mr.innerHTML = moonRowsHTML(state.days[state.sel]);
   renderHeader();
+  // move the live tide-chart fish every 30s so it rides the curve with the time
+  if (++__tfN % 30 === 0) moveTideFish();
+}
+// repositions the #tidefish marker along the tide curve to the current time
+var __tfN = 0;
+function moveTideFish() {
+  var g = document.getElementById("tidefish"), sc = state.tideScale;
+  if (!g || !sc || !state.ready) return;
+  var now = Date.now(), d1 = sc.d0 + 86400000;
+  if (now < sc.d0 || now > d1) { g.style.display = "none"; return; }
+  g.style.display = "";
+  var fx = sc.pL + (now - sc.d0) / 86400000 * (sc.W - sc.pL - sc.pR);
+  var fy = sc.pT + (1 - (tideAt(now) - sc.mn) / (sc.mx - sc.mn)) * (sc.H - sc.pT - sc.pB);
+  g.setAttribute("transform", "translate(" + (fx - 15).toFixed(1) + "," + (fy - 15).toFixed(1) + ")");
 }
 function showError() {
   var S = STR[state.lang];
