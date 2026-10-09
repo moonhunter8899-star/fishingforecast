@@ -127,11 +127,35 @@ function durText(ms, lang) {
   var m = Math.round(ms / 60000), h = Math.floor(m / 60);
   return STR[lang].dur(h, m % 60);
 }
+function hx2rgb(h){h=h.replace("#","");if(h.length===3){h=h[0]+h[0]+h[1]+h[1]+h[2]+h[2];}return [parseInt(h.substr(0,2),16),parseInt(h.substr(2,2),16),parseInt(h.substr(4,2),16)];}
+function rgb2hx(r,g,b){function c(x){x=Math.max(0,Math.min(255,Math.round(x)));var s=x.toString(16);return s.length<2?"0"+s:s;}return "#"+c(r)+c(g)+c(b);}
+function shade(hex,p){var c=hx2rgb(hex);if(p>=0){return rgb2hx(c[0]+(255-c[0])*p/100,c[1]+(255-c[1])*p/100,c[2]+(255-c[2])*p/100);}var f=1+p/100;return rgb2hx(c[0]*f,c[1]*f,c[2]*f);}
+function mixc(h1,h2,p){var a=hx2rgb(h1),b=hx2rgb(h2);return rgb2hx(a[0]+(b[0]-a[0])*p/100,a[1]+(b[1]-a[1])*p/100,a[2]+(b[2]-a[2])*p/100);}
 function fishSVG(color, size) {
+  var u = (window.__fishUID = (window.__fishUID || 0) + 1);
+  var back = shade(color, -30), belly = mixc(color, "#f6dc8e", 62);
+  var tailA = mixc(color, "#d9a441", 55), tailB = mixc(color, "#9c742a", 35);
+  var finD = shade(color, -32), finDark = shade(color, -55);
   return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 64 64">' +
-    '<path d="M8 32 C18 18 34 14 46 22 L58 12 L54 32 L58 52 L46 42 C34 50 18 46 8 32 Z" fill="' + color + '"/>' +
-    '<path d="M20 26 C24 29 24 35 20 38" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round"/>' +
-    '<circle cx="16" cy="29" r="3" fill="#fff"/><circle cx="16" cy="29" r="1.5" fill="#22312b"/></svg>';
+    '<defs>' +
+    '<linearGradient id="fbg' + u + '" x1="0" y1="0" x2="0" y2="1">' +
+    '<stop offset="0" stop-color="' + back + '"/><stop offset=".48" stop-color="' + color + '"/><stop offset="1" stop-color="' + belly + '"/>' +
+    '</linearGradient>' +
+    '<linearGradient id="ftg' + u + '" x1="0" y1="0" x2="1" y2="0">' +
+    '<stop offset="0" stop-color="' + tailA + '"/><stop offset="1" stop-color="' + tailB + '"/>' +
+    '</linearGradient>' +
+    '</defs>' +
+    '<path d="M47.5 27.5 C52 21, 56 16, 62 11 C59 19, 57.5 25.5, 56.5 32 C57.5 38.5, 59 45, 62 53 C56 48, 52 43, 47.5 36.5 Z" fill="url(#ftg' + u + ')"/>' +
+    '<path d="M8 28 C9 23, 11 20, 15 18 C24 13, 34 12.5, 42 19 C45.5 22, 48 25, 49.5 28.5 L49.5 35.5 C46 42, 40 46, 33 47.5 C25 49, 16 46, 9.5 40 C7.5 38, 7.5 30, 8 28 Z" fill="url(#fbg' + u + ')"/>' +
+    '<path d="M18 18 C26 10, 35 6, 44 4 C40 9, 39 13, 40 18.5 C32 14.5, 24 15, 18 18 Z" fill="' + finD + '"/>' +
+    '<path d="M40 44 C43 47, 45 50, 46 53 C44 50, 41 47, 39 44 Z" fill="' + finD + '"/>' +
+    '<path d="M29 47 C31 50.5, 33 53, 36 55 C34 51.5, 32 49, 30 47.5 Z" fill="' + finD + '"/>' +
+    '<path d="M20.5 35 C25 37, 28 41, 29 46 C25 44, 21.5 41, 19.5 37 Z" fill="' + finDark + '"/>' +
+    '<path d="M21 24.5 C24 29.5, 24 37, 21 42" stroke="rgba(255,255,255,.6)" stroke-width="1.6" fill="none" stroke-linecap="round"/>' +
+    '<path d="M26 33.5 C33 32, 41 32, 48 33.5" stroke="rgba(255,255,255,.35)" stroke-width="1" fill="none"/>' +
+    '<path d="M8 35 L11 36" stroke="' + finDark + '" stroke-width="1.4" stroke-linecap="round"/>' +
+    '<circle cx="13.5" cy="29" r="3.1" fill="#fff"/><circle cx="13.5" cy="29" r="1.7" fill="#22312b"/><circle cx="14.2" cy="28.3" r="0.7" fill="#fff"/>' +
+    '</svg>';
 }
 function clockStr(lang) { // 12h in both languages, e.g. "2:26 PM"
   var d = new Date();
