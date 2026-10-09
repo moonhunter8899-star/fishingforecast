@@ -25,6 +25,8 @@
   .hd { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin: 4px 2px 12px; }
   .hd .t1 { font-family: "Fraunces", serif; font-weight: 800; font-size: 16px; }
   .hd .t2 { color: #8a7a5f; font-size: 10px; margin-top: 2px; }
+  .hd .brand { font-family: "Fraunces", serif; font-weight: 900; font-size: 15px; color: #22312b; }
+  .hd .nick { font-size: 11px; font-weight: 700; color: #9a4a16; margin: 1px 0 7px; letter-spacing: .02em; }
   .hdBtns { display: flex; align-items: center; gap: 8px; flex: none; }
   .langbtn {
     background: #fffaf0; border: 1.5px solid #d9c9a3; border-radius: 999px;
@@ -156,6 +158,21 @@
   }
   .tchip.hi { background: #bc5a1e; border-color: #bc5a1e; color: #fff; }
 
+  /* Hour by hour */
+  .hsec .hh2 { font-family: "Fraunces", serif; font-weight: 800; font-size: 15px; color: #9a4a16; margin-bottom: 6px; }
+  .htable { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .htable th {
+    font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em;
+    color: #8a7a5f; text-align: left; padding: 4px 6px; border-bottom: 1px solid #e3d5b3;
+  }
+  .htable td { padding: 6px; border-bottom: 1px solid #f0e7d2; white-space: nowrap; }
+  .htable tr:last-child td { border-bottom: none; }
+  .hrow.inbite td { background: rgba(29,158,108,.12); }
+  .hhour { font-family: "Fraunces", serif; font-weight: 800; }
+  .hscore { font-weight: 800; }
+  .hscore svg { vertical-align: -5px; }
+  .hint { font-size: 10px; color: #8a7a5f; margin: 8px 2px 0; font-weight: 600; }
+
   .loading, .err { text-align: center; padding: 40px 16px; color: #8a7a5f; font-size: 14px; }
   .err button { margin-top: 10px; }
   .foot { text-align: center; color: #b3a37f; font-size: 10px; margin-top: 18px; }
@@ -165,6 +182,8 @@
 <div class="wrap">
   <div class="hd">
     <div>
+      <div class="brand">🎣 Pompano Forecast · Tien Huynh</div>
+      <div class="nick">Tư Tò Tò – Nha Trang</div>
       <div class="t1" id="locName">…</div>
       <div class="t2" id="updLine"></div>
     </div>
@@ -200,6 +219,8 @@ var STR = {
     nextHigh: function(d) { return "High tide in " + d; },
     nextLow: function(d) { return "Low tide in " + d; },
     tideNote: "Tide data unavailable right now.", moonNote: "Moon bite times unavailable right now.",
+    hourly: "Hour by hour", thHour: "Hour", thScore: "Bite", thSkyWind: "Sky · Wind",
+    thRain: "Rain", thAirWtr: "Air/Wtr", biteHint: "Tinted rows fall inside a bite window.",
     days: ["SUN","MON","TUE","WED","THU","FRI","SAT"],
     months: ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
     condName: {
@@ -229,6 +250,8 @@ var STR = {
     nextHigh: function(d) { return "Nước lên sau " + d; },
     nextLow: function(d) { return "Nước xuống sau " + d; },
     tideNote: "Hiện chưa có dữ liệu thủy triều.", moonNote: "Hiện chưa có giờ cá cắn theo mặt trăng.",
+    hourly: "Từng giờ trong ngày", thHour: "Giờ", thScore: "Điểm cắn", thSkyWind: "Trời · Gió",
+    thRain: "Mưa", thAirWtr: "KK/Nước", biteHint: "Hàng tô màu nằm trong giờ cá cắn.",
     days: ["CN","T2","T3","T4","T5","T6","T7"],
     months: ["Th1","Th2","Th3","Th4","Th5","Th6","Th7","Th8","Th9","Th10","Th11","Th12"],
     condName: {
@@ -669,6 +692,48 @@ function tideChipsHTML(day) {
   });
   return html;
 }
+function hourLabel(d) { // 12h in both languages, e.g. "2 PM" — never 24h/military
+  var h = d.getHours(), ap = h >= 12 ? "PM" : "AM";
+  h = h % 12; if (h === 0) h = 12;
+  return h + " " + ap;
+}
+function hourlyHTML(day) {
+  var S = STR[state.lang];
+  var wx = state.wx.hourly, mar = state.mar.hourly;
+  var rows = "";
+  for (var i = 0; i < wx.time.length; i++) {
+    var dt = new Date(wx.time[i]);
+    if (dt.getFullYear() !== day.date.getFullYear() || dt.getMonth() !== day.date.getMonth() ||
+        dt.getDate() !== day.date.getDate()) continue;
+    var ms = dt.getTime();
+    var mi = hourlyIndex(mar, ms);
+    var sc = Math.max(0, Math.min(100, Math.round(adjHourScore(i, mi, ms))));
+    var c = ratingColor(sc);
+    var code = wx.weather_code[i];
+    var sky = S.condIcon[code] || "🌤️";
+    var wsp = Math.round(wx.windspeed_10m[i]);
+    var wdir = compass(wx.winddirection_10m[i]);
+    var rp = wx.precipitation_probability[i];
+    var air = Math.round(wx.temperature_2m[i]);
+    var wtr = mar.sea_surface_temperature[mi];
+    var wtrS = (wtr == null || isNaN(wtr)) ? "—" : (Math.round(wtr * 10) / 10) + "°";
+    var inbite = false;
+    (day.windows || []).forEach(function(w) {
+      if (ms >= w.start.getTime() && ms < w.end.getTime()) inbite = true;
+    });
+    rows += '<tr class="hrow' + (inbite ? " inbite" : "") + '">' +
+      '<td class="hhour">' + hourLabel(dt) + "</td>" +
+      '<td class="hscore">' + fishSVG(c, 20) + ' <span style="color:' + c + '">' + sc + "</span></td>" +
+      "<td>" + sky + " " + wsp + " " + wdir + "</td>" +
+      "<td>" + rp + "%</td>" +
+      "<td>" + air + "°/" + wtrS + "</td></tr>";
+  }
+  if (!rows) return "";
+  return '<div class="card"><div class="hsec"><div class="hh2">🕐 ' + S.hourly + "</div>" +
+    '<table class="htable"><tr><th>' + S.thHour + "</th><th>" + S.thScore + "</th><th>" +
+    S.thSkyWind + "</th><th>" + S.thRain + "</th><th>" + S.thAirWtr + "</th></tr>" +
+    rows + '</table><p class="hint">' + S.biteHint + "</p></div></div>";
+}
 function renderHeader() {
   var S = STR[state.lang], L = state.loc;
   var name = "📌 " + L.name;
@@ -758,6 +823,8 @@ function renderAll() {
         tideSVG(day) + '<div class="tchips">' + tideChipsHTML(day) + "</div>"
       : '<p class="cdline">' + S.tideNote + "</p>") + "</div>";
   html += "</div>";
+  // hour-by-hour card for the selected day, after the tide chart
+  html += hourlyHTML(day);
   app.innerHTML = html;
   // wire buttons
   var pills = app.querySelectorAll("[data-day]");
