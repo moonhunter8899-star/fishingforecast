@@ -367,13 +367,17 @@ function hourlyIndex(hourly, ms) {
   return best;
 }
 function tideAt(ms) {
+  // Cosine interpolation between hilo events: tides rise/fall fastest
+  // mid-tide and flatten at highs/lows, so the chart renders as a smooth
+  // natural curve instead of angular straight segments.
   var T = state.tides;
   if (!T.length) return 0;
   if (ms <= T[0].t) return T[0].v;
   for (var i = 0; i < T.length - 1; i++) {
     if (ms >= T[i].t && ms <= T[i + 1].t) {
       var f = (ms - T[i].t) / (T[i + 1].t - T[i].t);
-      return T[i].v + f * (T[i + 1].v - T[i].v);
+      var s = (1 - Math.cos(Math.PI * f)) / 2;
+      return T[i].v + s * (T[i + 1].v - T[i].v);
     }
   }
   return T[T.length - 1].v;
