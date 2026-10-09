@@ -6,32 +6,39 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#f2f5f9">
-<title>Fishing Forecast — Tien Huynh</title>
+<title>Pompano Forecast — Tien Huynh</title>
 <style>
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body { margin: 0; padding: 0; }
   body {
-    background: #eef2f7; color: #16202b;
+    background: #f7f2e7; color: #16202b;
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
     max-width: 430px; margin: 0 auto; padding: 12px 12px 32px;
   }
-  h1 { font-size: 19px; margin: 4px 0 2px; }
-  h1 .name { color: #0284c7; font-weight: 600; font-size: 15px; }
+  h1 {
+    font-size: 19px; margin: 4px 0 8px; color: #fff;
+    background: linear-gradient(135deg, #14532d, #1d6b3c);
+    padding: 12px 14px; border-radius: 14px;
+    box-shadow: 0 2px 6px rgba(20,83,45,.25);
+  }
+  h1 .name { color: #fcd34d; font-weight: 600; font-size: 15px; }
   .sub { color: #66788a; font-size: 12px; margin-bottom: 10px; }
   .strip { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-bottom: 12px; }
-  .dpill { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 8px 0; text-align: center; cursor: pointer; }
+  .dpill { background: #fff; border: 1px solid #e7dfc9; border-radius: 12px; padding: 8px 0; text-align: center; cursor: pointer; }
   .dpill .dn { font-size: 19px; font-weight: 800; }
   .dpill .dw { font-size: 11px; color: #66788a; }
-  .dpill.sel { background: #1d9bf0; border-color: #1d9bf0; }
+  .dpill.sel { background: #166534; border-color: #166534; }
   .dpill.sel .dn, .dpill.sel .dw { color: #fff; }
   .card {
-    background: #fff; border: 1px solid #e2e8f0; border-radius: 16px;
+    background: #fff; border: 1px solid #e7dfc9; border-radius: 16px;
     padding: 14px; margin-bottom: 12px; box-shadow: 0 1px 2px rgba(15,30,45,.05);
   }
   .score-wrap { display: flex; align-items: center; justify-content: space-between; }
   .majmin { flex: 1; }
   .majmin .k { color: #66788a; font-size: 13px; margin-bottom: 6px; }
   .majmin .t { font-weight: 800; font-size: 14px; margin-bottom: 4px; font-variant-numeric: tabular-nums; }
+  .majmin .t.next { background: #fef9c3; border-radius: 6px; padding: 2px 4px; }
+  .solcd { text-align: center; font-size: 13px; font-weight: 700; color: #166534; margin-top: 4px; font-variant-numeric: tabular-nums; }
   .dial { position: relative; width: 128px; height: 128px; flex: none; margin: 0 4px; }
   .dial .num { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
     font-size: 34px; font-weight: 800; }
@@ -40,7 +47,7 @@
   .count { background: #f1f5f9; border-radius: 10px; padding: 8px; text-align: center; }
   .count .k { font-size: 10px; text-transform: uppercase; letter-spacing: .5px; color: #66788a; }
   .count .v { font-size: 13px; font-weight: 800; margin-top: 2px; }
-  .count .c { font-size: 12px; color: #0284c7; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .count .c { font-size: 12px; color: #166534; font-weight: 700; font-variant-numeric: tabular-nums; }
   .wx { display: flex; align-items: center; gap: 14px; }
   .wx .big { font-size: 44px; font-weight: 800; }
   .wx .hl { font-size: 15px; font-weight: 700; color: #334155; }
@@ -59,9 +66,15 @@
   .moonbig .il { color: #66788a; font-size: 13px; font-weight: 600; }
   .tidebig { font-size: 40px; font-weight: 800; }
   .tidebig .tr { font-size: 24px; }
+  .hstrip { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
+  .hchip { flex: none; background: #f1f5f9; border-radius: 10px; padding: 8px 10px; text-align: center; min-width: 62px; }
+  .hchip .ht { font-size: 11px; color: #66788a; font-weight: 600; }
+  .hchip .hx { font-size: 15px; font-weight: 800; margin: 2px 0; }
+  .hchip .hr { font-size: 11px; color: #166534; font-weight: 700; }
+  .cond { font-size: 14px; font-weight: 700; margin: 2px 0; }
   .tide-svg { width: 100%; height: 110px; display: block; margin-top: 6px; }
   .legend { font-size: 11px; color: #66788a; margin-top: 4px; }
-  .bite { display: flex; align-items: center; gap: 8px; padding: 7px 0; font-size: 13px; border-top: 1px solid #eef2f7; }
+  .bite { display: flex; align-items: center; gap: 8px; padding: 7px 0; font-size: 13px; border-top: 1px solid #f7f2e7; }
   .bite:first-child { border-top: none; }
   .bite .t { font-weight: 700; }
   .bite .tag { color: #66788a; font-size: 11px; margin-left: auto; text-align: right; }
@@ -69,13 +82,21 @@
   .err { color: #dc2626; font-size: 13px; }
   .loading { color: #66788a; text-align: center; padding: 40px 0; }
   .foot { color: #94a3b8; font-size: 11px; text-align: center; margin-top: 16px; }
-  .foot a { color: #0284c7; }
+  .foot a { color: #166534; }
+  .sol { display: flex; align-items: center; gap: 10px; padding: 7px 0; font-size: 14px; border-top: 1px solid #f7f2e7; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .sol:first-child { border-top: none; }
+  .sol.next { background: #fef9c3; margin: 0 -14px; padding: 7px 14px; border-radius: 8px; }
+  .pillmaj { font-size: 10px; font-weight: 800; background: #14532d; color: #fff; padding: 3px 8px; border-radius: 6px; letter-spacing: .5px; flex: none; }
+  .pillmin { font-size: 10px; font-weight: 800; background: #e7dfc9; color: #64748b; padding: 3px 8px; border-radius: 6px; letter-spacing: .5px; flex: none; }
+  .bestday { background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; border-radius: 10px; padding: 8px 12px; font-size: 13px; margin-bottom: 12px; text-align: center; }
+  .condbox { background: #f1f5f9; border-radius: 10px; padding: 10px; text-align: center; font-size: 18px; font-weight: 800; margin-bottom: 10px; }
 </style>
 </head>
 <body>
-<h1>🎣 Fishing Forecast <span class="name">· Tien Huynh</span></h1>
-<div class="sub">Jupiter Inlet, FL · <span id="updated">loading…</span></div>
+<h1>🐟 Pompano Forecast <span class="name">· Tien Huynh</span></h1>
+<div class="sub">Jupiter Inlet, FL · 🎯 targeting Florida pompano · <span id="updated">loading…</span></div>
 <div class="strip" id="strip"></div>
+<div id="bestday"></div>
 <div id="app"><div class="loading">Loading forecast…</div></div>
 <div class="foot">Data: Open-Meteo · NOAA tides · USNO sun &amp; moon · Compare: <a href="https://tides4fishing.com/us/florida-east-coast/jupiter-inlet-south-jetty">tides4fishing</a><br>Rating is an estimate, not a guarantee.</div>
 
@@ -87,13 +108,38 @@ function fishIcon(s, size){
   size = size || 22;
   const c = fishColor(s);
   return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" style="vertical-align:-5px;flex:none">` +
-    `<path d="M2.5 12C5.3 7.8 8.8 5.8 12.6 5.8c2.7 0 5.2 1.5 7.2 4.2l1.7 2-1.7 2c-2 2.7-4.5 4.2-7.2 4.2-3.8 0-7.3-2-10.1-6.2z" fill="${c}"/>` +
-    `<circle cx="15.8" cy="10.6" r="1.2" fill="#fff"/></svg>`;
+    `<path d="M2.2 12C4.5 7.5 8.5 5.5 13 5.5L18 7l4.5-2.5-1.7 4.5 1.7 4.5L18 11.5C13 15.5 7 16 2.2 12z" fill="${c}"/>` +
+    `<path d="M9.5 6.2L11 3.4l1.6 2.8z" fill="${c}"/>` +
+    `<circle cx="5.6" cy="10.8" r="1.1" fill="#fff"/></svg>`;
 }
 
 const MOON_EMOJI = { "New Moon": "🌑", "Waxing Crescent": "🌒", "First Quarter": "🌓", "Waxing Gibbous": "🌔",
   "Full Moon": "🌕", "Waning Gibbous": "🌖", "Last Quarter": "🌗", "Waning Crescent": "🌘" };
 const moonEmoji = p => MOON_EMOJI[p] || "🌙";
+
+function wxLabel(code){
+  if (code === 0) return "☀️ Sunny";
+  if (code === 1) return "🌤️ Mostly sunny";
+  if (code === 2) return "⛅ Partly cloudy";
+  if (code === 3) return "☁️ Cloudy";
+  if (code <= 48) return "🌫️ Foggy";
+  if (code <= 67) return "🌧️ Rainy";
+  if (code <= 77) return "🌨️ Snowy";
+  if (code <= 82) return "🌧️ Showers";
+  if (code <= 86) return "🌨️ Snow showers";
+  return "⛈️ Stormy";
+}
+
+function wxShort(code){
+  if (code === 0) return "Sunny";
+  if (code === 1) return "Mostly sunny";
+  if (code === 2) return "Partly cloudy";
+  if (code === 3) return "Cloudy";
+  if (code <= 48) return "Foggy";
+  if (code <= 82) return "Rainy";
+  if (code <= 86) return "Snowy";
+  return "Stormy";
+}
 
 const p2 = n => String(n).padStart(2, "0");
 const fmtT12 = d => {
@@ -104,16 +150,20 @@ const fmtRange12 = (a, b) => fmtT12(a) + " – " + fmtT12(b);
 const dayKey = iso => iso.slice(0, 10);
 
 function fishScore(d){
+  // Tuned for Florida pompano: moving water, 65-75°F, moderate surf stirring up sand fleas
   let s = 0;
   s += d.windMax <= 10 ? 30 : d.windMax <= 15 ? 22 : d.windMax <= 20 ? 12 : 4;
   s += d.rainMax < 20 ? 20 : d.rainMax < 40 ? 14 : d.rainMax < 60 ? 8 : 3;
-  s += (d.waterTemp >= 65 && d.waterTemp <= 80) ? 20 : (d.waterTemp >= 60 && d.waterTemp <= 85) ? 14 : 8;
-  s += d.waveMax < 1.5 ? 15 : d.waveMax < 3 ? 10 : 5;
-  s += d.tideRange >= 2 ? 15 : 8;
+  s += (d.waterTemp >= 65 && d.waterTemp <= 75) ? 25 : (d.waterTemp >= 60 && d.waterTemp <= 80) ? 18 : 10;
+  s += (d.waveMax >= 1 && d.waveMax <= 3) ? 18 : d.waveMax < 1 ? 12 : d.waveMax <= 5 ? 8 : 4;
+  s += d.tideRange >= 2.5 ? 20 : d.tideRange >= 1.5 ? 14 : 8;
   return Math.min(100, Math.round(s));
 }
 function activityLabel(s){
   return s >= 80 ? "Very high activity" : s >= 60 ? "High activity" : s >= 40 ? "Average activity" : "Low activity";
+}
+function ratingWord(s){
+  return s >= 100 ? "Outstanding" : s >= 85 ? "Superb" : s >= 75 ? "Great" : s >= 60 ? "Good" : s >= 40 ? "Fair" : "Poor";
 }
 
 function biteWindows(tides){
@@ -157,7 +207,8 @@ async function skyInfo(dateStr){
     if (ms){ const t = toD(ms); minors.push({ start: new Date(t.getTime() - H), end: new Date(t.getTime() + H), label: "Moonset" }); }
     const sr = getPhen(data.sundata, "Rise"), ss = getPhen(data.sundata, "Set");
     return {
-      phase: data.curphase, illum: data.fracillum, majors, minors,
+      phase: data.curphase, illum: data.fracillum,
+      majors: majors.filter(mm => mm.label !== "Moon underfoot"), minors,
       sunrise: sr ? toD(sr) : null, sunset: ss ? toD(ss) : null,
       moonrise: mr ? toD(mr) : null, moonset: ms ? toD(ms) : null
     };
@@ -166,7 +217,7 @@ async function skyInfo(dateStr){
 
 async function load(){
   const fUrl = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}` +
-    `&hourly=temperature_2m,precipitation_probability,wind_speed_10m,wind_direction_10m,pressure_msl,relative_humidity_2m` +
+    `&hourly=temperature_2m,precipitation_probability,wind_speed_10m,wind_direction_10m,pressure_msl,relative_humidity_2m,weathercode` +
     `&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,wind_speed_10m_max,wind_direction_10m_dominant,uv_index_max` +
     `&timezone=${encodeURIComponent(TZ)}&wind_speed_unit=mph&temperature_unit=fahrenheit&forecast_days=7`;
   const mUrl = `https://marine-api.open-meteo.com/v1/marine?latitude=${LAT}&longitude=${LON}` +
@@ -219,6 +270,16 @@ async function load(){
     };
     const tides = (t.predictions || []).filter(p => dayKey(p.t) === date);
     const hs = tides.map(p => parseFloat(p.v));
+    let wxCode = null;
+    {
+      let bj = hrs[0], bd = 1e15;
+      const tgt = i === 0 ? Date.now() : new Date(date + "T12:00:00").getTime();
+      hrs.forEach(j => {
+        const diff = Math.abs(new Date(f.hourly.time[j]).getTime() - tgt);
+        if (diff < bd){ bd = diff; bj = j; }
+      });
+      wxCode = f.hourly.weathercode[bj];
+    }
     const d = {
       date, i,
       tMax: Math.round(f.daily.temperature_2m_max[i]),
@@ -234,6 +295,7 @@ async function load(){
       hum: cur ? cur.hum : Math.round(dayAvg("relative_humidity_2m") ?? 0),
       curTemp: cur ? cur.temp : null,
       curRain: cur ? cur.rain : null,
+      wxCode,
       tides, hrs, wins: biteWindows(tides)
     };
     d.score = fishScore(d);
@@ -253,6 +315,7 @@ async function load(){
   });
 
   window.__days = days;
+  window.__fh = f.hourly;
   renderStrip(0);
   render(0);
 }
@@ -302,7 +365,7 @@ function tideSVG(day, highlight){
   let marks = "";
   pts.forEach(p => {
     const x = X(p.t.getTime()), y = Y(p.v);
-    marks += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3.5" fill="${p.type === "H" ? "#0284c7" : "#d97706"}"/>` +
+    marks += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3.5" fill="${p.type === "H" ? "#166534" : "#d97706"}"/>` +
       `<text x="${x.toFixed(1)}" y="${(y - 8).toFixed(1)}" fill="#334155" font-size="10" text-anchor="middle">${p.type} ${fmtT12(p.t).replace(" ", "")}</text>`;
   });
   let fish = "";
@@ -317,44 +380,9 @@ function tideSVG(day, highlight){
   const nowLine = (nowX > P && nowX < W - P)
     ? `<line x1="${nowX.toFixed(1)}" y1="${P}" x2="${nowX.toFixed(1)}" y2="${H - P}" stroke="#ef4444" stroke-width="1.5"/>` : "";
   return `<svg class="tide-svg" viewBox="0 0 ${W} ${H}">${shades}` +
-    `<path d="${dAttr}" fill="none" stroke="#0284c7" stroke-width="2"/>${marks}${fish}${nowLine}</svg>` +
+    `<path d="${dAttr}" fill="none" stroke="#166534" stroke-width="2"/>${marks}${fish}${nowLine}</svg>` +
     `<div class="legend">🐟 = best bite · green = prime window · 🔴 = now</div>`;
 }
-
-let tickTimer = null;
-function fmtCountdown(ms){
-  const s = Math.max(0, Math.floor(ms / 1000));
-  const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), ss = s % 60;
-  return h ? `${h}h ${p2(m)}m ${p2(ss)}s` : `${m}m ${p2(ss)}s`;
-}
-function startTicks(){
-  if (tickTimer) clearInterval(tickTimer);
-  const days = window.__days;
-  const today = days[0];
-  function tick(){
-    const tv = document.getElementById("cd-tide-v"), tc = document.getElementById("cd-tide-c");
-    const bv = document.getElementById("cd-bite-v"), bc = document.getElementById("cd-bite-c");
-    if (!tv || !bv) return;
-    const now = Date.now();
-    const nx = today.tides
-      .map(p => ({ t: new Date(p.t).getTime(), type: p.type, v: parseFloat(p.v) }))
-      .filter(p => p.t > now)[0];
-    if (nx){
-      tv.textContent = `${nx.type === "H" ? "High" : "Low"} ${fmtT12(new Date(nx.t))} · ${nx.v.toFixed(1)}ft`;
-      tc.textContent = "in " + fmtCountdown(nx.t - now);
-    }
-    const bw = today.wins.length ? bestWindow(today.wins) : null;
-    if (bw){
-      bv.innerHTML = `${fishIcon(today.score, 18)} ${fmtRange12b(bw)} · ${today.score}`;
-      bc.textContent = (now >= bw.start.getTime() && now <= bw.end.getTime())
-        ? "Biting NOW · ends in " + fmtCountdown(bw.end.getTime() - now)
-        : "in " + fmtCountdown(bw.start.getTime() - now);
-    }
-  }
-  tick();
-  tickTimer = setInterval(tick, 1000);
-}
-function fmtRange12b(w){ return fmtT12(w.start) + " – " + fmtT12(w.end); }
 
 const COMPASS = ["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSW","SW","WSW","W","WNW","NW","NNW"];
 const compass = d => COMPASS[Math.round(d / 22.5) % 16];
@@ -368,6 +396,11 @@ function renderStrip(sel){
   }).join("");
   document.querySelectorAll(".dpill").forEach(el =>
     el.addEventListener("click", () => { renderStrip(+el.dataset.i); render(+el.dataset.i); }));
+  let bi = 0;
+  days.forEach((d, i) => { if (d.score > days[bi].score) bi = i; });
+  const bdt = new Date(days[bi].date + "T12:00:00");
+  document.getElementById("bestday").innerHTML =
+    `⭐ Best day this week: <b>${bdt.toLocaleDateString("en-US", { weekday: "short" })} ${bdt.getDate()}</b> — ${ratingWord(days[bi].score)} (${days[bi].score})`;
 }
 
 function render(i){
@@ -378,35 +411,32 @@ function render(i){
   const sky = d.sky;
   const C = 2 * Math.PI * 54;
 
-  const majors = sky ? sky.majors.slice(0, 2) : [];
-  const minors = sky ? sky.minors.slice(0, 2) : [];
+  const nowMs = Date.now();
+  const majors = sky ? sky.majors.filter(mm => mm.end.getTime() > nowMs) : [];
+  const minors = sky ? sky.minors.filter(mm => mm.end.getTime() > nowMs) : [];
+  const allSol = [
+    ...(sky ? sky.majors.map(m => ({ ...m, kind: "Major" })) : []),
+    ...(sky ? sky.minors.map(m => ({ ...m, kind: "Minor" })) : [])
+  ];
+  let nextSol = null;
+  allSol.forEach(s => {
+    if (s.end.getTime() > nowMs && (!nextSol || s.start.getTime() < nextSol.start.getTime())) nextSol = s;
+  });
+  const isNext = mm => nextSol && mm.start.getTime() === nextSol.start.getTime() && mm.label === nextSol.label;
 
   let html = `<div class="card">
-    <div class="score-wrap">
-      <div class="majmin"><div class="k">Major times</div>
-        ${majors.map(mm => `<div class="t">${fmtRange12(mm.start, mm.end)}</div>`).join("") || `<div class="t">—</div>`}
-      </div>
+    <div class="score-wrap" style="justify-content:center">
       <div class="dial">
         <svg width="128" height="128" viewBox="0 0 128 128">
-          <circle cx="64" cy="64" r="54" fill="none" stroke="#e2e8f0" stroke-width="11"/>
+          <circle cx="64" cy="64" r="54" fill="none" stroke="#e7dfc9" stroke-width="11"/>
           <circle cx="64" cy="64" r="54" fill="none" stroke="${fishColor(d.score)}" stroke-width="11"
             stroke-linecap="round" stroke-dasharray="${(d.score / 100 * C).toFixed(1)} ${C.toFixed(1)}"
             transform="rotate(-90 64 64)"/>
         </svg>
         <div class="num">${d.score}</div>
       </div>
-      <div class="majmin" style="text-align:right"><div class="k">Minor times</div>
-        ${minors.map(mm => `<div class="t">${fmtRange12(mm.start, mm.end)}</div>`).join("") || `<div class="t">—</div>`}
-      </div>
     </div>
     <div class="activity">${activityLabel(d.score)}</div>`;
-
-  if (i === 0){
-    html += `<div class="counts">
-      <div class="count"><div class="k">Next tide</div><div class="v" id="cd-tide-v">—</div><div class="c" id="cd-tide-c"></div></div>
-      <div class="count"><div class="k">Next bite</div><div class="v" id="cd-bite-v">—</div><div class="c" id="cd-bite-c"></div></div>
-    </div>`;
-  }
 
   if (d.wins.length){
     html += `<div style="margin-top:10px"><div class="sec-t" style="font-size:12px">🐟 Best bite windows</div>`;
@@ -421,9 +451,17 @@ function render(i){
   }
   html += `</div>`;
 
+  if (majors.length || minors.length){
+    html += `<div class="card"><div class="sec-t">Major & minor times</div>` +
+      majors.map(mm => `<div class="sol${isNext(mm) ? " next" : ""}"><span class="pillmaj">MAJOR</span><span>${fmtRange12(mm.start, mm.end)}</span></div>`).join("") +
+      minors.map(mm => `<div class="sol${isNext(mm) ? " next" : ""}"><span class="pillmin">MINOR</span><span>${fmtRange12(mm.start, mm.end)}</span></div>`).join("") +
+      `</div>`;
+  }
+
   const bigT = d.curTemp !== null ? d.curTemp : d.tMax;
   const rain = d.curRain !== null ? d.curRain : d.rainMax;
-  html += `<div class="card"><div class="sec-t">Weather<span class="r">Rain</span></div>
+  html += `<div class="card"><div class="condbox">${wxLabel(d.wxCode)}</div>
+    <div class="sec-t">Weather<span class="r">Rain</span></div>
     <div class="wx">
       <div><div class="big">${bigT}°</div><div class="hl">${d.tMax}°F <span>${d.tMin}°F</span></div></div>
       <div class="wxgrid">
@@ -471,10 +509,18 @@ function render(i){
   }
   html += `<div class="card"><div class="sec-t">Tides</div>${tideTop}${tideSVG(d, best)}</div>`;
 
+  const fh = window.__fh;
+  if (fh && d.hrs.length){
+    html += `<div class="card"><div class="sec-t">Hourly</div><div class="hstrip">` +
+      d.hrs.map(j => `<div class="hchip"><div class="ht">${fmtT12(new Date(fh.time[j]))}</div>` +
+        `<div class="hx">${Math.round(fh.temperature_2m[j])}°</div>` +
+        `<div class="hr">💧${fh.precipitation_probability[j] ?? 0}%</div></div>`).join("") +
+      `</div></div>`;
+  }
+
   app.innerHTML = html;
   document.getElementById("updated").textContent =
     "updated " + new Date().toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", timeZone: TZ });
-  startTicks();
 }
 
 load().catch(() => {
