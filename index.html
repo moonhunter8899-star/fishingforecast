@@ -630,7 +630,7 @@ function tideCountdownHTML() {
   return parts.join(" · ");
 }
 function tideSVG(day) {
-  var W = 360, H = 138, pL = 8, pR = 8, pT = 18, pB = 22;
+  var W = 360, H = 176, pL = 8, pR = 8, pT = 56, pB = 22;
   var d0 = day.date.getTime(), d1 = d0 + 86400000;
   var pts = [];
   for (var t = d0; t <= d1; t += 900000) pts.push([t, tideAt(t)]);
