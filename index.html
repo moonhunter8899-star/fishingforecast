@@ -22,10 +22,20 @@
   h1, h2, h3, .serif { font-family: "Fraunces", Georgia, serif; }
 
   /* Header */
-  .hd { display: flex; align-items: flex-start; justify-content: space-between; margin: 4px 2px 12px; }
-  .hd .t1 { font-family: "Fraunces", serif; font-weight: 800; font-size: 15px; }
-  .hd .t1 .nm { color: #8a7a5f; font-weight: 600; font-size: 12px; }
+  .hd { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin: 4px 2px 12px; }
+  .hd .t1 { font-family: "Fraunces", serif; font-weight: 800; font-size: 16px; }
   .hd .t2 { color: #8a7a5f; font-size: 10px; margin-top: 2px; }
+  .hdBtns { display: flex; align-items: center; gap: 8px; flex: none; }
+  .langbtn {
+    background: #fffaf0; border: 1.5px solid #d9c9a3; border-radius: 999px;
+    font-size: 11px; font-weight: 800; padding: 7px 10px; cursor: pointer; color: #8a7a5f;
+  }
+  .langbtn b { color: #9a4a16; }
+  .locbtn {
+    width: 34px; height: 34px; border-radius: 50%; background: #fffaf0;
+    border: 1.5px solid #d9c9a3; font-size: 16px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
   .refresh {
     background: #bc5a1e; color: #fff; border: none; border-radius: 999px;
     font-family: "Fraunces", serif; font-weight: 800; font-size: 13px;
@@ -86,562 +96,770 @@
     margin-left: auto; background: #6b4a1f; color: #ffe9a8; border: none; border-radius: 999px;
     font-size: 10px; font-weight: 800; padding: 6px 12px; cursor: pointer; letter-spacing: .06em; flex: none;
   }
+  .bestbanner .bt { font-family: "Fraunces", serif; font-weight: 800; font-size: 11px; letter-spacing: .08em; }
 
-  /* Day summary card */
+  /* Day card */
   .card {
     background: #fffaf0; border-radius: 20px; padding: 16px; margin-bottom: 14px;
     border: 1.5px solid #1d9e6c;
   }
-  .card h3 { margin: 0; font-size: 20px; font-weight: 900; }
-  .card h3 .dt { font-family: "Public Sans", sans-serif; font-size: 13px; font-weight: 600; color: #8a7a5f; }
-  .sub2 { font-size: 12px; color: #8a7a5f; margin: 2px 0 10px; }
-  .ratingpill {
-    display: inline-flex; align-items: center; gap: 8px; border-radius: 999px;
-    padding: 7px 14px 7px 8px; color: #fff; font-weight: 800; font-size: 14px; margin-bottom: 12px;
-  }
-  .ratingpill .wc {
-    width: 30px; height: 30px; border-radius: 50%; background: #fff;
-    display: flex; align-items: center; justify-content: center; flex: none;
-  }
-  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
-  .chip {
-    display: inline-flex; align-items: center; gap: 6px; border-radius: 999px;
-    padding: 7px 12px; font-size: 12px; font-weight: 700;
-    background: #fffaf0; border: 1px solid #d9c9a3; color: #2b2620;
-  }
-  .chip.best { background: #bc5a1e; border-color: #bc5a1e; color: #fff; }
+  .card h3 { margin: 0; font-size: 19px; font-weight: 900; }
+  .card h3 .dt { font-family: "Public Sans", sans-serif; font-size: 12px; font-weight: 600; color: #8a7a5f; }
 
-  .wxgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
-  .wxbox { background: #ede4cc; border-radius: 12px; padding: 12px; }
-  .wxbox.sky { border: 1.5px solid #c9b78f; }
-  .wxbox .k { font-size: 10px; font-weight: 700; letter-spacing: .08em; color: #8a7a5f; text-transform: uppercase; }
-  .wxbox .v { font-family: "Fraunces", serif; font-size: 21px; font-weight: 800; margin-top: 2px; }
-  .wxbox .s { font-size: 11px; color: #6b5f4c; margin-top: 2px; }
-
-  .mmhead {
-    display: flex; align-items: center; justify-content: space-between; margin: 2px 0 6px;
+  /* GO FISH band */
+  .gofish {
+    display: flex; align-items: center; gap: 10px;
+    background: #bc5a1e; color: #fff; border-radius: 14px; padding: 11px 14px;
+    margin: 12px 0; font-family: "Fraunces", serif; font-weight: 900; font-size: 19px;
+    box-shadow: 0 3px 10px rgba(188,90,30,.35);
   }
-  .mmhead .t { font-size: 12px; font-weight: 800; letter-spacing: .1em; color: #9a4a16; text-transform: uppercase; }
-  .mmhead .n { font-size: 10px; font-weight: 700; background: #ede4cc; border-radius: 999px; padding: 3px 10px; color: #6b5f4c; }
-  .mmrow {
-    display: flex; align-items: center; gap: 10px; padding: 8px 10px;
-    border-top: 1px solid #eee2c8; font-size: 13px;
+  .gofish .fic {
+    width: 34px; height: 34px; border-radius: 50%; background: #fff; flex: none;
+    display: flex; align-items: center; justify-content: center;
   }
-  .mmrow.next { background: #fff3cf; border: 1.5px solid #d9a441; border-radius: 10px; margin: 4px 0; }
-  .mmbadge { font-size: 10px; font-weight: 800; letter-spacing: .06em; padding: 4px 9px; border-radius: 6px; color: #fff; flex: none; }
-  .mmbadge.major { background: #bc5a1e; }
-  .mmbadge.minor { background: #9a958a; }
-  .mmrow .tt { font-weight: 700; }
-  .mmrow .mc { color: #8a7a5f; font-size: 11px; margin-left: auto; }
-  .mmrow .nextpill {
-    background: #6b4a1f; color: #ffe9a8; font-size: 9px; font-weight: 800;
-    padding: 3px 8px; border-radius: 999px; letter-spacing: .06em; flex: none;
+  .gofish .gl { font-size: 15px; letter-spacing: .04em; }
+  .gofish .gt { margin-left: 2px; }
+
+  /* 4 weather tiles */
+  .tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 16px; }
+  .tile { background: #ede4cc; border-radius: 12px; padding: 10px 6px; text-align: center; }
+  .tile .k { font-size: 9px; font-weight: 700; letter-spacing: .06em; color: #8a7a5f; text-transform: uppercase; }
+  .tile .v { font-family: "Fraunces", serif; font-size: 15px; font-weight: 800; margin-top: 3px; white-space: nowrap; }
+
+  /* Major / Minor section */
+  .moonsec { margin-bottom: 16px; }
+  .moonsec .mh { font-family: "Fraunces", serif; font-weight: 800; font-size: 15px; color: #9a4a16; margin-bottom: 2px; }
+  .cdline { font-size: 11px; color: #8a7a5f; margin: 0 0 8px; font-weight: 600; }
+  .mrow {
+    display: flex; align-items: center; gap: 10px;
+    background: #f3ecda; border: 1px solid #e0d2ae; border-radius: 12px;
+    padding: 9px 12px; margin-bottom: 7px; font-weight: 700; font-size: 14px;
   }
-  .footnote { font-size: 11px; color: #8a7a5f; margin-top: 12px; line-height: 1.7; }
+  .mrow.now { background: #fff3cf; border: 2px solid #d9a441; box-shadow: 0 0 8px rgba(217,164,65,.45); }
+  .mbadge {
+    font-size: 10px; font-weight: 800; letter-spacing: .06em; border-radius: 7px;
+    padding: 4px 8px; flex: none;
+  }
+  .mbadge.major { background: #bc5a1e; color: #fff; }
+  .mbadge.minor { background: #e3d5b3; color: #6b5f4c; }
+  .mrow .mt { font-family: "Fraunces", serif; font-weight: 800; }
+  .nowpill {
+    margin-left: auto; background: #1d9e6c; color: #fff; font-size: 10px; font-weight: 800;
+    border-radius: 999px; padding: 3px 10px; letter-spacing: .06em; flex: none;
+  }
 
-  /* Hourly */
-  .hcard { background: #fffaf0; border-radius: 20px; padding: 16px; margin-bottom: 14px; border: 1.5px solid #e3d5b3; }
-  .hcard h3 { margin: 0 0 4px; font-size: 18px; }
-  .legend { display: flex; gap: 14px; font-size: 11px; font-weight: 700; color: #6b5f4c; margin-bottom: 8px; align-items: center; }
-  .htable { width: 100%; border-collapse: collapse; font-size: 12px; }
-  .htable th { text-align: left; font-size: 10px; text-transform: uppercase; letter-spacing: .06em; color: #8a7a5f; padding: 6px 4px; border-bottom: 1px solid #e3d5b3; }
-  .htable td { padding: 7px 4px; border-bottom: 1px solid #f0e7d2; }
-  .htable tr.biterow td { background: #e4f4e8; }
-  .htable tr:first-child td { border-top: none; }
-  .hfoot { font-size: 10px; color: #8a7a5f; margin-top: 8px; line-height: 1.6; }
-
-  /* Tide */
-  .tidecard { background: #fffaf0; border-radius: 20px; padding: 16px; margin-bottom: 14px; border: 1.5px solid #e3d5b3; }
-  .tidecard h3 { margin: 0; font-size: 18px; }
-  .tidesub { font-size: 12px; color: #8a7a5f; margin: 2px 0 6px; }
-  .tide-svg { width: 100%; height: 104px; display: block; }
-  .tidechips { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+  /* Tide section */
+  .tidesec .th { font-family: "Fraunces", serif; font-weight: 800; font-size: 15px; color: #0f766e; margin-bottom: 2px; }
+  .tidechart { width: 100%; height: auto; display: block; margin: 4px 0 8px; }
+  .tchips { display: flex; flex-wrap: wrap; gap: 8px; }
   .tchip {
     display: inline-flex; align-items: center; gap: 6px; border-radius: 999px;
-    padding: 7px 12px; font-size: 12px; font-weight: 700;
+    padding: 6px 12px; font-size: 12px; font-weight: 700;
+    background: #ede4cc; border: 1px solid #d9c9a3; color: #2b2620;
   }
-  .tchip.hi { background: #bc5a1e; color: #fff; }
-  .tchip.lo { background: #ede4cc; color: #6b5f4c; }
+  .tchip.hi { background: #bc5a1e; border-color: #bc5a1e; color: #fff; }
 
-  .loading { text-align: center; color: #8a7a5f; padding: 60px 0; font-size: 14px; }
-  .err { color: #c93a2e; text-align: center; padding: 40px 0; }
-  .gofish {
-    background: #bc5a1e; color: #fff; border-radius: 14px; padding: 14px;
-    font-size: 16px; font-weight: 700; text-align: center; margin-bottom: 14px;
-  }
-  .gofish b { font-size: 21px; letter-spacing: .02em; }
-  details.more {
-    background: #fffaf0; border: 1.5px solid #e3d5b3; border-radius: 16px;
-    padding: 12px 16px; margin-bottom: 14px;
-  }
-  details.more summary {
-    font-family: "Fraunces", serif; font-weight: 800; font-size: 15px;
-    cursor: pointer; color: #9a4a16; list-style: none;
-  }
-  details.more summary::-webkit-details-marker { display: none; }
-  details.more summary::after { content: " ▾"; font-size: 12px; }
-  details.more[open] summary::after { content: " ▴"; }
+  .loading, .err { text-align: center; padding: 40px 16px; color: #8a7a5f; font-size: 14px; }
+  .err button { margin-top: 10px; }
+  .foot { text-align: center; color: #b3a37f; font-size: 10px; margin-top: 18px; }
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="hd">
     <div>
-      <div class="t1">Jupiter Inlet, FL — Pompano <span class="nm">· Tien Huynh</span></div>
-      <div class="t2" id="hdsub">26.9166°, −80.0642°</div>
+      <div class="t1" id="locName">…</div>
+      <div class="t2" id="updLine"></div>
     </div>
-    <button class="refresh" id="refreshBtn">Refresh</button>
+    <div class="hdBtns">
+      <button class="langbtn" id="langBtn" title="Language / Ngôn ngữ"></button>
+      <button class="locbtn" id="locBtn" title="Use my location">📍</button>
+      <button class="refresh" id="refBtn">Refresh</button>
+    </div>
   </div>
-  <div id="app"><div class="loading">Checking pompano conditions…</div></div>
+  <div id="app"><div class="loading" id="loading">Checking pompano conditions…</div></div>
+  <div class="foot">Pompano Forecast · Tien Huynh</div>
 </div>
 <script>
-const HOME = { lat: 26.9166, lon: -80.0642, station: "8722495", name: "Jupiter Inlet, FL", short: "JUPITER INLET" };
-const TZ = "America/New_York";
-let LOC = { ...HOME, live: false };
+"use strict";
+/* ================= constants ================= */
+var PIN = { lat: 26.9166, lon: -80.0642, name: "Jupiter Inlet, FL", station: "8722495" };
+var SHORE_KM = 3.2; // ~2 miles from the FL east coast shoreline = "near the beach"
 
-function hav(a,b,c,d){
-  const R = 3958.8, r = Math.PI/180;
-  const x = (c-a)*r, y = (d-b)*r;
-  const h = Math.sin(x/2)**2 + Math.cos(a*r)*Math.cos(c*r)*Math.sin(y/2)**2;
-  return 2*R*Math.asin(Math.sqrt(h));
-}
-function getPos(){
-  return new Promise(res => {
-    if (!navigator.geolocation) return res(null);
-    navigator.geolocation.getCurrentPosition(
-      p => res({ lat: p.coords.latitude, lon: p.coords.longitude }),
-      () => res(null),
-      { timeout: 8000, maximumAge: 600000 }
-    );
-  });
-}
-async function revName(lat, lon){
-  try{
-    const r = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`);
-    const j = await r.json();
-    const city = j.city || j.locality || "";
-    const st = j.principalSubdivisionCode ? j.principalSubdivisionCode.split("-").pop() : "";
-    return city ? (st ? `${city}, ${st}` : city) : null;
-  }catch(e){ return null; }
-}
-async function nearestStation(lat, lon){
-  try{
-    const r = await fetch("https://api.tidesandcurrents.noaa.gov/mdapi/prod/webapi/stations.json");
-    const j = await r.json();
-    let best = null, bd = 1e9;
-    for (const s of j.stations || []){
-      if (!s.tidal) continue;
-      const d = hav(lat, lon, parseFloat(s.lat), parseFloat(s.lng));
-      if (d < bd){ bd = d; best = s; }
-    }
-    return best ? { id: best.id, name: best.name } : null;
-  }catch(e){ return null; }
-}
-const BEACHES = [
-  [26.9166,-80.0642],[27.86,-80.45],[27.45,-80.29],[27.19,-80.18],[26.71,-80.03],
-  [26.36,-80.07],[26.12,-80.12],[25.76,-80.13],[28.32,-80.61],[29.21,-81.01],
-  [27.27,-80.35],[27.64,-80.39],[30.33,-81.43],[24.55,-81.78],[28.0,-80.55]
+var STATIONS = [
+  { id: "8720030", lat: 30.61, lon: -81.47 },
+  { id: "8720218", lat: 30.40, lon: -80.66 },
+  { id: "8720587", lat: 29.86, lon: -81.29 },
+  { id: "8721120", lat: 29.23, lon: -81.01 },
+  { id: "8721604", lat: 28.42, lon: -80.59 },
+  { id: "8722495", lat: 26.94, lon: -80.07 },
+  { id: "8722670", lat: 26.61, lon: -80.03 },
+  { id: "8723214", lat: 25.73, lon: -80.16 }
 ];
-const nearBeach = (lat, lon) => BEACHES.some(([a,b]) => hav(lat, lon, a, b) < 12);
-async function detectLocation(){
-  const pos = await getPos();
-  if (!pos) return;
-  if (hav(pos.lat, pos.lon, HOME.lat, HOME.lon) < 10) return;
-  if (!nearBeach(pos.lat, pos.lon)){ LOC.pinned = true; return; }
-  const [nm, st] = await Promise.all([revName(pos.lat, pos.lon), nearestStation(pos.lat, pos.lon)]);
-  LOC = {
-    lat: pos.lat, lon: pos.lon,
-    station: st ? st.id : HOME.station,
-    name: nm || (st ? st.name : null) || `${pos.lat.toFixed(2)}°, ${pos.lon.toFixed(2)}°`,
-    short: (nm || "CURRENT SPOT").toUpperCase(),
-    live: true
-  };
-}
-
-/* Pompano icon: deep compressed body, blunt steep head, deeply forked tail */
-function pompano(color, size){
-  size = size || 24;
-  return `<svg width="${size}" height="${size}" viewBox="0 0 48 48" style="flex:none;display:block">` +
-    `<path d="M4 24C8 14 16 8 26 8L34 12L44 6L40 16L44 26L34 21C28 27 18 32 10 30C6 29 4 27 4 24Z" fill="${color}"/>` +
-    `<path d="M15 23C18 21 21 21 23.5 23" stroke="#fff" stroke-width="1.8" fill="none" opacity=".9"/>` +
-    `<circle cx="11" cy="20" r="2.7" fill="#fff"/><circle cx="11" cy="20" r="1.3" fill="#22312b"/></svg>`;
-}
-function rateColor(s){ return s >= 60 ? "#1d9e6c" : s >= 40 ? "#d98a16" : "#c93a2e"; }
-function outlook(s){
-  return s >= 90 ? "Outstanding" : s >= 80 ? "Great" : s >= 65 ? "Good" : s >= 40 ? "Fair" : "Poor";
-}
-const p2 = n => String(n).padStart(2, "0");
-const fmtT12 = d => {
-  let h = d.getHours(); const ap = h >= 12 ? "PM" : "AM"; h = h % 12 || 12;
-  return h + ":" + p2(d.getMinutes()) + " " + ap;
+// Simplified Florida east-coast shoreline polyline, Jacksonville -> Miami [lat, lon]
+var SHORE = [
+  [30.61,-81.43],[30.40,-81.40],[30.10,-81.33],[29.86,-81.28],[29.60,-81.18],
+  [29.40,-81.10],[29.23,-80.99],[29.05,-80.88],[28.90,-80.78],[28.70,-80.70],
+  [28.57,-80.62],[28.42,-80.58],[28.20,-80.57],[28.00,-80.55],[27.80,-80.45],
+  [27.60,-80.35],[27.40,-80.27],[27.25,-80.20],[27.05,-80.12],[26.94,-80.07],
+  [26.77,-80.03],[26.60,-80.03],[26.45,-80.03],[26.30,-80.06],[26.10,-80.10],
+  [25.95,-80.12],[25.75,-80.13],[25.60,-80.15]
+];
+var TOWNS = [
+  ["Fernandina Beach, FL",30.61,-81.47],["Jacksonville Beach, FL",30.29,-81.39],
+  ["St. Augustine, FL",29.89,-81.31],["Daytona Beach, FL",29.21,-81.02],
+  ["New Smyrna Beach, FL",29.03,-80.90],["Titusville, FL",28.61,-80.81],
+  ["Cocoa Beach, FL",28.32,-80.61],["Melbourne, FL",28.08,-80.60],
+  ["Sebastian, FL",27.82,-80.47],["Vero Beach, FL",27.64,-80.36],
+  ["Fort Pierce, FL",27.44,-80.30],["Stuart, FL",27.20,-80.22],
+  ["Jupiter, FL",26.93,-80.09],["Juno Beach, FL",26.87,-80.06],
+  ["North Palm Beach, FL",26.82,-80.06],["West Palm Beach, FL",26.71,-80.05],
+  ["Lake Worth, FL",26.61,-80.06],["Boynton Beach, FL",26.53,-80.06],
+  ["Boca Raton, FL",26.37,-80.08],["Pompano Beach, FL",26.24,-80.10],
+  ["Fort Lauderdale, FL",26.12,-80.12],["Hollywood, FL",26.01,-80.13],
+  ["Miami Beach, FL",25.79,-80.13],["Miami, FL",25.76,-80.19]
+];
+/* ================= i18n ================= */
+var STR = {
+  en: {
+    loading: "Checking pompano conditions…",
+    rating: "POMPANO BITE RATING", today: "TODAY",
+    pickDay: "Pick a day", best: "★ BEST", bestWeek: "BEST DAY THIS WEEK", goDay: "GO DAY",
+    goFish: "GO FISH", wind: "WIND", water: "WATER", cond: "CONDITION", rain: "RAIN",
+    moonTitle: "Major / Minor bite times", major: "MAJOR", minor: "MINOR", now: "NOW",
+    tide: "Tide", high: "High", low: "Low", refresh: "Refresh", todayWord: "Today",
+    retry: "Try again", loadFail: "Could not load live data. Check your connection.",
+    outstanding: "Outstanding", great: "Great", good: "Good", fair: "Fair", poor: "Poor",
+    updated: function(d, t) { return "Updated " + d + " at " + t; },
+    miAway: function(mi) { return mi + " mi away"; },
+    dur: function(h, m) { return h > 0 ? h + "h " + m + "m" : m + "m"; },
+    nextMajor: function(d) { return "Next Major in " + d; },
+    nextMinor: function(d) { return "Next Minor in " + d; },
+    majorNow: "Major bite happening now", minorNow: "Minor bite happening now",
+    nextHigh: function(d) { return "High tide in " + d; },
+    nextLow: function(d) { return "Low tide in " + d; },
+    days: ["SUN","MON","TUE","WED","THU","FRI","SAT"],
+    months: ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
+    condName: {
+      0:"Clear", 1:"Mostly clear", 2:"Partly cloudy", 3:"Overcast",
+      45:"Fog", 48:"Fog", 51:"Drizzle", 53:"Drizzle", 55:"Drizzle",
+      56:"Freezing drizzle", 57:"Freezing drizzle", 61:"Light rain", 63:"Rain",
+      65:"Heavy rain", 66:"Freezing rain", 67:"Freezing rain", 71:"Snow",
+      73:"Snow", 75:"Snow", 77:"Snow", 80:"Showers", 81:"Showers", 82:"Showers",
+      85:"Snow showers", 86:"Snow showers", 95:"Thunderstorm", 96:"Storm", 99:"Storm"
+    },
+    condIcon: { 0:"☀️", 1:"🌤️", 2:"⛅", 3:"☁️", 45:"🌫️", 48:"🌫️", 61:"🌧️", 63:"🌧️", 65:"🌧️", 80:"🌦️", 81:"🌦️", 82:"🌦️", 95:"⛈️", 96:"⛈️", 99:"⛈️" }
+  },
+  vi: {
+    loading: "Đang kiểm tra điều kiện câu cá…",
+    rating: "ĐIỂM CẮN CÂU POMPANO", today: "HÔM NAY",
+    pickDay: "Chọn ngày", best: "★ ĐẸP NHẤT", bestWeek: "NGÀY ĐẸP NHẤT TUẦN", goDay: "ĐI NGAY",
+    goFish: "ĐI CÂU NGAY", wind: "GIÓ", water: "NƯỚC", cond: "THỜI TIẾT", rain: "MƯA",
+    moonTitle: "Giờ cá cắn câu chính / phụ", major: "CHÍNH", minor: "PHỤ", now: "NGAY BÂY GIỜ",
+    tide: "Thủy triều", high: "Nước lên", low: "Nước xuống", refresh: "Làm mới", todayWord: "Hôm nay",
+    retry: "Thử lại", loadFail: "Không tải được dữ liệu. Kiểm tra kết nối mạng.",
+    outstanding: "Xuất sắc", great: "Tuyệt vời", good: "Tốt", fair: "Trung bình", poor: "Kém",
+    updated: function(d, t) { return "Cập nhật " + d + " lúc " + t; },
+    miAway: function(mi) { return "cách " + mi + " dặm"; },
+    dur: function(h, m) { return h > 0 ? h + " giờ " + m + " phút" : m + " phút"; },
+    nextMajor: function(d) { return "Cá cắn mạnh sau " + d; },
+    nextMinor: function(d) { return "Cá cắn nhẹ sau " + d; },
+    majorNow: "Đang cắn mạnh ngay bây giờ", minorNow: "Đang cắn nhẹ ngay bây giờ",
+    nextHigh: function(d) { return "Nước lên sau " + d; },
+    nextLow: function(d) { return "Nước xuống sau " + d; },
+    days: ["CN","T2","T3","T4","T5","T6","T7"],
+    months: ["Th1","Th2","Th3","Th4","Th5","Th6","Th7","Th8","Th9","Th10","Th11","Th12"],
+    condName: {
+      0:"Trời quang", 1:"Ít mây", 2:"Mây rải rác", 3:"Nhiều mây",
+      45:"Sương mù", 48:"Sương mù", 51:"Mưa phùn", 53:"Mưa phùn", 55:"Mưa phùn",
+      56:"Mưa phùn", 57:"Mưa phùn", 61:"Mưa nhẹ", 63:"Mưa",
+      65:"Mưa to", 66:"Mưa đá", 67:"Mưa đá", 71:"Tuyết",
+      73:"Tuyết", 75:"Tuyết", 77:"Tuyết", 80:"Mưa rào", 81:"Mưa rào", 82:"Mưa rào",
+      85:"Mưa tuyết", 86:"Mưa tuyết", 95:"Dông", 96:"Dông", 99:"Dông"
+    },
+    condIcon: { 0:"☀️", 1:"🌤️", 2:"⛅", 3:"☁️", 45:"🌫️", 48:"🌫️", 61:"🌧️", 63:"🌧️", 65:"🌧️", 80:"🌦️", 81:"🌦️", 82:"🌦️", 95:"⛈️", 96:"⛈️", 99:"⛈️" }
+  }
 };
-const fmtRange = (a, b) => fmtT12(a).replace(" ", "") + "–" + fmtT12(b).replace(" ", "");
-const dayKey = iso => iso.slice(0, 10);
-const COMPASS = ["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSW","SW","WSW","W","WNW","NW","NNW"];
-const compass = d => COMPASS[Math.round(d / 22.5) % 16];
-const arrow = d => `<span style="display:inline-block;transform:rotate(${d + 180}deg)">➤</span>`;
 
-function wxInfo(code){
-  if (code === 0) return { t: "Sunny", e: "☀️" };
-  if (code === 1) return { t: "Mostly sunny", e: "🌤️" };
-  if (code === 2) return { t: "Partly cloudy", e: "⛅" };
-  if (code === 3) return { t: "Cloudy", e: "☁️" };
-  if (code <= 48) return { t: "Foggy", e: "🌫️" };
-  if (code <= 67) return { t: "Rainy", e: "🌧️" };
-  if (code <= 77) return { t: "Snowy", e: "🌨️" };
-  if (code <= 82) return { t: "Showers", e: "🌦️" };
-  return { t: "Stormy", e: "⛈️" };
+/* ================= helpers ================= */
+function $(id) { return document.getElementById(id); }
+function pad(n) { return (n < 10 ? "0" : "") + n; }
+function havKm(a, b, c, d) {
+  var R = 6371, r1 = a * Math.PI / 180, r2 = c * Math.PI / 180;
+  var h = Math.sin((c - a) * Math.PI / 360), k = Math.sin((d - b) * Math.PI / 360);
+  var x = h * h + Math.cos(r1) * Math.cos(r2) * k * k;
+  return 2 * R * Math.asin(Math.sqrt(x));
 }
+// distance (km) from point to FL east-coast shoreline polyline (equirectangular approx)
+function distToShore(lat, lon) {
+  var best = 1e9, kx = 111.32 * Math.cos(lat * Math.PI / 180), ky = 110.57;
+  for (var i = 0; i < SHORE.length - 1; i++) {
+    var ax = SHORE[i][1] * kx, ay = SHORE[i][0] * ky;
+    var bx = SHORE[i+1][1] * kx, by = SHORE[i+1][0] * ky;
+    var px = lon * kx, py = lat * ky;
+    var dx = bx - ax, dy = by - ay;
+    var t = ((px - ax) * dx + (py - ay) * dy) / (dx * dx + dy * dy);
+    t = Math.max(0, Math.min(1, t));
+    var ex = ax + t * dx - px, ey = ay + t * dy - py;
+    var d = Math.sqrt(ex * ex + ey * ey);
+    if (d < best) best = d;
+  }
+  return best;
+}
+function nearestStation(lat, lon) {
+  var best = STATIONS[0], bd = 1e9;
+  for (var i = 0; i < STATIONS.length; i++) {
+    var d = havKm(lat, lon, STATIONS[i].lat, STATIONS[i].lon);
+    if (d < bd) { bd = d; best = STATIONS[i]; }
+  }
+  return best.id;
+}
+function nearestTown(lat, lon) {
+  var best = TOWNS[0][0], bd = 1e9;
+  for (var i = 0; i < TOWNS.length; i++) {
+    var d = havKm(lat, lon, TOWNS[i][1], TOWNS[i][2]);
+    if (d < bd) { bd = d; best = TOWNS[i][0]; }
+  }
+  return best;
+}
+function compass(deg) {
+  var dirs = ["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSW","SW","WSW","W","WNW","NW","NNW"];
+  return dirs[Math.round(deg / 22.5) % 16];
+}
+function tstr(d, lang) { // "7:35p" / "19:35"
+  if (lang === "vi") return pad(d.getHours()) + ":" + pad(d.getMinutes());
+  var h = d.getHours(), ap = h >= 12 ? "p" : "a";
+  h = h % 12; if (h === 0) h = 12;
+  return h + ":" + pad(d.getMinutes()) + ap;
+}
+function trange(a, b, lang) { return tstr(a, lang) + "–" + tstr(b, lang); }
+function clockStr(lang) {
+  var d = new Date();
+  if (lang === "vi") return pad(d.getHours()) + ":" + pad(d.getMinutes()) + ":" + pad(d.getSeconds());
+  var h = d.getHours(), ap = h >= 12 ? "PM" : "AM";
+  h = h % 12; if (h === 0) h = 12;
+  return h + ":" + pad(d.getMinutes()) + " " + ap;
+}
+function dayTitle(date, idx, lang) {
+  var S = STR[lang];
+  var dw = idx === 0 ? S.todayWord : S.days[date.getDay()];
+  var md = lang === "vi"
+    ? date.getDate() + " " + S.months[date.getMonth()]
+    : S.months[date.getMonth()] + " " + date.getDate();
+  return dw + " " + md + ", " + date.getFullYear() + ' <span class="dt">· <span id="clock">' + clockStr(lang) + "</span></span>";
+}
+function ratingColor(s) { return s >= 60 ? "#1d9e6c" : (s >= 40 ? "#d9a441" : "#c0392b"); }
+function ratingWord(s, lang) {
+  var S = STR[lang];
+  return s >= 90 ? S.outstanding : s >= 70 ? S.great : s >= 55 ? S.good : s >= 40 ? S.fair : S.poor;
+}
+function durText(ms, lang) {
+  if (ms < 0) ms = 0;
+  var m = Math.round(ms / 60000), h = Math.floor(m / 60);
+  return STR[lang].dur(h, m % 60);
+}
+function fishSVG(color, size) {
+  return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 64 64">' +
+    '<path d="M8 32 C18 18 34 14 46 22 L58 12 L54 32 L58 52 L46 42 C34 50 18 46 8 32 Z" fill="' + color + '"/>' +
+    '<path d="M20 26 C24 29 24 35 20 38" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round"/>' +
+    '<circle cx="16" cy="29" r="3" fill="#fff"/><circle cx="16" cy="29" r="1.5" fill="#22312b"/></svg>';
+}
+/* ================= state ================= */
+var state = {
+  lang: localStorage.getItem("pf_lang") || "en",
+  ready: false, sel: 0, days: [], moon: [], tides: [],
+  loc: { mode: "pin", name: PIN.name, distMi: null, lat: PIN.lat, lon: PIN.lon, station: PIN.station },
+  updatedAt: null
+};
 
-/* Pompano-tuned scoring: moving water, 65–76°F, 1–3 ft surf */
-function fishScore(d){
-  let s = 0;
-  s += d.windMax <= 10 ? 30 : d.windMax <= 15 ? 22 : d.windMax <= 20 ? 12 : 4;
-  s += d.rainMax < 20 ? 20 : d.rainMax < 40 ? 14 : d.rainMax < 60 ? 8 : 3;
-  s += (d.waterTemp >= 65 && d.waterTemp <= 76) ? 25 : (d.waterTemp >= 60 && d.waterTemp <= 80) ? 18 : 10;
-  s += (d.waveMax >= 1 && d.waveMax <= 3) ? 18 : d.waveMax < 1 ? 12 : d.waveMax <= 5 ? 8 : 4;
-  s += d.tideRange >= 2.5 ? 20 : d.tideRange >= 1.5 ? 14 : 8;
-  return Math.min(100, Math.round(s));
+/* ================= data loading ================= */
+function fetchJSON(url) {
+  return fetch(url).then(function(r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); });
 }
-function hourScore(h, inBite, moonBoost){
-  let s = 45;
-  s += (h.temp >= 70 && h.temp <= 80) ? 15 : (h.temp >= 65 && h.temp <= 85) ? 8 : -5;
-  s += h.wind <= 10 ? 10 : h.wind <= 15 ? 4 : -10;
-  s += h.rain < 20 ? 10 : h.rain < 50 ? 0 : -12;
-  if (inBite) s += 18;
-  if (moonBoost) s += 8;
-  return Math.max(0, Math.min(100, Math.round(s)));
+function ymd(d) { return d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()); }
+function ymdDash(d) { return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()); }
+
+function loadWeather(lat, lon) {
+  var u = "https://api.open-meteo.com/v1/forecast?latitude=" + lat + "&longitude=" + lon +
+    "&hourly=temperature_2m,precipitation_probability,weathercode,windspeed_10m,winddirection_10m" +
+    "&daily=temperature_2m_max,temperature_2m_min,weathercode,precipitation_probability_max" +
+    "&timezone=auto&forecast_days=8&temperature_unit=fahrenheit&windspeed_unit=mph";
+  return fetchJSON(u);
 }
-function biteWindows(tides){
-  return tides.map(p => {
-    const c = new Date(p.t).getTime(), w = 90 * 60 * 1000;
-    return { start: new Date(c - w), end: new Date(c + w), peak: new Date(p.t), type: p.type };
+function loadMarine(lat, lon) {
+  var u = "https://marine-api.open-meteo.com/v1/marine?latitude=" + lat + "&longitude=" + lon +
+    "&hourly=wave_height,water_temperature&timezone=auto&forecast_days=8&temperature_unit=fahrenheit";
+  return fetchJSON(u);
+}
+function loadTides(station, fromD, toD) {
+  var u = "https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?begin_date=" + ymd(fromD) +
+    "&end_date=" + ymd(toD) + "&station=" + station +
+    "&product=predictions&datum=MLLW&time_zone=lst_ldt&units=english&interval=hilo&format=json&application=pompano-forecast";
+  return fetchJSON(u).then(function(j) {
+    var out = [];
+    (j.predictions || []).forEach(function(p) {
+      // "2026-10-09 15:21" local station time
+      var m = /^(\d+)-(\d+)-(\d+) (\d+):(\d+)$/.exec(p.t);
+      if (!m) return;
+      out.push({ t: new Date(+m[1], +m[2] - 1, +m[3], +m[4], +m[5]).getTime(), type: p.type, v: parseFloat(p.v) });
+    });
+    out.sort(function(a, b) { return a.t - b.t; });
+    return out;
   });
 }
-const overlaps = (a, b) => a.start.getTime() < b.end.getTime() && b.start.getTime() < a.end.getTime();
-function bestWindow(wins){
-  const now = Date.now();
-  const up = wins.filter(w => w.end.getTime() > now);
-  if (!up.length) return wins[0];
-  const bm = up.filter(w => w.moonMajor);
-  return bm.length ? bm[0] : up[0];
+function parseUSNOTime(s, baseDate) {
+  // "5:44 AM"
+  var m = /(\d+):(\d+)\s*(AM|PM)/i.exec(s || "");
+  if (!m) return null;
+  var h = +m[1] % 12; if (/pm/i.test(m[3])) h += 12;
+  return new Date(baseDate.getFullYear(), baseDate.getMonth(), baseDate.getDate(), h, +m[2]).getTime();
+}
+function loadMoonDay(lat, lon, date) {
+  var u = "https://aa.usno.navy.mil/api/rs/oneday?date=" + ymdDash(date) + "&coords=" + lat + "," + lon;
+  return fetchJSON(u).then(function(j) {
+    var wins = [];
+    (j.moondata || []).forEach(function(ph) {
+      var t = parseUSNOTime(ph.time, date);
+      if (t == null) return;
+      var type = null;
+      if (/transit/i.test(ph.phen)) type = "major";
+      else if (/rise|set/i.test(ph.phen)) type = "minor";
+      if (type) wins.push({ type: type, start: t - 3600000, end: t + 3600000, center: t });
+    });
+    return wins;
+  }).catch(function() { return []; });
+}
+function loadPlaceName(lat, lon) {
+  var u = "https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=" + lat +
+    "&longitude=" + lon + "&localityLanguage=en";
+  return fetchJSON(u).then(function(j) {
+    var city = j.city || j.locality || j.principalSubdivision || "";
+    if (city) return city + ", FL";
+    return nearestTown(lat, lon);
+  }).catch(function() { return nearestTown(lat, lon); });
 }
 
-async function skyInfo(dateStr){
-  try{
-    const tzH = -new Date(dateStr + "T12:00:00").getTimezoneOffset() / 60;
-    const r = await fetch(`https://aa.usno.navy.mil/api/rstt/oneday?date=${dateStr}&coords=${LOC.lat},${LOC.lon}&tz=${tzH}`);
-    const j = await r.json();
-    const data = j.properties.data;
-    const toD = hm => {
-      const [h, m] = hm.split(":").map(Number);
-      const d = new Date(dateStr + "T12:00:00"); d.setHours(h, m, 0, 0); return d;
-    };
-    const getPhen = (arr, phen) => (((arr || []).find(x => x.phen === phen) || {}).time);
-    const H = 36e5, majors = [], minors = [];
-    const upper = getPhen(data.moondata, "Upper Transit");
-    if (upper){
-      const u = toD(upper);
-      majors.push({ start: new Date(u.getTime() - 2 * H), end: new Date(u.getTime() + 2 * H), label: "Moon overhead" });
+function atHourly(hourly, isoIdx, key) { return hourly[key][isoIdx]; }
+function hourlyIndex(hourly, ms) {
+  // hourly.time entries "2026-10-09T14:00" local
+  var best = 0, bd = 1e15;
+  for (var i = 0; i < hourly.time.length; i++) {
+    var t = new Date(hourly.time[i]).getTime();
+    var d = Math.abs(t - ms);
+    if (d < bd) { bd = d; best = i; }
+  }
+  return best;
+}
+function tideAt(ms) {
+  var T = state.tides;
+  if (!T.length) return 0;
+  if (ms <= T[0].t) return T[0].v;
+  for (var i = 0; i < T.length - 1; i++) {
+    if (ms >= T[i].t && ms <= T[i + 1].t) {
+      var f = (ms - T[i].t) / (T[i + 1].t - T[i].t);
+      return T[i].v + f * (T[i + 1].v - T[i].v);
     }
-    const mr = getPhen(data.moondata, "Rise"), ms = getPhen(data.moondata, "Set");
-    if (mr){ const t = toD(mr); minors.push({ start: new Date(t.getTime() - H), end: new Date(t.getTime() + H), label: "Moonrise" }); }
-    if (ms){ const t = toD(ms); minors.push({ start: new Date(t.getTime() - H), end: new Date(t.getTime() + H), label: "Moonset" }); }
-    const sr = getPhen(data.sundata, "Rise"), ss = getPhen(data.sundata, "Set");
-    return {
-      phase: data.curphase, illum: data.fracillum, majors, minors,
-      sunrise: sr ? toD(sr) : null, sunset: ss ? toD(ss) : null,
-      moonrise: mr ? toD(mr) : null, moonset: ms ? toD(ms) : null
-    };
-  }catch(e){ return null; }
+  }
+  return T[T.length - 1].v;
 }
-
-async function load(){
-  await detectLocation();
-  const fUrl = `https://api.open-meteo.com/v1/forecast?latitude=${LOC.lat}&longitude=${LOC.lon}` +
-    `&hourly=temperature_2m,precipitation_probability,wind_speed_10m,wind_direction_10m,windgusts_10m,weathercode` +
-    `&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,wind_speed_10m_max,wind_direction_10m_dominant,weathercode` +
-    `&timezone=${encodeURIComponent(TZ)}&wind_speed_unit=mph&temperature_unit=fahrenheit&forecast_days=7`;
-  const mUrl = `https://marine-api.open-meteo.com/v1/marine?latitude=${LOC.lat}&longitude=${LOC.lon}` +
-    `&hourly=sea_surface_temperature,wave_height&timezone=${encodeURIComponent(TZ)}` +
-    `&temperature_unit=fahrenheit&forecast_days=7`;
-  const now = new Date();
-  const bd = now.toISOString().slice(0, 10).replace(/-/g, "");
-  const ed = new Date(now.getTime() + 7 * 864e5).toISOString().slice(0, 10).replace(/-/g, "");
-  const tUrl = `https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?product=predictions&datum=MLLW` +
-    `&station=${LOC.station}&time_zone=lst_ldt&units=english&interval=hilo&format=json&begin_date=${bd}&end_date=${ed}`;
-
-  const [f, m, t] = await Promise.all([
-    fetch(fUrl).then(r => r.json()),
-    fetch(mUrl).then(r => r.json()),
-    fetch(tUrl).then(r => r.json()).catch(() => ({ predictions: [] }))
-  ]);
-
-  const days = f.daily.time.map((date, i) => {
-    const hrs = f.hourly.time.map((t2, j) => j).filter(j => dayKey(f.hourly.time[j]) === date);
-    let waveMax = 0, waterNoon = null;
-    const mh = m.hourly.time.map((t2, j) => j).filter(j => dayKey(m.hourly.time[j]) === date);
-    mh.forEach(j => {
-      const wv = (m.hourly.wave_height[j] || 0) * 3.28084;
-      if (wv > waveMax) waveMax = wv;
-      if (Math.abs(new Date(m.hourly.time[j]).getHours() - 12) < 2 && waterNoon === null)
-        waterNoon = m.hourly.sea_surface_temperature[j];
-    });
-    const at = j => ({
-      temp: Math.round(f.hourly.temperature_2m[j]),
-      rain: f.hourly.precipitation_probability[j] ?? 0,
-      wind: Math.round(f.hourly.wind_speed_10m[j]),
-      gust: Math.round(f.hourly.windgusts_10m[j] ?? 0),
-      wdir: f.hourly.wind_direction_10m[j],
-      code: f.hourly.weathercode[j],
-      time: new Date(f.hourly.time[j])
-    });
-    const tides = (t.predictions || []).filter(p => dayKey(p.t) === date);
-    const hs = tides.map(p => parseFloat(p.v));
-    const wins = biteWindows(tides);
-    const d = {
-      date, i, hrs: hrs.map(at), tides, wins,
-      tMax: Math.round(f.daily.temperature_2m_max[i]),
-      tMin: Math.round(f.daily.temperature_2m_min[i]),
-      rainMax: f.daily.precipitation_probability_max[i] ?? 0,
-      windMax: Math.round(f.daily.wind_speed_10m_max[i] ?? 0),
-      windDir: f.daily.wind_direction_10m_dominant[i] ?? 0,
-      wxCode: f.daily.weathercode[i],
-      waterTemp: waterNoon !== null ? Math.round(waterNoon) : null,
-      waveMax: Math.round(waveMax * 10) / 10,
-      tideRange: hs.length ? Math.round((Math.max(...hs) - Math.min(...hs)) * 10) / 10 : 0
-    };
-    d.score = fishScore(d);
-    return d;
-  });
-
-  const skies = await Promise.all(days.map(d => skyInfo(d.date)));
-  days.forEach(d => {
-    d.sky = skies[d.i];
-    d.wins.forEach(w => {
-      w.moonMajor = d.sky ? d.sky.majors.some(mm => overlaps(w, mm)) : false;
-    });
-    if (d.wins.some(w => w.moonMajor)) d.score = Math.min(100, d.score + 10);
-    d.hrs.forEach(h => {
-      const t = h.time.getTime();
-      const inBite = d.wins.some(w => t >= w.start.getTime() && t <= w.end.getTime());
-      const moonB = d.sky ? d.sky.majors.some(mm => t >= mm.start.getTime() && t <= mm.end.getTime()) : false;
-      h.score = hourScore(h, inBite, moonB);
-      h.inBite = inBite;
-    });
-  });
-
-  window.__days = days;
-  const bi = days.reduce((a, d, i) => d.score > days[a].score ? i : a, 0);
-  window.__best = bi;
-  document.querySelector(".hd .t1").innerHTML =
-    `${LOC.live ? "📍 " : LOC.pinned ? "📌 " : ""}${LOC.name} — Pompano <span class="nm">· Tien Huynh</span>`;
-  render(0);
-  document.getElementById("hdsub").textContent =
-    `${LOC.lat.toFixed(4)}°, ${LOC.lon.toFixed(4)}° · Updated ` +
-    new Date().toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit", timeZone: TZ }) + " ET";
+function tideRate(ms) { // ft per hour
+  return (tideAt(ms + 1800000) - tideAt(ms - 1800000));
 }
-
-function tideAt(day, timeMs){
-  const pts = day.tides.map(p => ({ t: new Date(p.t).getTime(), v: parseFloat(p.v) }));
-  if (!pts.length) return null;
-  if (timeMs <= pts[0].t) return { v: pts[0].v, dir: 0 };
-  for (let k = 0; k < pts.length - 1; k++){
-    const a = pts[k], b = pts[k + 1];
-    if (timeMs >= a.t && timeMs <= b.t){
-      const fr = (timeMs - a.t) / ((b.t - a.t) || 1);
-      const v = a.v + (b.v - a.v) * (0.5 - 0.5 * Math.cos(Math.PI * fr));
-      return { v, dir: b.v > a.v ? 1 : b.v < a.v ? -1 : 0 };
+function moonBoost(ms) {
+  var b = 0, inside = null;
+  for (var i = 0; i < state.moon.length; i++) {
+    var w = state.moon[i];
+    if (ms >= w.start && ms <= w.end) { b = Math.max(b, w.type === "major" ? 20 : 12); inside = w.type; }
+  }
+  return { boost: b, inside: inside };
+}
+function biteScore(ms, wx, mar) {
+  var wi = hourlyIndex(wx.hourly, ms), mi = hourlyIndex(mar.hourly, ms);
+  var move = Math.min(Math.abs(tideRate(ms)) / 1.0, 1) * 50;
+  var wt = mar.hourly.water_temperature[mi];
+  var temp = 15 * Math.max(0, 1 - Math.abs(wt - 70.5) / 18);
+  var wsp = wx.hourly.windspeed_10m[wi];
+  var wind = wsp <= 10 ? 15 : (wsp >= 25 ? 0 : 15 * (1 - (wsp - 10) / 15));
+  var mb = moonBoost(ms);
+  return Math.min(100, move + temp + wind + mb.boost);
+}
+function buildDays(wx, mar) {
+  var days = [];
+  var now = new Date();
+  for (var d = 0; d < 7; d++) {
+    var date = new Date(now.getFullYear(), now.getMonth(), now.getDate() + d);
+    var d0 = date.getTime(), d1 = d0 + 86400000;
+    // find bite-window peaks, 30-min samples
+    var peaks = [];
+    var samples = [];
+    for (var t2 = d0; t2 < d1; t2 += 1800000) samples.push({ t: t2, s: biteScore(t2, wx, mar) });
+    for (var i = 1; i < samples.length - 1; i++) {
+      if (samples[i].s >= samples[i-1].s && samples[i].s >= samples[i+1].s && samples[i].s >= 40) {
+        var ok = true;
+        for (var k = 0; k < peaks.length; k++) {
+          if (Math.abs(peaks[k].t - samples[i].t) < 7200000) {
+            ok = false;
+            if (samples[i].s > peaks[k].s) peaks[k] = { t: samples[i].t, s: samples[i].s };
+          }
+        }
+        if (ok) peaks.push({ t: samples[i].t, s: samples[i].s });
+      }
     }
+    peaks.sort(function(a, b) { return b.s - a.s; });
+    peaks = peaks.slice(0, 4);
+    var windows = peaks.map(function(p) {
+      return { start: new Date(p.t - 3600000), end: new Date(p.t + 3600000), score: Math.round(p.s) };
+    });
+    windows.sort(function(a, b) { return a.start - b.start; });
+    var best = windows[0];
+    windows.forEach(function(w) { if (w.score > best.score) best = w; });
+    var dayScore = 0;
+    if (windows.length) {
+      var avg = windows.reduce(function(a, w) { return a + w.score; }, 0) / windows.length;
+      dayScore = Math.round(0.65 * best.score + 0.35 * avg);
+    }
+    // weather tiles at best-window peak (or noon)
+    var refT = best ? best.start.getTime() + 3600000 : d0 + 43200000;
+    var wi = hourlyIndex(wx.hourly, refT), mi = hourlyIndex(mar.hourly, refT);
+    var wv = mar.hourly.wave_height[mi] * 3.28084;
+    days.push({
+      date: date, score: dayScore, windows: windows, best: best,
+      wind: Math.round(wx.hourly.windspeed_10m[wi]),
+      windDir: compass(wx.hourly.winddirection_10m[wi]),
+      water: wx && mar ? (Math.round(mar.hourly.water_temperature[mi] * 10) / 10) : 0,
+      waveFt: Math.round(wv * 10) / 10,
+      condCode: wx.hourly.weathercode[wi],
+      rain: wx.daily.precipitation_probability_max[d]
+    });
   }
-  return { v: pts[pts.length - 1].v, dir: 0 };
+  return days;
 }
-
-function tideSVG(day, highlight){
-  const pts = day.tides.map(p => ({ t: new Date(p.t), v: parseFloat(p.v), type: p.type }));
-  if (pts.length < 2) return `<div style="font-size:12px;color:#8a7a5f">Tide data unavailable.</div>`;
-  const W = 340, H = 104, P = 10;
-  const vs = pts.map(p => p.v), vMin = Math.min(...vs), vMax = Math.max(...vs), vR = (vMax - vMin) || 1;
-  const t0 = pts[0].t.getTime(), t1 = pts[pts.length - 1].t.getTime(), tR = (t1 - t0) || 1;
-  const X = t => P + (t - t0) / tR * (W - 2 * P);
-  const Y = v => H - P - (v - vMin) / vR * (H - 2 * P);
-  let dAttr = "";
-  for (let k = 0; k <= 110; k++){
-    const tt = t0 + tR * k / 110;
-    let seg = 0;
-    while (seg < pts.length - 2 && pts[seg + 1].t.getTime() < tt) seg++;
-    const a = pts[seg], b = pts[seg + 1];
-    const fr = Math.min(1, Math.max(0, (tt - a.t.getTime()) / ((b.t.getTime() - a.t.getTime()) || 1)));
-    const v = a.v + (b.v - a.v) * (0.5 - 0.5 * Math.cos(Math.PI * fr));
-    dAttr += (k ? "L" : "M") + X(tt).toFixed(1) + "," + Y(v).toFixed(1);
+/* ================= render ================= */
+function moonScore(w) {
+  if (!state.wx || w._score == null) {
+    try { w._score = Math.round(biteScore(w.center, state.wx, state.mar)); }
+    catch (e) { w._score = 0; }
   }
-  let shades = "";
-  day.wins.forEach(w => {
-    const x1 = X(Math.max(t0, w.start.getTime())), x2 = X(Math.min(t1, w.end.getTime()));
-    if (x2 <= x1) return;
-    shades += `<rect x="${x1.toFixed(1)}" y="${P}" width="${(x2 - x1).toFixed(1)}" height="${H - 2 * P}" fill="#14705f" opacity="0.18" rx="4"/>`;
-  });
-  let marks = "";
-  pts.forEach(p => {
-    const x = X(p.t.getTime()), y = Y(p.v);
-    marks += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4" fill="#fff" stroke="#14705f" stroke-width="2.5"/>` +
-      `<text x="${x.toFixed(1)}" y="${(y - 9).toFixed(1)}" fill="#5c5546" font-size="9" text-anchor="middle" font-weight="700">${p.type === "H" ? "▲" : "▼"} ${fmtT12(p.t).replace(" ", "")}</text>`;
-  });
-  let fish = "";
-  if (highlight){
-    const hx = X(highlight.peak.getTime());
-    fish = `<g transform="translate(${hx.toFixed(1)},${P + 12})">` +
-      `<circle r="11" fill="#fff" stroke="#14705f" stroke-width="2"/>` +
-      `<g transform="translate(-8,-8) scale(0.34)">${pompano("#14705f", 48).replace(/width="48" height="48" /, "")}</g>` +
-      `<text y="26" text-anchor="middle" font-size="9" font-weight="800" fill="#14705f">${fmtT12(highlight.peak).replace(" ", "")}</text></g>`;
-  }
-  const nowX = X(Date.now());
-  const nowLine = (nowX > P && nowX < W - P)
-    ? `<line x1="${nowX.toFixed(1)}" y1="${P}" x2="${nowX.toFixed(1)}" y2="${H - P}" stroke="#d9a441" stroke-width="1.5" stroke-dasharray="4,3"/>` : "";
-  const ax = `<text x="${P}" y="${H - 1}" font-size="8" fill="#8a7a5f">12a</text>` +
-    `<text x="${W - P}" y="${H - 1}" font-size="8" fill="#8a7a5f" text-anchor="end">12p</text>`;
-  return `<svg class="tide-svg" viewBox="0 0 ${W} ${H}">${shades}` +
-    `<path d="${dAttr}" fill="none" stroke="#14705f" stroke-width="2.5"/>${marks}${fish}${nowLine}${ax}</svg>`;
+  return w._score || 0;
 }
-
-function render(sel){
-  const days = window.__days, bi = window.__best;
-  const d = days[sel], sky = d.sky, bd = days[bi];
-  const app = document.getElementById("app");
-  const rc = rateColor(d.score), word = outlook(d.score);
-  const best = d.wins.length ? bestWindow(d.wins) : null;
-  const nowMs = Date.now();
-
-  /* next major/minor */
-  const allSol = [
-    ...(sky ? sky.majors.map(mm => ({ ...mm, kind: "MAJOR" })) : []),
-    ...(sky ? sky.minors.map(mm => ({ ...mm, kind: "MINOR" })) : [])
-  ].sort((a, b) => a.start - b.start);
-  const nextSol = allSol.find(mm => mm.end.getTime() > nowMs) || null;
-
-  /* top card */
-  const dt = new Date(d.date + "T12:00:00");
-  const dayName = sel === 0 ? "TODAY" : dt.toLocaleDateString("en-US", { weekday: "long" }).toUpperCase();
-  let html = `<div class="topcard" style="border-color:${rc}">` +
-    `<div class="wm">${pompano("#ffffff", 72)}</div>` +
-    `<div class="row"><div class="badge">${pompano(rc, 40)}</div>` +
-    `<div><div class="lbl">POMPANO BITE RATING</div>` +
-    `<div class="big">${word.toUpperCase()} <span class="sc" style="color:${rc}">${d.score}/100</span></div></div>` +
-    `<div class="side">${dayName}<br>${LOC.short}</div></div></div>`;
-
-  /* day strip */
-  const d0 = new Date(days[0].date + "T12:00:00"), d6 = new Date(days[6].date + "T12:00:00");
-  const rng = d0.toLocaleDateString("en-US", { month: "short", day: "numeric" }) + " – " +
-    d6.toLocaleDateString("en-US", { month: "short", day: "numeric" });
-  html += `<div class="pick"><div class="ph">Pick a day</div><div class="pr">${rng}</div></div><div class="strip">` +
-    days.map((dd, i) => {
-      const t = new Date(dd.date + "T12:00:00"), c = rateColor(dd.score);
-      const cls = "dpill" + (i === sel ? " sel" : "") + (i === bi ? " best" : "");
-      const st = i === sel ? `background:${c};` : "";
-      return `<button class="${cls}" data-i="${i}" style="${st}">` +
-        (i === bi ? `<span class="bestbadge">★ BEST</span>` : "") +
-        `<div class="dw">${i === 0 ? "Today" : t.toLocaleDateString("en-US", { weekday: "short" })}</div>` +
-        `<div class="dn">${t.getDate()}</div>` +
-        `<div style="display:flex;justify-content:center;margin:2px 0">${pompano(i === sel ? "#ffffff" : c, 20)}</div>` +
-        `<div class="dsc" style="color:${i === sel ? "#fff" : c}">${dd.score}</div>` +
-        `<div class="dow2">${outlook(dd.score)}</div></button>`;
-    }).join("") + `</div>`;
-
-  /* best day banner */
-  const bdt = new Date(bd.date + "T12:00:00");
-  html += `<div class="bestbanner"><span class="star">★</span>` +
-    `<span>BEST DAY THIS WEEK — ${bdt.toLocaleDateString("en-US", { weekday: "short" })} ${bdt.getDate()} · ${bdt.toLocaleDateString("en-US", { month: "short" })} ${bdt.getDate()} — ${outlook(bd.score)} (${bd.score})</span>` +
-    `<button class="go" data-i="${bi}">GO DAY</button></div>`;
-
-  /* day summary card */
-  html += `<div class="card" style="border-color:${rc}">` +
-    `<h3>${sel === 0 ? "Today" : dt.toLocaleDateString("en-US", { weekday: "long" })} <span class="dt">${dt.toLocaleDateString("en-US", { month: "short", day: "numeric" })}</span></h3>` +
-    `<div class="ratingpill" style="background:${rc};margin-top:8px"><span class="wc">${pompano(rc, 22)}</span>${d.score} ${word.toUpperCase()}</div>` +
-    (best ? `<div class="gofish">🎣 GO FISH<br><b>${fmtRange(best.start, best.end)}</b>${best.moonMajor ? " 🌙" : ""}</div>` : "");
-
-  const chipsHtml = `<div style="font-size:10px;font-weight:800;letter-spacing:.1em;color:#9a4a16;margin:12px 0 6px">🐟 ALL BITE WINDOWS</div><div class="chips">` + d.wins.map(w => {
-    const isBest = best && w.peak.getTime() === best.peak.getTime();
-    const wsc = Math.max(0, Math.min(100, d.score + (w.moonMajor ? 8 : 0) + (isBest ? 5 : 0)));
-    return `<span class="chip${isBest ? " best" : ""}">${pompano(isBest ? "#ffffff" : rc, 18)}` +
-      `${fmtRange(w.start, w.end)} · ${wsc}${w.moonMajor ? " 🌙" : ""}</span>`;
-  }).join("") + `</div>`;
-
-  /* weather grid */
-  const wx = wxInfo(d.wxCode);
-  const w0 = d.hrs[0] || {};
-  html += `<div class="wxgrid">` +
-    `<div class="wxbox"><div class="k">💧 Water</div><div class="v">${d.waterTemp !== null ? d.waterTemp + "°F" : "—"}</div><div class="s">Waves to ${d.waveMax} ft</div></div>` +
-    `<div class="wxbox sky"><div class="k">${wx.e} Sky</div><div class="v">${wx.t}</div><div class="s">Air ${d.tMax}° / ${d.tMin}°</div></div>` +
-    `<div class="wxbox"><div class="k">🌧️ Rain chance</div><div class="v">${d.rainMax}%</div><div class="s">${d.rainMax < 20 ? "No rain" : d.rainMax < 50 ? "Possible showers" : "Likely rain"}</div></div>` +
-    `<div class="wxbox"><div class="k">Wind ${compass(d.windDir)}</div><div class="v">${arrow(d.windDir)} ${d.windMax} <span style="font-size:13px">mph</span></div><div class="s">Gust ${Math.max(...d.hrs.map(h => h.gust), 0)} mph</div></div>` +
-    `</div>`;
-
-  const moonHtml = `<div class="mmhead"><div class="t">🌙 Moon bite times</div><div class="n">${allSol.length} windows</div></div>` +
-    allSol.map(mm => {
-      const isNext = nextSol && mm.start.getTime() === nextSol.start.getTime() && mm.kind === nextSol.kind;
-      return `<div class="mmrow${isNext ? " next" : ""}">` +
-        `<span class="mmbadge ${mm.kind === "MAJOR" ? "major" : "minor"}">${mm.kind}</span>` +
-        `<span class="tt">${fmtRange(mm.start, mm.end)}</span>` +
-        `<span class="mc">${mm.label}</span></div>`;
-    }).join("");
-
-  /* footnote */
-  let dayLen = "";
-  if (sky && sky.sunrise && sky.sunset){
-    const ms = sky.sunset - sky.sunrise;
-    dayLen = `${Math.floor(ms / 36e5)}h ${Math.round(ms % 36e5 / 6e4)}m`;
+function moonRowsHTML(day) {
+  var S = STR[state.lang], now = Date.now();
+  var d0 = day.date.getTime(), d1 = d0 + 86400000;
+  var rows = state.moon.filter(function(w) { return w.end > d0 && w.start < d1; });
+  rows.sort(function(a, b) { return a.start - b.start; });
+  if (!rows.length) return "";
+  var html = "";
+  rows.forEach(function(w) {
+    var sc = moonScore(w), c = ratingColor(sc);
+    var active = now >= w.start && now <= w.end;
+    html += '<div class="mrow' + (active ? " now" : "") + '">' +
+      '<span class="mbadge ' + w.type + '">' + (w.type === "major" ? S.major : S.minor) + "</span>" +
+      '<span class="mt">' + trange(new Date(w.start), new Date(w.end), state.lang) + "</span>" +
+      '<span style="display:inline-flex;align-items:center;gap:6px;margin-left:4px;">' +
+        fishSVG(c, 22) + '<span class="mt" style="color:' + c + '">' + sc + "</span></span>" +
+      (active ? '<span class="nowpill">' + S.now + "</span>" : "") +
+      "</div>";
+  });
+  return html;
+}
+function moonCountdownHTML() {
+  var S = STR[state.lang], now = Date.now();
+  function next(type) {
+    var best = null;
+    state.moon.forEach(function(w) {
+      if (w.type !== type || w.end <= now) return;
+      if (!best || w.start < best.start) best = w;
+    });
+    return best;
   }
-  const footHtml = `<div class="footnote">` +
-    `☀️ ${sky && sky.sunrise ? fmtT12(sky.sunrise).replace(" ", "") : "—"} – ${sky && sky.sunset ? fmtT12(sky.sunset).replace(" ", "") : "—"} (${dayLen}) · ` +
-    `🌊 Surf to ${d.waveMax} ft · 🎯 Pompano sweet spot: moving water, 65–76°F<br>` +
-    `🌙 ${sky ? sky.phase : "—"} · ${sky ? sky.illum : "—"} lit` +
-    `</div>`;
-  html += `<div class="card">${moonHtml}</div>`;
-
-  /* more details (collapsed) */
-  html += `<details class="more"><summary>More details</summary>` +
-    chipsHtml + footHtml +
-    `<div style="font-size:10px;font-weight:800;letter-spacing:.1em;color:#9a4a16;margin:12px 0 6px">🕐 HOUR BY HOUR</div>` +
-    `<div class="legend">${pompano("#1d9e6c", 16)} Good &nbsp;${pompano("#d98a16", 16)} Fair &nbsp;${pompano("#c93a2e", 16)} Bad</div>` +
-    `<table class="htable"><tr><th>Hour</th><th>Pompano</th><th>Sky · Wind</th><th>Rain</th><th>Air/Wtr</th></tr>` +
-    d.hrs.map(h => {
-      const hx = wxInfo(h.code), c = rateColor(h.score);
-      return `<tr class="${h.inBite ? "biterow" : ""}">` +
-        `<td><b>${fmtT12(h.time).replace(":00 ", " ")}</b></td>` +
-        `<td><span style="display:inline-flex;align-items:center;gap:4px">${pompano(c, 16)}<b style="color:${c}">${h.score}</b></span></td>` +
-        `<td>${hx.e} ${arrow(h.wdir)} ${h.wind} ${compass(h.wdir)}</td>` +
-        `<td>${h.rain}%</td>` +
-        `<td>${h.temp}°</td></tr>`;
-    }).join("") + `</table>` +
-    `<div class="hfoot">Green-tinted rows fall inside a moving-tide bite window — prime pompano time.</div></details>`;
-
-  /* tide card */
-  const nx = d.tides.map(p => ({ t: new Date(p.t).getTime(), type: p.type, v: parseFloat(p.v) }))
-    .filter(p => p.t > nowMs).sort((a, b) => a.t - b.t)[0];
-  const tideChips = d.tides.map(p => {
-    const isNext = nx && new Date(p.t).getTime() === nx.t;
-    const v = parseFloat(p.v);
-    return `<span class="tchip ${p.type === "H" ? "hi" : "lo"}">${p.type === "H" ? "▲" : "▼"} ${p.type === "H" ? "High" : "Low"} ${fmtT12(new Date(p.t)).replace(":00 ", " ").replace(" ", "")} · ${v.toFixed(1)}ft</span>`;
-  }).join("");
-  html += `<div class="tidecard"><h3>🌊 Tide · ${sel === 0 ? "Today" : "This day"}</h3>` +
-    `<div class="tidesub">${nx ? `Next ${nx.type === "H" ? "High" : "Low"} ${fmtT12(new Date(nx.t))} · ${nx.v.toFixed(1)} ft` : "—"} · range ${d.tideRange} ft</div>` +
-    tideSVG(d, best) +
-    `<div class="tidechips">${tideChips}</div></div>`;
-
+  var parts = [];
+  [["major", S.nextMajor, S.majorNow], ["minor", S.nextMinor, S.minorNow]].forEach(function(cfg) {
+    var w = next(cfg[0]);
+    if (!w) return;
+    parts.push(now >= w.start ? cfg[2] : cfg[1](durText(w.start - now, state.lang)));
+  });
+  return parts.join(" · ");
+}
+function tideCountdownHTML() {
+  var S = STR[state.lang], now = Date.now();
+  var nh = null, nl = null;
+  state.tides.forEach(function(e) {
+    if (e.t <= now) return;
+    if (e.type === "H" && !nh) nh = e;
+    if (e.type === "L" && !nl) nl = e;
+  });
+  var parts = [];
+  if (nh) parts.push(S.nextHigh(durText(nh.t - now, state.lang)));
+  if (nl) parts.push(S.nextLow(durText(nl.t - now, state.lang)));
+  return parts.join(" · ");
+}
+function tideSVG(day) {
+  var W = 340, H = 118, pL = 6, pR = 6, pT = 16, pB = 18;
+  var d0 = day.date.getTime(), d1 = d0 + 86400000;
+  var pts = [];
+  for (var t = d0; t <= d1; t += 900000) pts.push([t, tideAt(t)]);
+  var vs = pts.map(function(p) { return p[1]; });
+  var mn = Math.min.apply(null, vs), mx = Math.max.apply(null, vs);
+  if (mx - mn < 0.3) { mx += 0.15; mn -= 0.15; }
+  function X(t) { return pL + (t - d0) / 86400000 * (W - pL - pR); }
+  function Y(v) { return pT + (1 - (v - mn) / (mx - mn)) * (H - pT - pB); }
+  var line = "M" + pts.map(function(p) { return X(p[0]).toFixed(1) + "," + Y(p[1]).toFixed(1); }).join(" L");
+  var svg = '<svg class="tidechart" viewBox="0 0 ' + W + " " + H + '">';
+  // shade bite windows
+  (day.windows || []).forEach(function(w, i) {
+    var isBest = day.best && w.start.getTime() === day.best.start.getTime();
+    svg += '<rect x="' + X(w.start.getTime()).toFixed(1) + '" y="' + pT + '" width="' +
+      (X(w.end.getTime()) - X(w.start.getTime())).toFixed(1) + '" height="' + (H - pT - pB) +
+      '" fill="' + (isBest ? "rgba(13,148,136,.28)" : "rgba(13,148,136,.12)") + '" rx="4"/>';
+  });
+  svg += '<path d="' + line + " L" + X(d1).toFixed(1) + "," + (H - pB) + " L" + X(d0).toFixed(1) + "," + (H - pB) +
+    ' Z" fill="rgba(13,148,136,.15)" stroke="none"/>';
+  svg += '<path d="' + line + '" fill="none" stroke="#0f766e" stroke-width="2.5" stroke-linejoin="round"/>';
+  // high / low dots
+  state.tides.forEach(function(e) {
+    if (e.t < d0 || e.t > d1) return;
+    svg += '<circle cx="' + X(e.t).toFixed(1) + '" cy="' + Y(e.v).toFixed(1) +
+      '" r="5" fill="#fff" stroke="#0f766e" stroke-width="2.5"/>';
+  });
+  // now line
+  var now = Date.now();
+  if (now >= d0 && now <= d1) {
+    svg += '<line x1="' + X(now).toFixed(1) + '" y1="' + pT + '" x2="' + X(now).toFixed(1) + '" y2="' + (H - pB) +
+      '" stroke="#d9a441" stroke-width="2" stroke-dasharray="5,4"/>';
+  }
+  // best-bite marker
+  if (day.best) {
+    var bt = day.best.start.getTime() + 3600000, bv = tideAt(bt);
+    svg += '<circle cx="' + X(bt).toFixed(1) + '" cy="' + (Y(bv) - 12).toFixed(1) +
+      '" r="9" fill="#fff" stroke="#bc5a1e" stroke-width="2"/>';
+    svg += '<text x="' + X(bt).toFixed(1) + '" y="' + (Y(bv) - 8.5).toFixed(1) +
+      '" text-anchor="middle" font-size="10">🎣</text>';
+  }
+  // x labels
+  var S = STR[state.lang];
+  [["12a", 0], ["6a", 6], ["12p", 12], ["6p", 18]].forEach(function(l) {
+    var lab = state.lang === "vi" ? (l[1] + "h") : l[0];
+    svg += '<text x="' + X(d0 + l[1] * 3600000).toFixed(1) + '" y="' + (H - 5) +
+      '" text-anchor="middle" font-size="9" fill="#8a7a5f">' + lab + "</text>";
+  });
+  svg += '<text x="' + (W - pR) + '" y="' + (pT - 4) + '" text-anchor="end" font-size="9" fill="#8a7a5f">ft</text>';
+  return svg + "</svg>";
+}
+function tideChipsHTML(day) {
+  var S = STR[state.lang];
+  var d0 = day.date.getTime(), d1 = d0 + 86400000;
+  var html = "";
+  state.tides.forEach(function(e) {
+    if (e.t < d0 || e.t > d1) return;
+    var hi = e.type === "H";
+    html += '<span class="tchip' + (hi ? " hi" : "") + '">' + (hi ? "▲" : "▼") + " " +
+      (hi ? S.high : S.low) + " " + tstr(new Date(e.t), state.lang) + " · " + e.v.toFixed(1) + " ft</span>";
+  });
+  return html;
+}
+function renderHeader() {
+  var S = STR[state.lang], L = state.loc;
+  var name = (L.mode === "live" ? "📍 " : "📌 ") + L.name;
+  if (L.mode === "pin" && L.distMi != null) name += " · " + S.miAway(L.distMi);
+  $("locName").textContent = name;
+  var d = new Date();
+  var ds = state.lang === "vi"
+    ? d.getDate() + " " + S.months[d.getMonth()]
+    : S.months[d.getMonth()] + " " + d.getDate();
+  $("updLine").textContent = state.updatedAt ? S.updated(ds, clockStr(state.lang)) : "";
+  $("langBtn").innerHTML = state.lang === "en" ? "<b>EN</b> | VI" : "EN | <b>VI</b>";
+  $("refBtn").textContent = S.refresh;
+}
+function renderAll() {
+  var S = STR[state.lang];
+  renderHeader();
+  var app = $("app");
+  if (!state.ready || !state.days.length) return;
+  var d0 = state.days[0];
+  var c0 = ratingColor(d0.score);
+  var html = "";
+  // top rating card
+  html += '<div class="topcard" style="border-color:' + c0 + '">' +
+    '<div class="wm">' + fishSVG(c0, 110) + "</div>" +
+    '<div class="row"><div class="badge">' + fishSVG(c0, 40) + "</div>" +
+    '<div><div class="lbl">' + S.rating + '</div>' +
+    '<div class="big">' + ratingWord(d0.score, state.lang).toUpperCase() +
+    ' <span class="sc" style="color:' + c0 + '">' + d0.score + '/100</span></div></div>' +
+    '<div class="side">' + S.today + "<br>" + state.loc.name.toUpperCase() + "</div>" +
+    "</div></div>";
+  // pick-a-day strip
+  var bestIdx = 0;
+  state.days.forEach(function(d, i) { if (d.score > state.days[bestIdx].score) bestIdx = i; });
+  html += '<div class="pick"><span class="ph">' + S.pickDay + "</span>" +
+    '<span class="pr">' + S.months[d0.date.getMonth()] + " " + d0.date.getDate() + " – " +
+    S.months[state.days[6].date.getMonth()] + " " + state.days[6].date.getDate() + "</span></div>";
+  html += '<div class="strip">';
+  state.days.forEach(function(d, i) {
+    var c = ratingColor(d.score);
+    var cls = "dpill" + (i === state.sel ? " sel" : "") + (i === bestIdx ? " best" : "");
+    var dw = i === 0 ? S.todayWord.toUpperCase() : S.days[d.date.getDay()];
+    html += '<div class="' + cls + '" data-day="' + i + '"' +
+      (i === state.sel ? ' style="background:' + c + '"' : "") + ">" +
+      (i === bestIdx ? '<span class="bestbadge">' + S.best + "</span>" : "") +
+      '<div class="dw">' + dw + '</div><div class="dn">' + d.date.getDate() + "</div>" +
+      '<div style="margin:2px 0">' + fishSVG(i === state.sel ? "#ffffff" : c, 22) + "</div>" +
+      '<div class="dsc" style="color:' + (i === state.sel ? "#fff" : c) + '">' + d.score + "</div>" +
+      '<div class="dow2">' + ratingWord(d.score, state.lang) + "</div></div>";
+  });
+  html += "</div>";
+  // best-day banner
+  var bd = state.days[bestIdx];
+  html += '<div class="bestbanner"><div class="star">★</div><div>' +
+    '<div class="bt">' + S.bestWeek + "</div>" +
+    '<div>' + (bestIdx === 0 ? S.todayWord : S.days[bd.date.getDay()] + " " + bd.date.getDate()) +
+    " · " + S.months[bd.date.getMonth()] + " " + bd.date.getDate() +
+    " — " + ratingWord(bd.score, state.lang) + " (" + bd.score + ")</div></div>" +
+    '<button class="go" data-goday="' + bestIdx + '">' + S.goDay + "</button></div>";
+  // day card
+  var day = state.days[state.sel];
+  var dc = ratingColor(day.score);
+  html += '<div class="card" style="border-color:' + dc + '">' +
+    "<h3>" + dayTitle(day.date, state.sel, state.lang) + "</h3>";
+  if (day.best) {
+    html += '<div class="gofish"><span class="fic">' + fishSVG(dc, 24) + "</span>" +
+      '<span class="gl">🎣 ' + S.goFish + '</span><span class="gt">' +
+      trange(day.best.start, day.best.end, state.lang) + "</span></div>";
+  }
+  var ci = S.condIcon[day.condCode] || "🌤️";
+  var cn = S.condName[day.condCode] || S.condName[2];
+  html += '<div class="tiles">' +
+    '<div class="tile"><div class="k">💨 ' + S.wind + '</div><div class="v">◣ ' + day.wind + " " + day.windDir + "</div></div>" +
+    '<div class="tile"><div class="k">💧 ' + S.water + '</div><div class="v">' + day.water.toFixed(1) + "°F</div></div>" +
+    '<div class="tile"><div class="k">' + S.cond + '</div><div class="v">' + ci + " " + cn + "</div></div>" +
+    '<div class="tile"><div class="k">🌧️ ' + S.rain + '</div><div class="v">' + day.rain + "%</div></div>" +
+    "</div>";
+  // major/minor
+  html += '<div class="moonsec"><div class="mh">🌙 ' + S.moonTitle + "</div>" +
+    '<p class="cdline" id="moonCd">' + moonCountdownHTML() + "</p>" +
+    '<div id="moonRows">' + moonRowsHTML(day) + "</div></div>";
+  // tide
+  html += '<div class="tidesec"><div class="th">🌊 ' + S.tide + " · " +
+    (state.sel === 0 ? S.todayWord : S.days[day.date.getDay()] + " " + day.date.getDate()) + "</div>" +
+    '<p class="cdline" id="tideCd">' + tideCountdownHTML() + "</p>" +
+    tideSVG(day) + '<div class="tchips">' + tideChipsHTML(day) + "</div></div>";
+  html += "</div>";
   app.innerHTML = html;
-  document.querySelectorAll("[data-i]").forEach(el =>
-    el.addEventListener("click", () => render(+el.dataset.i)));
+  // wire buttons
+  var pills = app.querySelectorAll("[data-day]");
+  for (var i = 0; i < pills.length; i++) {
+    (function(el) {
+      el.addEventListener("click", function() { state.sel = +el.getAttribute("data-day"); renderAll(); });
+    })(pills[i]);
+  }
+  var go = app.querySelector("[data-goday]");
+  if (go) go.addEventListener("click", function() { state.sel = +go.getAttribute("data-goday"); renderAll(); });
 }
-
-document.getElementById("refreshBtn").addEventListener("click", () => {
-  document.getElementById("app").innerHTML = `<div class="loading">Checking pompano conditions…</div>`;
-  load();
+function tick() {
+  if (!state.ready) return;
+  var clk = $("clock");
+  if (clk) clk.textContent = clockStr(state.lang);
+  var mc = $("moonCd");
+  if (mc) mc.textContent = moonCountdownHTML();
+  var tc = $("tideCd");
+  if (tc) tc.textContent = tideCountdownHTML();
+  var mr = $("moonRows");
+  if (mr && state.days[state.sel]) mr.innerHTML = moonRowsHTML(state.days[state.sel]);
+  renderHeader();
+}
+function showError() {
+  var S = STR[state.lang];
+  $("app").innerHTML = '<div class="err">' + S.loadFail +
+    '<br><button class="refresh" onclick="boot(true)">' + S.retry + "</button></div>";
+}
+function dedupeMoon(wins) {
+  wins.sort(function(a, b) { return a.start - b.start; });
+  var out = [];
+  wins.forEach(function(w) {
+    var last = out[out.length - 1];
+    if (last && last.type === w.type && w.start <= last.end + 600000) {
+      last.end = Math.max(last.end, w.end);
+    } else out.push(w);
+  });
+  return out;
+}
+function startLoad(lat, lon, mode, distMi) {
+  state.loading = true;
+  var station = mode === "live" ? nearestStation(lat, lon) : PIN.station;
+  state.loc = {
+    mode: mode, name: mode === "live" ? "…" : PIN.name, distMi: distMi,
+    lat: lat, lon: lon, station: station
+  };
+  renderHeader();
+  var fromD = new Date(); fromD.setDate(fromD.getDate() - 1);
+  var toD = new Date(); toD.setDate(toD.getDate() + 7);
+  var moonPs = [];
+  for (var i = 0; i < 8; i++) {
+    var dt = new Date(); dt.setDate(dt.getDate() + i);
+    moonPs.push(loadMoonDay(lat, lon, dt));
+  }
+  var placeP = mode === "live" ? loadPlaceName(lat, lon) : Promise.resolve(PIN.name);
+  Promise.all([loadWeather(lat, lon), loadMarine(lat, lon), loadTides(station, fromD, toD),
+      Promise.all(moonPs), placeP])
+    .then(function(r) {
+      var wx = r[0], mar = r[1];
+      state.wx = wx; state.mar = mar;
+      state.tides = r[2];
+      var all = [];
+      r[3].forEach(function(arr) { arr.forEach(function(w) { all.push(w); }); });
+      state.moon = dedupeMoon(all);
+      state.loc.name = r[4];
+      state.days = buildDays(wx, mar);
+      state.sel = 0;
+      state.ready = true; state.loading = false;
+      state.updatedAt = new Date();
+      renderAll();
+    })
+    .catch(function() { state.loading = false; showError(); });
+}
+function onGeo(pos) {
+  var lat = pos.coords.latitude, lon = pos.coords.longitude;
+  if (distToShore(lat, lon) <= SHORE_KM) {
+    startLoad(lat, lon, "live", null);
+  } else {
+    var mi = Math.round(havKm(lat, lon, PIN.lat, PIN.lon) * 0.621371);
+    startLoad(PIN.lat, PIN.lon, "pin", mi);
+  }
+}
+function onGeoFail() {
+  startLoad(PIN.lat, PIN.lon, "pin", null);
+}
+function boot(force) {
+  state.ready = false; state.sel = 0; state.days = [];
+  var S = STR[state.lang];
+  document.documentElement.lang = state.lang;
+  $("app").innerHTML = '<div class="loading">' + S.loading + "</div>";
+  renderHeader();
+  if (force) { onGeoFail(); return; }
+  var got = false;
+  function once(fn) { return function(a) { if (!got) { got = true; fn(a); } }; }
+  if (navigator.geolocation) {
+    try {
+      navigator.geolocation.getCurrentPosition(once(onGeo), once(onGeoFail),
+        { timeout: 9000, maximumAge: 600000 });
+    } catch (e) { onGeoFail(); got = true; }
+  }
+  setTimeout(function() { if (!got) { got = true; onGeoFail(); } }, 10000);
+}
+$("langBtn").addEventListener("click", function() {
+  state.lang = state.lang === "en" ? "vi" : "en";
+  localStorage.setItem("pf_lang", state.lang);
+  document.documentElement.lang = state.lang;
+  if (state.ready) renderAll(); else boot();
 });
-load().catch(() => {
-  document.getElementById("app").innerHTML = `<div class="err">Couldn't load forecast data. Check your connection and reopen.</div>`;
+$("refBtn").addEventListener("click", function() { boot(true); });
+$("locBtn").addEventListener("click", function() {
+  if (navigator.geolocation) {
+    try { navigator.geolocation.getCurrentPosition(onGeo, onGeoFail, { timeout: 9000 }); }
+    catch (e) { onGeoFail(); }
+  } else onGeoFail();
 });
-setInterval(load, 3600e3);
-document.addEventListener("visibilitychange", () => { if (!document.hidden) load(); });
+boot();
+setInterval(tick, 1000);
 </script>
 </body>
 </html>
