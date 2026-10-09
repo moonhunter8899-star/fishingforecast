@@ -565,8 +565,7 @@ function render(sel){
       return `<div class="mmrow${isNext ? " next" : ""}">` +
         `<span class="mmbadge ${mm.kind === "MAJOR" ? "major" : "minor"}">${mm.kind}</span>` +
         `<span class="tt">${fmtRange(mm.start, mm.end)}</span>` +
-        `<span class="mc">${mm.label}</span>` +
-        (isNext ? `<span class="nextpill">NEXT</span>` : "") + `</div>`;
+        `<span class="mc">${mm.label}</span></div>`;
     }).join("");
 
   /* footnote */
