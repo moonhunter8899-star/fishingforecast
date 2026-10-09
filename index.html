@@ -179,7 +179,61 @@
   <div id="app"><div class="loading">Checking pompano conditions…</div></div>
 </div>
 <script>
-const LAT = 26.9166, LON = -80.0642, TZ = "America/New_York", STATION = "8722495";
+const HOME = { lat: 26.9166, lon: -80.0642, station: "8722495", name: "Jupiter Inlet, FL", short: "JUPITER INLET" };
+const TZ = "America/New_York";
+let LOC = { ...HOME, live: false };
+
+function hav(a,b,c,d){
+  const R = 3958.8, r = Math.PI/180;
+  const x = (c-a)*r, y = (d-b)*r;
+  const h = Math.sin(x/2)**2 + Math.cos(a*r)*Math.cos(c*r)*Math.sin(y/2)**2;
+  return 2*R*Math.asin(Math.sqrt(h));
+}
+function getPos(){
+  return new Promise(res => {
+    if (!navigator.geolocation) return res(null);
+    navigator.geolocation.getCurrentPosition(
+      p => res({ lat: p.coords.latitude, lon: p.coords.longitude }),
+      () => res(null),
+      { timeout: 8000, maximumAge: 600000 }
+    );
+  });
+}
+async function revName(lat, lon){
+  try{
+    const r = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`);
+    const j = await r.json();
+    const city = j.city || j.locality || "";
+    const st = j.principalSubdivisionCode ? j.principalSubdivisionCode.split("-").pop() : "";
+    return city ? (st ? `${city}, ${st}` : city) : null;
+  }catch(e){ return null; }
+}
+async function nearestStation(lat, lon){
+  try{
+    const r = await fetch("https://api.tidesandcurrents.noaa.gov/mdapi/prod/webapi/stations.json");
+    const j = await r.json();
+    let best = null, bd = 1e9;
+    for (const s of j.stations || []){
+      if (!s.tidal) continue;
+      const d = hav(lat, lon, parseFloat(s.lat), parseFloat(s.lng));
+      if (d < bd){ bd = d; best = s; }
+    }
+    return best ? { id: best.id, name: best.name } : null;
+  }catch(e){ return null; }
+}
+async function detectLocation(){
+  const pos = await getPos();
+  if (!pos) return;
+  if (hav(pos.lat, pos.lon, HOME.lat, HOME.lon) < 10) return;
+  const [nm, st] = await Promise.all([revName(pos.lat, pos.lon), nearestStation(pos.lat, pos.lon)]);
+  LOC = {
+    lat: pos.lat, lon: pos.lon,
+    station: st ? st.id : HOME.station,
+    name: nm || (st ? st.name : null) || `${pos.lat.toFixed(2)}°, ${pos.lon.toFixed(2)}°`,
+    short: (nm || "CURRENT SPOT").toUpperCase(),
+    live: true
+  };
+}
 
 /* Pompano icon: deep compressed body, blunt steep head, deeply forked tail */
 function pompano(color, size){
@@ -253,7 +307,7 @@ function bestWindow(wins){
 async function skyInfo(dateStr){
   try{
     const tzH = -new Date(dateStr + "T12:00:00").getTimezoneOffset() / 60;
-    const r = await fetch(`https://aa.usno.navy.mil/api/rstt/oneday?date=${dateStr}&coords=${LAT},${LON}&tz=${tzH}`);
+    const r = await fetch(`https://aa.usno.navy.mil/api/rstt/oneday?date=${dateStr}&coords=${LOC.lat},${LOC.lon}&tz=${tzH}`);
     const j = await r.json();
     const data = j.properties.data;
     const toD = hm => {
@@ -280,18 +334,19 @@ async function skyInfo(dateStr){
 }
 
 async function load(){
-  const fUrl = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}` +
+  await detectLocation();
+  const fUrl = `https://api.open-meteo.com/v1/forecast?latitude=${LOC.lat}&longitude=${LOC.lon}` +
     `&hourly=temperature_2m,precipitation_probability,wind_speed_10m,wind_direction_10m,windgusts_10m,weathercode` +
     `&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,wind_speed_10m_max,wind_direction_10m_dominant,weathercode` +
     `&timezone=${encodeURIComponent(TZ)}&wind_speed_unit=mph&temperature_unit=fahrenheit&forecast_days=7`;
-  const mUrl = `https://marine-api.open-meteo.com/v1/marine?latitude=${LAT}&longitude=${LON}` +
+  const mUrl = `https://marine-api.open-meteo.com/v1/marine?latitude=${LOC.lat}&longitude=${LOC.lon}` +
     `&hourly=sea_surface_temperature,wave_height&timezone=${encodeURIComponent(TZ)}` +
     `&temperature_unit=fahrenheit&forecast_days=7`;
   const now = new Date();
   const bd = now.toISOString().slice(0, 10).replace(/-/g, "");
   const ed = new Date(now.getTime() + 7 * 864e5).toISOString().slice(0, 10).replace(/-/g, "");
   const tUrl = `https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?product=predictions&datum=MLLW` +
-    `&station=${STATION}&time_zone=lst_ldt&units=english&interval=hilo&format=json&begin_date=${bd}&end_date=${ed}`;
+    `&station=${LOC.station}&time_zone=lst_ldt&units=english&interval=hilo&format=json&begin_date=${bd}&end_date=${ed}`;
 
   const [f, m, t] = await Promise.all([
     fetch(fUrl).then(r => r.json()),
@@ -356,9 +411,12 @@ async function load(){
   window.__days = days;
   const bi = days.reduce((a, d, i) => d.score > days[a].score ? i : a, 0);
   window.__best = bi;
+  document.querySelector(".hd .t1").innerHTML =
+    `${LOC.live ? "📍 " : ""}${LOC.name} — Pompano <span class="nm">· Tien Huynh</span>`;
   render(0);
   document.getElementById("hdsub").textContent =
-    "Updated " + new Date().toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit", timeZone: TZ }) + " ET";
+    `${LOC.lat.toFixed(4)}°, ${LOC.lon.toFixed(4)}° · Updated ` +
+    new Date().toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit", timeZone: TZ }) + " ET";
 }
 
 function tideAt(day, timeMs){
@@ -449,7 +507,7 @@ function render(sel){
     `<div class="row"><div class="badge">${pompano(rc, 40)}</div>` +
     `<div><div class="lbl">POMPANO BITE RATING</div>` +
     `<div class="big">${word.toUpperCase()} <span class="sc" style="color:${rc}">${d.score}/100</span></div></div>` +
-    `<div class="side">${dayName}<br>JUPITER INLET</div></div></div>`;
+    `<div class="side">${dayName}<br>${LOC.short}</div></div></div>`;
 
   /* day strip */
   const d0 = new Date(days[0].date + "T12:00:00"), d6 = new Date(days[6].date + "T12:00:00");
