@@ -722,11 +722,17 @@ function tideSVG(day) {
     }
     svg += '<g transform="translate(' + (mx - 10).toFixed(1) + "," + (my - 10).toFixed(1) + ')">' + fishSVG(fcol, 20) + "</g>";
   });
-  // live fishing-rod marker riding the tide curve at the current time
+  // live fishing-rod marker riding the tide curve at the current time.
+  // Custom rod-only icon: the 🎣 emoji renders with a blue fish on the hook on iOS,
+  // and Tien wants the rod with no fish. The day's rating number sits above the rod
+  // in the rating color (numbers only, so EN/VI both work).
   if (state.tideScale) {
     var fxx = X(now), fyy = Y(tideAt(now));
-    svg += '<g id="tidefish"><text id="tiderod" x="' + fxx.toFixed(1) + '" y="' + (fyy + 10).toFixed(1) +
-      '" text-anchor="middle" font-size="30">🎣</text></g>';
+    svg += '<g id="tiderod" transform="translate(' + fxx.toFixed(1) + ',' + fyy.toFixed(1) + ')">' +
+      '<text x="0" y="-30" text-anchor="middle" font-size="13" font-weight="700" fill="' + fcol + '">' + day.score + '</text>' +
+      '<path d="M-11,13 L11,-13" stroke="#7a5c33" stroke-width="3" stroke-linecap="round"/>' +
+      '<circle cx="-4" cy="5" r="4.2" fill="#3f3f46"/><circle cx="-4" cy="5" r="1.5" fill="#d4d4d8"/>' +
+      '<path d="M11,-13 Q15,-3 12,9" stroke="#a8a29e" stroke-width="1.2" fill="none"/></g>';
   }
   // x labels — 12h style in both languages
   var S = STR[state.lang];
@@ -951,8 +957,7 @@ function moveTideFish() {
   t.style.display = "";
   var fx = sc.pL + (now - sc.d0) / 86400000 * (sc.W - sc.pL - sc.pR);
   var fy = sc.pT + (1 - (tideAt(now) - sc.mn) / (sc.mx - sc.mn)) * (sc.H - sc.pT - sc.pB);
-  t.setAttribute("x", fx.toFixed(1));
-  t.setAttribute("y", (fy + 10).toFixed(1));
+  t.setAttribute("transform", "translate(" + fx.toFixed(1) + "," + fy.toFixed(1) + ")");
   if (ln) {
     var tm = majorTargetMid(sc.d0, now);
     if (tm == null) { ln.style.display = "none"; }
