@@ -536,11 +536,11 @@ function render(sel){
   /* day summary card */
   html += `<div class="card" style="border-color:${rc}">` +
     `<h3>${sel === 0 ? "Today" : dt.toLocaleDateString("en-US", { weekday: "long" })} <span class="dt">${dt.toLocaleDateString("en-US", { month: "short", day: "numeric" })}</span></h3>` +
-    `<div class="sub2">Best hour ${fmtT12(bh.time).replace(":00 ", " ")} · Go at ${best ? fmtT12(best.peak).replace(":00 ", " ") : "—"}</div>` +
+    `<div class="sub2">Best hour ${fmtT12(bh.time).replace(":00 ", " ")} · <b style="color:#9a4a16">Go at ${best ? fmtT12(best.peak).replace(":00 ", " ") : "—"}</b></div>` +
     `<div class="ratingpill" style="background:${rc}"><span class="wc">${pompano(rc, 22)}</span>${d.score} ${word.toUpperCase()}</div>`;
 
   /* bite chips */
-  html += `<div class="chips">` + d.wins.map(w => {
+  html += `<div style="font-size:10px;font-weight:800;letter-spacing:.1em;color:#9a4a16;margin-bottom:6px">🐟 BITE WINDOWS · MOVING WATER</div><div class="chips">` + d.wins.map(w => {
     const isBest = best && w.peak.getTime() === best.peak.getTime();
     const wsc = Math.max(0, Math.min(100, d.score + (w.moonMajor ? 8 : 0) + (isBest ? 5 : 0)));
     return `<span class="chip${isBest ? " best" : ""}">${pompano(isBest ? "#ffffff" : rc, 18)}` +
@@ -558,7 +558,8 @@ function render(sel){
     `</div>`;
 
   /* major & minor list */
-  html += `<div class="mmhead"><div class="t">All Major & Minor bites</div><div class="n">${allSol.length} windows</div></div>` +
+  html += `<div class="mmhead"><div class="t">🌙 Moon bite times</div><div class="n">${allSol.length} windows</div></div>` +
+    `<div style="font-size:11px;color:#8a7a5f;margin:-2px 0 8px;line-height:1.5">MAJOR = moon overhead, strongest pull · MINOR = moonrise / moonset · when a 🐟 window overlaps the moon, the score jumps</div>` +
     allSol.map(mm => {
       const isNext = nextSol && mm.start.getTime() === nextSol.start.getTime() && mm.kind === nextSol.kind;
       return `<div class="mmrow${isNext ? " next" : ""}">` +
