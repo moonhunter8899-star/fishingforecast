@@ -229,7 +229,7 @@ var STR = {
     moonTitle: "Major / Minor bite times", major: "MAJOR", minor: "MINOR", now: "NOW",
     tide: "Tide", high: "High", low: "Low", refresh: "Refresh", todayWord: "Today",
     retry: "Try again", loadFail: "Could not load live data. Check your connection.",
-    outstanding: "Outstanding", great: "Great", good: "Good", fair: "Fair", poor: "Poor",
+    great: "Great", good: "Good", fair: "Fair", poor: "Poor",
     updated: function(d, t) { return "Updated " + d + " at " + t; },
     miAway: function(mi) { return mi + " mi away"; },
     dur: function(h, m) { return h > 0 ? h + "h " + m + "m" : m + "m"; },
@@ -258,7 +258,7 @@ var STR = {
     moonTitle: "Giờ cá cắn câu chính / phụ", major: "CHÍNH", minor: "PHỤ", now: "NGAY BÂY GIỜ",
     tide: "Thủy triều", high: "Nước lên", low: "Nước xuống", refresh: "Làm mới", todayWord: "Hôm nay",
     retry: "Thử lại", loadFail: "Không tải được dữ liệu. Kiểm tra kết nối mạng.",
-    outstanding: "Xuất sắc", great: "Tuyệt vời", good: "Tốt", fair: "Trung bình", poor: "Kém",
+    great: "Tuyệt vời", good: "Tốt", fair: "Trung bình", poor: "Tệ",
     updated: function(d, t) { return "Cập nhật " + d + " lúc " + t; },
     miAway: function(mi) { return "cách " + mi + " dặm"; },
     dur: function(h, m) { return h > 0 ? h + " giờ " + m + " phút" : m + " phút"; },
@@ -351,7 +351,7 @@ function dayTitle(date, idx, lang) {
 function ratingColor(s) { return s >= 60 ? "#1d9e6c" : (s >= 40 ? "#d9a441" : "#c0392b"); }
 function ratingWord(s, lang) {
   var S = STR[lang];
-  return s >= 90 ? S.outstanding : s >= 70 ? S.great : s >= 55 ? S.good : s >= 40 ? S.fair : S.poor;
+  return s >= 80 ? S.great : s >= 60 ? S.good : s >= 40 ? S.fair : S.poor;
 }
 function durText(ms, lang) {
   if (ms < 0) ms = 0;
