@@ -178,7 +178,7 @@
 <script>
 "use strict";
 /* ================= constants ================= */
-var PIN = { lat: 26.9166, lon: -80.0642, name: "Jupiter Inlet, FL", station: "8722495" };
+var PIN = { lat: 26.9165914, lon: -80.0641906, name: "Jupiter Inlet, FL", station: "8722495" };
 /* ================= i18n ================= */
 var STR = {
   en: {
@@ -309,14 +309,14 @@ function ymdDash(d) { return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-"
 
 function loadWeather(lat, lon) {
   var u = "https://api.open-meteo.com/v1/forecast?latitude=" + lat + "&longitude=" + lon +
-    "&hourly=temperature_2m,precipitation_probability,weathercode,windspeed_10m,winddirection_10m" +
-    "&daily=temperature_2m_max,temperature_2m_min,weathercode,precipitation_probability_max" +
-    "&timezone=auto&forecast_days=8&temperature_unit=fahrenheit&windspeed_unit=mph";
+    "&hourly=temperature_2m,precipitation_probability,precipitation,windspeed_10m,winddirection_10m,wind_gusts_10m,weather_code" +
+    "&daily=temperature_2m_max,temperature_2m_min,weather_code,precipitation_probability_max" +
+    "&timezone=auto&forecast_days=7&temperature_unit=fahrenheit&windspeed_unit=mph";
   return fetchJSON(u);
 }
 function loadMarine(lat, lon) {
   var u = "https://marine-api.open-meteo.com/v1/marine?latitude=" + lat + "&longitude=" + lon +
-    "&hourly=wave_height,sea_surface_temperature&timezone=auto&forecast_days=8&temperature_unit=fahrenheit";
+    "&hourly=wave_height,sea_surface_temperature&timezone=auto&forecast_days=7&temperature_unit=fahrenheit";
   return fetchJSON(u);
 }
 function loadTides(station, fromD, toD) {
@@ -335,27 +335,23 @@ function loadTides(station, fromD, toD) {
     return out;
   });
 }
-function parseMoonTime(s, baseDate) {
-  // "6:14:28 AM" (location-local time from sunrisesunset.io)
-  var m = /(\d+):(\d+):(\d+)\s*(AM|PM)/i.exec(s || "");
-  if (!m) return null;
-  var h = +m[1] % 12; if (/pm/i.test(m[4])) h += 12;
-  return new Date(baseDate.getFullYear(), baseDate.getMonth(), baseDate.getDate(), h, +m[2], +m[3]).getTime();
-}
 function loadMoonDay(lat, lon, date) {
-  // USNO retired its public API; sunrisesunset.io gives moonrise/moonset.
-  // Moon transit (Major) ~= midpoint between moonrise and moonset.
-  var u = "https://api.sunrisesunset.io/json?lat=" + lat + "&lng=" + lon + "&date=" + ymdDash(date);
+  // MET Norway sunrise API — the same moon source the Muse app uses.
+  // high_moon/low_moon -> Major (+/-1h); moonrise/moonset -> Minor (+/-30min).
+  // Times requested in UTC (+00:00) so daylight-saving can't shift them.
+  var u = "https://api.met.no/weatherapi/sunrise/3.0/moon?lat=" + lat + "&lon=" + lon +
+    "&date=" + ymdDash(date) + "&offset=" + encodeURIComponent("+00:00");
   return fetchJSON(u).then(function(j) {
-    var r = j.results || {}, wins = [];
-    var rise = parseMoonTime(r.moonrise, date), set = parseMoonTime(r.moonset, date);
-    if (rise != null) wins.push({ type: "minor", start: rise - 3600000, end: rise + 3600000, center: rise });
-    if (set != null) wins.push({ type: "minor", start: set - 3600000, end: set + 3600000, center: set });
-    if (rise != null && set != null) {
-      var s2 = set < rise ? set + 86400000 : set;
-      var tr = rise + (s2 - rise) / 2;
-      wins.push({ type: "major", start: tr - 3600000, end: tr + 3600000, center: tr });
-    }
+    var p = (j && j.properties) || {}, wins = [];
+    function T(ev) { return ev && ev.time ? new Date(ev.time).getTime() : null; }
+    [["high_moon"], ["low_moon"]].forEach(function(cfg) {
+      var t = T(p[cfg[0]]);
+      if (t != null && !isNaN(t)) wins.push({ type: "major", start: t - 3600000, end: t + 3600000, center: t });
+    });
+    [["moonrise"], ["moonset"]].forEach(function(cfg) {
+      var t = T(p[cfg[0]]);
+      if (t != null && !isNaN(t)) wins.push({ type: "minor", start: t - 1800000, end: t + 1800000, center: t });
+    });
     return wins;
   }).catch(function() { return []; });
 }
@@ -382,73 +378,139 @@ function tideAt(ms) {
   }
   return T[T.length - 1].v;
 }
-function tideRate(ms) { // ft per hour
-  return (tideAt(ms + 1800000) - tideAt(ms - 1800000));
-}
-function moonBoost(ms) {
-  var b = 0, inside = null;
-  for (var i = 0; i < state.moon.length; i++) {
-    var w = state.moon[i];
-    if (ms >= w.start && ms <= w.end) { b = Math.max(b, w.type === "major" ? 20 : 12); inside = w.type; }
+/* ---- scoring (mirrors the Muse app's server/src/actions.ts) ----
+   Hourly score starts at 100 and subtracts penalties, clamped 0-100.
+   Tide adjustment is applied per hour afterwards, clamped to [-6, +14].
+   Moon boost applies ONLY to per-window bite ratings, never to day scores. */
+function hourScore(wi, mi) {
+  var wx = state.wx.hourly, mar = state.mar.hourly, s = 100;
+  var wsp = wx.windspeed_10m[wi];
+  if (wsp < 4) s -= 4;
+  else if (wsp <= 15) s -= 0;
+  else if (wsp <= 20) s -= 12;
+  else if (wsp <= 25) s -= 26;
+  else s -= 46;
+  var gust = wx.wind_gusts_10m ? wx.wind_gusts_10m[wi] : 0;
+  if (gust > wsp + 12) s -= 8;
+  if (gust > 30) s -= 18;
+  var rp = wx.precipitation_probability[wi];
+  if (rp >= 80) s -= 45; else if (rp >= 60) s -= 30; else if (rp >= 40) s -= 20; else if (rp >= 20) s -= 10;
+  var mm = wx.precipitation ? wx.precipitation[wi] : 0;
+  if (mm >= 2.5) s -= 30; else if (mm >= 0.5) s -= 15; else if (mm > 0) s -= 5;
+  var wt = mar.sea_surface_temperature[mi];
+  if (wt != null && !isNaN(wt)) {
+    if (wt >= 65 && wt <= 76) s -= 0;
+    else if ((wt >= 62 && wt < 65) || (wt > 76 && wt <= 80)) s -= 10;
+    else if ((wt >= 60 && wt < 62) || (wt > 80 && wt <= 84)) s -= 18;
+    else s -= 28;
   }
-  return { boost: b, inside: inside };
+  var wv = mar.wave_height[mi] * 3.28084; // ft
+  if (!isNaN(wv)) {
+    if (wv < 0.5) s -= 6;
+    else if (wv <= 3) s -= 0;
+    else if (wv <= 4) s -= 8;
+    else if (wv <= 5) s -= 18;
+    else if (wv <= 6) s -= 28;
+    else s -= 40;
+  }
+  return Math.max(0, Math.min(100, Math.round(s)));
 }
-function biteScore(ms, wx, mar) {
-  var wi = hourlyIndex(wx.hourly, ms), mi = hourlyIndex(mar.hourly, ms);
-  var move = Math.min(Math.abs(tideRate(ms)) / 1.0, 1) * 50;
-  var wt = mar.hourly.sea_surface_temperature[mi];
-  var temp = 15 * Math.max(0, 1 - Math.abs(wt - 70.5) / 18);
-  var wsp = wx.hourly.windspeed_10m[wi];
-  var wind = wsp <= 10 ? 15 : (wsp >= 25 ? 0 : 15 * (1 - (wsp - 10) / 15));
-  var mb = moonBoost(ms);
-  return Math.min(100, move + temp + wind + mb.boost);
+function tideAdj(ms) {
+  // +8 if the next tide event is a High (incoming), +2 if a Low (ebb).
+  // -8 within 0.5h of an event (slack), +2 within 1h, +6 within 3h (mid-tide flow).
+  var T = state.tides;
+  if (!T.length) return 0;
+  var next = null, nearest = 1e15, i, d;
+  for (i = 0; i < T.length; i++) {
+    d = Math.abs(T[i].t - ms);
+    if (d < nearest) nearest = d;
+    if (T[i].t > ms && !next) next = T[i];
+  }
+  var a = next ? (next.type === "H" ? 8 : 2) : 0;
+  if (nearest <= 1800000) a -= 8; else if (nearest <= 3600000) a += 2; else if (nearest <= 10800000) a += 6;
+  return Math.max(-6, Math.min(14, a));
+}
+function adjHourScore(wi, mi, ms) {
+  return hourScore(wi, mi) + tideAdj(ms);
+}
+function windowMoonBoost(startMs, endMs) {
+  // (any Major overlap ? 10 : any Minor overlap ? 5 : 0) + (High tide event in window ? 7 : 0)
+  var b = 0, minor = false, i;
+  for (i = 0; i < state.moon.length; i++) {
+    var w = state.moon[i];
+    if (w.end >= startMs && w.start <= endMs) {
+      if (w.type === "major") { b = 10; break; }
+      minor = true;
+    }
+  }
+  if (b === 0 && minor) b = 5;
+  for (i = 0; i < state.tides.length; i++) {
+    var e = state.tides[i];
+    if (e.type === "H" && e.t >= startMs && e.t <= endMs) { b += 7; break; }
+  }
+  return b;
 }
 function buildDays(wx, mar) {
   var days = [];
   var now = new Date();
   for (var d = 0; d < 7; d++) {
     var date = new Date(now.getFullYear(), now.getMonth(), now.getDate() + d);
-    var d0 = date.getTime(), d1 = d0 + 86400000;
-    // find bite-window peaks, 30-min samples
+    // tide-adjusted hourly scores for this date (spot-local hours)
+    var hs = [];
+    for (var i = 0; i < wx.hourly.time.length; i++) {
+      var dt = new Date(wx.hourly.time[i]);
+      if (dt.getFullYear() === date.getFullYear() && dt.getMonth() === date.getMonth() &&
+          dt.getDate() === date.getDate()) {
+        var mi = hourlyIndex(mar.hourly, dt.getTime());
+        hs.push({ t: dt.getTime(), s: adjHourScore(i, mi, dt.getTime()) });
+      }
+    }
+    // day score = rounded mean of the 06:00-19:00 pool (else all hours) — no moon boost
+    var pool = hs.filter(function(h) { var hh = new Date(h.t).getHours(); return hh >= 6 && hh <= 19; });
+    if (!pool.length) pool = hs;
+    var dayScore = 0;
+    if (pool.length) {
+      var sum = 0;
+      pool.forEach(function(h) { sum += h.s; });
+      dayScore = Math.max(0, Math.min(100, Math.round(sum / pool.length)));
+    }
+    // bite windows: local maxima of hourly scores (>=40, >=2h apart, top 4), +/-1h each
     var peaks = [];
-    var samples = [];
-    for (var t2 = d0; t2 < d1; t2 += 1800000) samples.push({ t: t2, s: biteScore(t2, wx, mar) });
-    for (var i = 1; i < samples.length - 1; i++) {
-      if (samples[i].s >= samples[i-1].s && samples[i].s >= samples[i+1].s && samples[i].s >= 40) {
+    for (var k = 1; k < hs.length - 1; k++) {
+      if (hs[k].s >= hs[k-1].s && hs[k].s >= hs[k+1].s && hs[k].s >= 40) {
         var ok = true;
-        for (var k = 0; k < peaks.length; k++) {
-          if (Math.abs(peaks[k].t - samples[i].t) < 7200000) {
+        for (var q = 0; q < peaks.length; q++) {
+          if (Math.abs(peaks[q].t - hs[k].t) < 7200000) {
             ok = false;
-            if (samples[i].s > peaks[k].s) peaks[k] = { t: samples[i].t, s: samples[i].s };
+            if (hs[k].s > peaks[q].s) peaks[q] = hs[k];
           }
         }
-        if (ok) peaks.push({ t: samples[i].t, s: samples[i].s });
+        if (ok) peaks.push(hs[k]);
       }
     }
     peaks.sort(function(a, b) { return b.s - a.s; });
     peaks = peaks.slice(0, 4);
     var windows = peaks.map(function(p) {
-      return { start: new Date(p.t - 3600000), end: new Date(p.t + 3600000), score: Math.round(p.s) };
+      var st = p.t - 3600000, en = p.t + 3600000, wsum = 0, n = 0;
+      hs.forEach(function(h) { if (h.t >= st && h.t <= en) { wsum += h.s; n++; } });
+      var sc = n ? wsum / n : p.s;
+      sc = Math.min(100, Math.round(sc + windowMoonBoost(st, en)));
+      return { start: new Date(st), end: new Date(en), score: sc };
     });
     windows.sort(function(a, b) { return a.start - b.start; });
-    var best = windows[0];
-    windows.forEach(function(w) { if (w.score > best.score) best = w; });
-    var dayScore = 0;
-    if (windows.length) {
-      var avg = windows.reduce(function(a, w) { return a + w.score; }, 0) / windows.length;
-      dayScore = Math.round(0.65 * best.score + 0.35 * avg);
-    }
+    var best = null;
+    windows.forEach(function(w) { if (!best || w.score > best.score) best = w; });
     // weather tiles at best-window peak (or noon)
-    var refT = best ? best.start.getTime() + 3600000 : d0 + 43200000;
-    var wi = hourlyIndex(wx.hourly, refT), mi = hourlyIndex(mar.hourly, refT);
-    var wv = mar.hourly.wave_height[mi] * 3.28084;
+    var refT = best ? best.start.getTime() + 3600000 : date.getTime() + 43200000;
+    var wi = hourlyIndex(wx.hourly, refT), mi2 = hourlyIndex(mar.hourly, refT);
+    var wv = mar.hourly.wave_height[mi2] * 3.28084;
     days.push({
       date: date, score: dayScore, windows: windows, best: best,
       wind: Math.round(wx.hourly.windspeed_10m[wi]),
       windDir: compass(wx.hourly.winddirection_10m[wi]),
-      water: wx && mar ? (Math.round(mar.hourly.sea_surface_temperature[mi] * 10) / 10) : 0,
+      water: Math.round(mar.hourly.sea_surface_temperature[mi2] * 10) / 10,
       waveFt: Math.round(wv * 10) / 10,
-      condCode: wx.hourly.weathercode[wi],
+      condCode: wx.hourly.weather_code[wi],
       rain: wx.daily.precipitation_probability_max[d]
     });
   }
@@ -456,9 +518,12 @@ function buildDays(wx, mar) {
 }
 /* ================= render ================= */
 function moonScore(w) {
-  if (!state.wx || w._score == null) {
-    try { w._score = Math.round(biteScore(w.center, state.wx, state.mar)); }
-    catch (e) { w._score = 0; }
+  // App's solunarRatingForWindow: tide-adjusted hourly score at the window + 10 (Major) / 5 (Minor), capped at 100.
+  if (w._score == null) {
+    try {
+      var wi = hourlyIndex(state.wx.hourly, w.center), mi = hourlyIndex(state.mar.hourly, w.center);
+      w._score = Math.min(100, Math.round(adjHourScore(wi, mi, w.center) + (w.type === "major" ? 10 : 5)));
+    } catch (e) { w._score = 0; }
   }
   return w._score || 0;
 }
