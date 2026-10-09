@@ -112,10 +112,6 @@
     margin: 12px 0; font-family: "Fraunces", serif; font-weight: 900; font-size: 19px;
     box-shadow: 0 3px 10px rgba(188,90,30,.35);
   }
-  .gofish .fic {
-    width: 34px; height: 34px; border-radius: 50%; background: #fff; flex: none;
-    display: flex; align-items: center; justify-content: center;
-  }
   .gofish .gl { font-size: 15px; letter-spacing: .04em; }
   .gofish .gt { margin-left: 2px; }
   .gofish .gs { margin-left: auto; font-size: 17px; white-space: nowrap; }
@@ -665,7 +661,7 @@ function renderAll() {
     "<h3>" + dayTitle(day.date, state.sel, state.lang, day.score) + "</h3>";
   if (day.best) {
     var bsc = day.best.score;
-    html += '<div class="gofish"><span class="fic">' + fishSVG(dc, 24) + "</span>" +
+    html += '<div class="gofish">' +
       '<span class="gl">🎣 ' + S.goFish + '</span><span class="gt">' +
       trange(day.best.start, day.best.end, state.lang) + '</span><span class="gs">· 🐟 ' + bsc + "</span></div>";
   }
