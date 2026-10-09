@@ -111,8 +111,7 @@ var STR = {
 };
 function $(id) { return document.getElementById(id); }
 function pad(n) { return (n < 10 ? "0" : "") + n; }
-function tstr(d, lang) {
-  if (lang === "vi") return pad(d.getHours()) + ":" + pad(d.getMinutes());
+function tstr(d, lang) { // 12h in both languages, e.g. "7:35p"
   var h = d.getHours(), ap = h >= 12 ? "p" : "a";
   h = h % 12; if (h === 0) h = 12;
   return h + ":" + pad(d.getMinutes()) + ap;
@@ -134,9 +133,8 @@ function fishSVG(color, size) {
     '<path d="M20 26 C24 29 24 35 20 38" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round"/>' +
     '<circle cx="16" cy="29" r="3" fill="#fff"/><circle cx="16" cy="29" r="1.5" fill="#22312b"/></svg>';
 }
-function clockStr(lang) {
+function clockStr(lang) { // 12h in both languages, e.g. "2:26 PM"
   var d = new Date();
-  if (lang === "vi") return pad(d.getHours()) + ":" + pad(d.getMinutes());
   var h = d.getHours(), ap = h >= 12 ? "PM" : "AM";
   h = h % 12; if (h === 0) h = 12;
   return h + ":" + pad(d.getMinutes()) + " " + ap;
