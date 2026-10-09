@@ -46,7 +46,7 @@
     margin-bottom: 14px; color: #fff;
   }
   .topcard .wm { position: absolute; top: -8px; right: 6px; opacity: .14; pointer-events: none; }
-  .topcard .row { display: flex; align-items: center; gap: 14px; position: relative; }
+  .topcard .row { display: flex; align-items: center; gap: 16px; position: relative; padding: 2px 4px; }
   .badge {
     width: 58px; height: 58px; border-radius: 50%; background: #fff; flex: none;
     display: flex; align-items: center; justify-content: center;
@@ -54,7 +54,6 @@
   .topcard .lbl { color: #e8c76a; font-size: 10px; font-weight: 700; letter-spacing: .18em; }
   .topcard .big { font-family: "Fraunces", serif; font-weight: 900; font-size: 30px; color: #fff; margin-top: 2px; }
   .topcard .big .sc { font-size: 22px; }
-  .topcard .side { margin-left: auto; text-align: right; color: #e8c76a; font-size: 10px; font-weight: 700; letter-spacing: .12em; line-height: 1.7; }
 
   /* Day strip */
   .pick { display: flex; align-items: baseline; justify-content: space-between; margin: 2px 2px 8px; }
@@ -630,7 +629,6 @@ function renderAll() {
     '<div><div class="lbl">' + S.rating + '</div>' +
     '<div class="big">' + ratingWord(d0.score, state.lang).toUpperCase() +
     ' <span class="sc" style="color:' + c0 + '">' + d0.score + '/100</span></div></div>' +
-    '<div class="side">' + S.today + "<br>" + state.loc.name.toUpperCase() + "</div>" +
     "</div></div>";
   // pick-a-day strip
   var bestIdx = 0;
