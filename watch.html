@@ -49,6 +49,8 @@
   }
   .cd .ck { margin-right: 6px; }
   .cd .note { color: #8a7a5f; font-weight: 600; }
+  .tidecard { margin-bottom: 10px; }
+  .tidecard svg { width: 100%; display: block; }
   .upd { text-align: center; color: #8a7a5f; font-size: 11px; margin-top: 6px; }
   .loading, .err { text-align: center; padding: 40px 16px; color: #8a7a5f; font-size: 14px; }
   .refresh {
@@ -373,6 +375,66 @@ function tideCountdowns() {
   if (nl) parts.push(S.nextLow(durText(nl.t - now, state.lang)));
   return parts.length ? parts.join(" · ") : S.tideNote;
 }
+/* Compact tide chart for today: cosine-interpolated curve (same as the main
+   page), sea-teal with soft gradient fill, high/low dots, and a small "now"
+   dot riding the curve. Nearly text-free so EN/VI need no changes. */
+function tideChartSVG() {
+  var T = state.tides;
+  if (!T.length) return "";
+  var nowD = new Date();
+  var d0 = new Date(nowD.getFullYear(), nowD.getMonth(), nowD.getDate()).getTime();
+  var d1 = d0 + 86400000;
+  function tideAt(ms) {
+    if (ms <= T[0].t) return T[0].v;
+    for (var i = 0; i < T.length - 1; i++) {
+      if (ms >= T[i].t && ms <= T[i + 1].t) {
+        var f = (ms - T[i].t) / (T[i + 1].t - T[i].t);
+        var s = (1 - Math.cos(Math.PI * f)) / 2;
+        return T[i].v + s * (T[i + 1].v - T[i].v);
+      }
+    }
+    return T[T.length - 1].v;
+  }
+  var W = 380, H = 118, pL = 6, pR = 6, pT = 12, pB = 8;
+  var pts = [], t;
+  for (t = d0; t <= d1; t += 900000) pts.push([t, tideAt(t)]);
+  var vs = pts.map(function(p) { return p[1]; });
+  var mn = Math.min.apply(null, vs), mx = Math.max.apply(null, vs);
+  if (mx - mn < 0.3) { mx += 0.15; mn -= 0.15; }
+  function X(tt) { return pL + (tt - d0) / 86400000 * (W - pL - pR); }
+  function Y(v) { return pT + (1 - (v - mn) / (mx - mn)) * (H - pT - pB); }
+  var d = "M" + X(pts[0][0]).toFixed(1) + "," + Y(pts[0][1]).toFixed(1);
+  for (var i = 0; i < pts.length - 1; i++) {
+    var p0 = pts[Math.max(0, i - 1)], p1 = pts[i], p2 = pts[i + 1], p3 = pts[Math.min(pts.length - 1, i + 2)];
+    var c1x = X(p1[0]) + (X(p2[0]) - X(p0[0])) / 6, c1y = Y(p1[1]) + (Y(p2[1]) - Y(p0[1])) / 6;
+    var c2x = X(p2[0]) - (X(p3[0]) - X(p1[0])) / 6, c2y = Y(p2[1]) - (Y(p3[1]) - Y(p1[1])) / 6;
+    d += "C" + c1x.toFixed(1) + "," + c1y.toFixed(1) + " " + c2x.toFixed(1) + "," + c2y.toFixed(1) +
+         " " + X(p2[0]).toFixed(1) + "," + Y(p2[1]).toFixed(1);
+  }
+  var svg = '<svg viewBox="0 0 ' + W + " " + H + '">';
+  svg += '<defs><linearGradient id="wtideg" x1="0" y1="0" x2="0" y2="1">' +
+    '<stop offset="0" stop-color="#14b8a6" stop-opacity=".30"/>' +
+    '<stop offset=".6" stop-color="#14b8a6" stop-opacity=".10"/>' +
+    '<stop offset="1" stop-color="#14b8a6" stop-opacity=".03"/>' +
+    "</linearGradient></defs>";
+  svg += '<rect x="0" y="0" width="' + W + '" height="' + H + '" rx="12" fill="#f8f2e3"/>';
+  svg += '<path d="' + d + " L" + X(d1).toFixed(1) + "," + (H - pB) + " L" + X(d0).toFixed(1) + "," + (H - pB) +
+    '" fill="url(#wtideg)" stroke="none"/>';
+  svg += '<path d="' + d + '" fill="none" stroke="#14b8a6" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"/>';
+  T.forEach(function(e) {
+    if (e.t < d0 || e.t > d1) return;
+    svg += '<circle cx="' + X(e.t).toFixed(1) + '" cy="' + Y(e.v).toFixed(1) +
+      '" r="4" fill="#fff" stroke="#0f766e" stroke-width="1.75"/>';
+  });
+  var now = Date.now();
+  if (now >= d0 && now <= d1 && state.today) {
+    var nc = ratingColor(state.today.score);
+    svg += '<circle cx="' + X(now).toFixed(1) + '" cy="' + Y(tideAt(now)).toFixed(1) +
+      '" r="5" fill="' + nc + '" stroke="#fff" stroke-width="2"/>';
+  }
+  svg += '<text x="' + (W - pR - 2) + '" y="' + (pT - 3) + '" text-anchor="end" font-size="8.5" fill="#a89a7c">ft</text>';
+  return svg + "</svg>";
+}
 function renderAll() {
   var S = STR[state.lang], lang = state.lang;
   $("langBtn").innerHTML = lang === "en" ? "<b>EN</b> | VI" : "EN | <b>VI</b>";
@@ -390,6 +452,7 @@ function renderAll() {
       trange(t.best.start, t.best.end, lang) + '</span><span class="gs">' +
       fishSVG(bc, 24) + " " + t.best.score + "</span></div>";
   }
+  html += '<div class="tidecard">' + tideChartSVG() + "</div>";
   html += '<div class="cd"><span class="ck">🌊</span><span id="tideCd">' + tideCountdowns() + "</span></div>";
   html += '<div class="cd"><span class="ck">🌙</span><span id="moonCd">' + moonCountdowns() + "</span></div>";
   html += '<div class="upd">' + S.updated(clockStr(lang)) + "</div>";
