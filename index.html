@@ -237,10 +237,17 @@ async function nearestStation(lat, lon){
     return best ? { id: best.id, name: best.name } : null;
   }catch(e){ return null; }
 }
+const BEACHES = [
+  [26.9166,-80.0642],[27.86,-80.45],[27.45,-80.29],[27.19,-80.18],[26.71,-80.03],
+  [26.36,-80.07],[26.12,-80.12],[25.76,-80.13],[28.32,-80.61],[29.21,-81.01],
+  [27.27,-80.35],[27.64,-80.39],[30.33,-81.43],[24.55,-81.78],[28.0,-80.55]
+];
+const nearBeach = (lat, lon) => BEACHES.some(([a,b]) => hav(lat, lon, a, b) < 12);
 async function detectLocation(){
   const pos = await getPos();
   if (!pos) return;
   if (hav(pos.lat, pos.lon, HOME.lat, HOME.lon) < 10) return;
+  if (!nearBeach(pos.lat, pos.lon)){ LOC.pinned = true; return; }
   const [nm, st] = await Promise.all([revName(pos.lat, pos.lon), nearestStation(pos.lat, pos.lon)]);
   LOC = {
     lat: pos.lat, lon: pos.lon,
@@ -428,7 +435,7 @@ async function load(){
   const bi = days.reduce((a, d, i) => d.score > days[a].score ? i : a, 0);
   window.__best = bi;
   document.querySelector(".hd .t1").innerHTML =
-    `${LOC.live ? "📍 " : ""}${LOC.name} — Pompano <span class="nm">· Tien Huynh</span>`;
+    `${LOC.live ? "📍 " : LOC.pinned ? "📌 " : ""}${LOC.name} — Pompano <span class="nm">· Tien Huynh</span>`;
   render(0);
   document.getElementById("hdsub").textContent =
     `${LOC.lat.toFixed(4)}°, ${LOC.lon.toFixed(4)}° · Updated ` +
