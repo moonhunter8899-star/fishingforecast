@@ -28,6 +28,7 @@
   .verdict.good .word { color: #4ade80; }
   .verdict.bad .word { color: #f87171; }
   .verdict .score { color: #8fa8bd; font-size: 12px; margin-top: 2px; }
+  .verdict .counts { font-size: 13px; margin-top: 8px; color: #cfe3f5; font-weight: 600; }
   .bite { display: flex; align-items: center; gap: 8px; padding: 7px 0; font-size: 13px; border-top: 1px solid #14293f; }
   .bite:first-child { border-top: none; }
   .bite .t { font-weight: 700; }
@@ -228,6 +229,34 @@ function inWin(timeISO, wins){
   return wins.some(w => tt >= w.start.getTime() && tt <= w.end.getTime());
 }
 
+let countTimer = null;
+function fmtDur(ms){
+  const m = Math.max(0, Math.round(ms / 60000));
+  const h = Math.floor(m / 60);
+  return h ? h + "h " + (m % 60) + "m" : m + "m";
+}
+function startCountdowns(today){
+  const el = document.getElementById("counts");
+  if (!el) return;
+  if (countTimer) clearInterval(countTimer);
+  function tick(){
+    const now = Date.now();
+    const parts = [];
+    const nx = today.tides
+      .map(p => ({ t: new Date(p.t).getTime(), type: p.type }))
+      .filter(p => p.t > now)[0];
+    if (nx) parts.push(`⏳ ${nx.type === "H" ? "High" : "Low"} tide in ${fmtDur(nx.t - now)}`);
+    const bw = today.wins.length ? bestWindow(today.wins) : null;
+    if (bw){
+      if (now >= bw.start.getTime() && now <= bw.end.getTime()) parts.push("🐟 Best bite NOW");
+      else if (bw.start.getTime() > now) parts.push(`🐟 Best bite in ${fmtDur(bw.start.getTime() - now)}`);
+    }
+    el.innerHTML = parts.join(" &nbsp;·&nbsp; ");
+  }
+  tick();
+  countTimer = setInterval(tick, 30000);
+}
+
 function render(days){
   const app = document.getElementById("app");
   const today = days[0];
@@ -236,6 +265,7 @@ function render(days){
   let html = `<div class="card verdict ${today.good ? "good" : "bad"}">
       <div class="row">${fishIcon(today.score, 34)}<span class="word">${today.good ? "GOOD" : "BAD"}</span></div>
       <div class="score">${today.score}/100 · Today</div>
+      <div class="counts" id="counts"></div>
     </div>`;
 
   html += `<div class="card"><div class="sec-t">🐟 Fish bite times today</div>`;
@@ -284,6 +314,7 @@ function render(days){
   document.getElementById("updated").textContent =
     "updated " + new Date().toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", timeZone: TZ });
   app.querySelectorAll(".day").forEach(el => el.addEventListener("click", () => el.classList.toggle("active")));
+  startCountdowns(today);
 }
 
 load().catch(() => {
