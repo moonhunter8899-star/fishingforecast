@@ -443,8 +443,6 @@ function wireLocUI() {
   var S = STR[state.lang];
   $("locSearch").placeholder = S.searchPh;
   $("locGPS").innerHTML = pinSVG(12) + escHTML(S.useMyLoc);
-  $("locGPS2").textContent = S.currentLoc;
-  $("locChange").textContent = S.chgLoc;
   $("locHome").textContent = S.homeBtn;
   renderRecents();
 }
@@ -1287,6 +1285,8 @@ function renderHeader() {
   $("langBtn").innerHTML = state.lang === "en" ? "<b>EN</b> | VI" : "EN | <b>VI</b>";
   $("refBtn").textContent = S.refresh;
   $("backBtn").textContent = S.back;
+  $("locGPS2").textContent = S.currentLoc;
+  $("locChange").textContent = S.chgLoc;
   $("rules").innerHTML = state.loc.home ? S.rules + " " + seasonPillHTML() : '<span class="regsn">' + S.checkRegs + "</span>";
 }
 function renderAll() {
