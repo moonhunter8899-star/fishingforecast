@@ -39,6 +39,8 @@
   }
   .langbtn b { color: #9a4a16; }
   .watchlink { text-decoration: none; display: inline-block; }
+  .rules { font-size: 11px; font-weight: 700; color: #8a7a5f; margin: 2px 2px 10px; }
+  .rules b { color: #9a4a16; }
   .refresh {
     background: #bc5a1e; color: #fff; border: none; border-radius: 999px;
     font-family: "Fraunces", serif; font-weight: 800; font-size: 13px;
@@ -249,12 +251,13 @@
       <div class="t2" id="updLine"></div>
     </div>
     <div class="hdBtns">
-      <a class="langbtn watchlink" href="index.html" id="backBtn">‹ Fish</a>
+      <a class="langbtn watchlink" href="index.html" id="backBtn">‹ Home</a>
       <a class="langbtn watchlink" href="watch.html" title="Apple Watch version">⌚</a>
       <button class="langbtn" id="langBtn" title="Language / Ngôn ngữ"></button>
       <button class="refresh" id="refBtn">Refresh</button>
     </div>
   </div>
+  <div class="rules" id="rules"></div>
   <div id="app"><div class="loading" id="loading">Checking pompano conditions…</div></div>
   <div class="foot">Pompano Forecast · Tien Huynh</div>
 </div>
@@ -270,7 +273,8 @@ var STR = {
     pickDay: "Pick a day", best: "★ BEST", bestWeek: "BEST DAY THIS WEEK", goDay: "GO DAY",
     goFish: "GO FISH", gotAway: "The one that got away! 🎣", wind: "WIND", water: "WATER", cond: "CONDITION", rain: "RAIN", moon: "MOON", catch: "Catch",
     moonTitle: "🌙 Major / Minor bite times", major: "MAJOR", minor: "MINOR", now: "NOW",
-    tide: "Tide", high: "High", low: "Low", refresh: "Refresh", back: "‹ Fish", todayWord: "Today",
+    tide: "Tide", high: "High", low: "Low", refresh: "Refresh", back: "‹ Home",
+    rules: "📏 <b>Pompano</b> — 6/day · min 11″ fork", todayWord: "Today",
     retry: "Try again", loadFail: "Could not load live data. Check your connection.",
     great: "Great", good: "Good", fair: "Fair", poor: "Poor",
     updated: function(d, t) { return "Updated " + d + " at " + t; },
@@ -306,7 +310,8 @@ var STR = {
     pickDay: "Chọn ngày", best: "★ ĐẸP NHẤT", bestWeek: "NGÀY ĐẸP NHẤT TUẦN", goDay: "ĐI NGAY",
     goFish: "ĐI CÂU NGAY", gotAway: "Cá chạy mất tiêu rồi! 🎣", wind: "GIÓ", water: "NƯỚC", cond: "THỜI TIẾT", rain: "MƯA", moon: "TRĂNG", catch: "Cá câu được",
     moonTitle: "🌙 Giờ cá cắn câu chính / phụ", major: "CHÍNH", minor: "PHỤ", now: "NGAY BÂY GIỜ",
-    tide: "Thủy triều", high: "Nước lên", low: "Nước xuống", refresh: "Làm mới", back: "‹ Cá", todayWord: "Hôm nay",
+    tide: "Thủy triều", high: "Nước lên", low: "Nước xuống", refresh: "Làm mới", back: "‹ Trang chủ",
+    rules: "📏 <b>Pompano</b> — 6 con/ngày · tối thiểu 11″ fork", todayWord: "Hôm nay",
     retry: "Thử lại", loadFail: "Không tải được dữ liệu. Kiểm tra kết nối mạng.",
     great: "Tuyệt vời", good: "Tốt", fair: "Trung bình", poor: "Tệ",
     updated: function(d, t) { return "Cập nhật " + d + " lúc " + t; },
@@ -1068,6 +1073,7 @@ function renderHeader() {
   $("langBtn").innerHTML = state.lang === "en" ? "<b>EN</b> | VI" : "EN | <b>VI</b>";
   $("refBtn").textContent = S.refresh;
   $("backBtn").textContent = S.back;
+  $("rules").innerHTML = S.rules;
 }
 function renderAll() {
   var S = STR[state.lang];
