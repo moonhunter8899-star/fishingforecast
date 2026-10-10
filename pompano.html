@@ -1357,7 +1357,7 @@ function startWind() {
     return p;
   }
   for (var i = 0; i < COUNT; i++) P.push(spawn({}));
-  var lastT = performance.now(), K = 3.4;
+  var lastT = performance.now(), K = 2.1;
   ctx.lineCap = "round";
   function frame(now) {
     if (mapMode !== "wind") return;
@@ -1378,7 +1378,7 @@ function startWind() {
       var q = map.latLngToContainerPoint([p.lat, p.lon]);
       var dx = ux * pxL, dy = -uy * pxA, dl = Math.sqrt(dx * dx + dy * dy) || 1;
       var nx = dx / dl, ny = dy / dl;
-      var AL = 13 + sp * 0.15, HS = 5.5;
+      var AL = 11 + sp * 0.12, HS = 4.5;
       var hx = q.x, hy = q.y;
       var tx = hx - nx * AL, ty = hy - ny * AL;
       var bx = hx - nx * HS, by = hy - ny * HS;
@@ -1389,7 +1389,7 @@ function startWind() {
         var halo = pass === 0;
         ctx.strokeStyle = halo ? "rgba(255,255,255," + (a * 0.85).toFixed(3) + ")" : "rgba(58,155,220," + a.toFixed(3) + ")";
         ctx.fillStyle = ctx.strokeStyle;
-        ctx.lineWidth = halo ? 5 : 2.4;
+        ctx.lineWidth = halo ? 3.6 : 1.6;
         ctx.beginPath(); ctx.moveTo(tx, ty); ctx.lineTo(bx, by); ctx.stroke();
         ctx.beginPath();
         ctx.moveTo(hx, hy);
