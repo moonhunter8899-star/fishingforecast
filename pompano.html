@@ -51,7 +51,7 @@
   .radarattr { margin-left: auto; font-weight: 600; opacity: .75; }
   .radarplay { border: 1px solid #d8c9a8; background: #fff; border-radius: 8px; padding: 3px 10px; font-size: 11px; cursor: pointer; color: #22312b; }
   .scoremark { background: none; border: none; }
-  .scorebadge { width: 46px; height: 46px; border-radius: 50%; color: #fff; font-family: "Fraunces", serif; font-weight: 900; font-size: 20px; display: flex; align-items: center; justify-content: center; border: 3px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,.35); }
+  .scoredot { width: 16px; height: 16px; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,.4); }
   .leaflet-container { font-family: "Public Sans", sans-serif; }
 
   .locbar { display: flex; align-items: center; gap: 8px; margin: 0 2px 8px; }
@@ -1292,12 +1292,12 @@ function initRadar() {
   var day = state.days[state.sel], c = ratingColor(day.score);
   var map = L.map("radarmap", { scrollWheelZoom: false, attributionControl: false });
   radarMap = map;
-  map.setView([state.loc.lat, state.loc.lon], 9);
-  L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19 }).addTo(map);
+  map.setView([state.loc.lat, state.loc.lon], 8);
+  L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19, detectRetina: true }).addTo(map);
   L.marker([state.loc.lat, state.loc.lon], {
     icon: L.divIcon({ className: "scoremark",
-      html: '<div class="scorebadge" style="background:' + c + '">' + day.score + "</div>",
-      iconSize: [46, 46], iconAnchor: [23, 23] }),
+      html: '<div class="scoredot" style="background:' + c + '"></div>',
+      iconSize: [16, 16], iconAnchor: [8, 8] }),
     interactive: false, keyboard: false
   }).addTo(map);
   var show = function(frames) {
