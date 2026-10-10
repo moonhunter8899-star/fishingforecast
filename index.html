@@ -889,7 +889,7 @@ function hourlyHTML(day) {
     var sc = Math.max(0, Math.min(100, Math.round(adjHourScore(i, mi, ms))));
     var c = ratingColor(sc);
     var code = wx.weather_code[i];
-    var sky = condIcon(code, (wx.hourly.is_day && wx.hourly.is_day[i] != null) ? wx.hourly.is_day[i] : 1, state.lang);
+    var sky = condIcon(code, (wx.is_day && wx.is_day[i] != null) ? wx.is_day[i] : 1, state.lang);
     var wsp = Math.round(wx.windspeed_10m[i]);
     var wdir = compass(wx.winddirection_10m[i]);
     var gst = (wx.wind_gusts_10m && wx.wind_gusts_10m[i] != null) ? Math.round(wx.wind_gusts_10m[i]) : null;
