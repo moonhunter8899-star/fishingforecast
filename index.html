@@ -37,6 +37,14 @@
   }
   .qsub { text-align: center; color: #8a7a5f; font-size: 12px; font-weight: 600; margin: 0 8px 18px; }
   .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .spcol { display: flex; flex-direction: column; }
+  .seasrow { text-align: center; margin-top: 10px; min-height: 26px; }
+  .season {
+    display: inline-block; font-size: 11px; font-weight: 800; letter-spacing: .05em;
+    border-radius: 999px; padding: 5px 12px; color: #fff; white-space: nowrap;
+  }
+  .season.open { background: #1d9e6c; }
+  .season.closed { background: #c0392b; }
   .spcard {
     display: block; border-radius: 22px; overflow: hidden; text-decoration: none;
     border: none; box-shadow: 0 6px 18px rgba(34,49,43,.22);
@@ -65,8 +73,14 @@
   <div class="q" id="q"></div>
   <p class="qsub" id="qsub"></p>
   <div class="cards">
-    <a class="spcard" href="snook.html"><img src="icons/snook-card.png" alt="Snook Forecast"></a>
-    <a class="spcard" href="pompano.html"><img src="icons/pompano-card.png" alt="Pompano Forecast"></a>
+    <div class="spcol">
+      <a class="spcard" href="snook.html"><img src="icons/snook-card.png" alt="Snook Forecast"></a>
+      <div class="seasrow"><span class="season" id="seasSnook"></span></div>
+    </div>
+    <div class="spcol">
+      <a class="spcard" href="pompano.html"><img src="icons/pompano-card.png" alt="Pompano Forecast"></a>
+      <div class="seasrow"><span class="season" id="seasPomp"></span></div>
+    </div>
   </div>
   <div class="cont" id="cont"></div>
   <div class="foot">Fishing Forecast · Tien Huynh</div>
@@ -79,24 +93,55 @@ var STR = {
     qsub: "Tap a card — each fish gets its own forecast.",
     last: "Last time",
     go: "continue →",
-    fish: { snook: "Snook", pompano: "Pompano" }
+    fish: { snook: "Snook", pompano: "Pompano" },
+    seasonOpen: function(d) { return "OPEN · " + d + "d left"; },
+    seasonClosed: function(d) { return "CLOSED · opens in " + d + "d"; },
+    seasonYear: "OPEN · year-round"
   },
   vi: {
     q: "Hôm nay bạn câu cá gì?",
     qsub: "Chạm vào một thẻ — mỗi loại cá có dự báo riêng.",
     last: "Lần trước",
     go: "tiếp tục →",
-    fish: { snook: "Snook", pompano: "Pompano" }
+    fish: { snook: "Snook", pompano: "Pompano" },
+    seasonOpen: function(d) { return "MỞ · còn " + d + "n"; },
+    seasonClosed: function(d) { return "ĐÓNG · mở sau " + d + "n"; },
+    seasonYear: "MỞ · quanh năm"
   }
 };
 var lang = "en";
 try { lang = localStorage.getItem("pf_lang") || "en"; } catch (e) {}
+/* FWC Atlantic snook harvest seasons (Jupiter Inlet is Atlantic):
+   open Feb 1–May 31 and Sep 1–Dec 14; closed Dec 15–Jan 31 and Jun 1–Aug 31.
+   Pompano has no closed season in FL state waters (open year-round). */
+function snookSeason() {
+  var now = new Date(); now.setHours(0, 0, 0, 0);
+  var y = now.getFullYear();
+  function D(m, d, yy) { return new Date(yy === undefined ? y : yy, m - 1, d); }
+  var open = false, target;
+  if (now >= D(2, 1) && now <= D(5, 31)) { open = true; target = D(5, 31); }
+  else if (now >= D(9, 1) && now <= D(12, 14)) { open = true; target = D(12, 14); }
+  else if (now >= D(12, 15)) { target = D(2, 1, y + 1); }
+  else if (now < D(2, 1)) { target = D(2, 1); }
+  else { target = D(9, 1); }
+  var days = Math.max(0, Math.round((target - now) / 86400000));
+  return { open: open, days: days };
+}
+function seasonPill(kind) {
+  var S = STR[lang];
+  if (kind === "pompano") return '<span class="season open">' + S.seasonYear + "</span>";
+  var r = snookSeason();
+  return '<span class="season ' + (r.open ? "open" : "closed") + '">' +
+    (r.open ? S.seasonOpen(r.days) : S.seasonClosed(r.days)) + "</span>";
+}
 function render() {
   var S = STR[lang];
   document.documentElement.lang = lang;
   document.getElementById("q").textContent = S.q;
   document.getElementById("qsub").textContent = S.qsub;
   document.getElementById("langBtn").innerHTML = lang === "en" ? "<b>EN</b> | VI" : "EN | <b>VI</b>";
+  document.getElementById("seasSnook").innerHTML = seasonPill("snook");
+  document.getElementById("seasPomp").innerHTML = seasonPill("pompano");
   var cont = document.getElementById("cont"), sp = null;
   try { sp = localStorage.getItem("ff_species"); } catch (e) {}
   if (sp === "snook" || sp === "pompano") {
