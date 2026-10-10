@@ -133,16 +133,6 @@
   .gofish .gl { font-size: 15px; letter-spacing: .04em; }
   .gofish .gt { margin-left: 2px; }
   .gofish .gs { margin-left: auto; font-size: 17px; white-space: nowrap; }
-  .gofish.past { overflow: hidden; }
-  .gofish.past .swim { display: inline-block; margin-left: auto; animation: swimaway 6s ease-in-out infinite; }
-  @keyframes swimaway {
-    0%   { transform: translateX(0) translateY(0) rotate(0deg); opacity: 0; }
-    12%  { transform: translateX(6px) translateY(0) rotate(0deg); opacity: 1; }
-    30%  { transform: translateX(48px) translateY(-7px) rotate(6deg); opacity: 1; }
-    55%  { transform: translateX(92px) translateY(5px) rotate(-5deg); opacity: .85; }
-    78%  { transform: translateX(132px) translateY(-4px) rotate(4deg); opacity: .3; }
-    92%, 100% { transform: translateX(152px) translateY(0) rotate(0deg); opacity: 0; }
-  }
   /* catch logger row inside the GO FISH band */
   .catchrow {
     display: flex; align-items: center; gap: 8px; width: 100%;
@@ -1137,12 +1127,7 @@ function renderAll() {
   if (day.best) {
     var bsc = day.best.score;
     var pastWindow = (state.sel === 0 && Date.now() > day.best.end.getTime());
-    if (pastWindow) {
-      html += '<div class="gofish past">' +
-        '<span class="gl">' + S.gotAway + '</span>' +
-        '<span class="swim">' + fishSVG(ratingColor(bsc), 30) + "</span>" +
-        catchRowHTML(day.date) + "</div>";
-    } else {
+    if (!pastWindow) {
       html += '<div class="gofish">' +
         '<span class="gl">🎣 ' + S.goFish + '</span><span class="gt">' +
         trange(day.best.start, day.best.end, state.lang) + '</span><span class="gs">· 🐟 ' + bsc + "</span>" +
