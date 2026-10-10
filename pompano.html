@@ -1348,7 +1348,7 @@ function startWind() {
     return [g[i00][0] * w00 + g[i00 + 1][0] * w10 + g[i00 + N][0] * w01 + g[i00 + N + 1][0] * w11,
             g[i00][1] * w00 + g[i00 + 1][1] * w10 + g[i00 + N][1] * w01 + g[i00 + N + 1][1] * w11];
   }
-  var P = [], COUNT = 260;
+  var P = [], COUNT = 200;
   function spawn(p) {
     var b = map.getBounds();
     p.lat = b.getSouth() + Math.random() * (b.getNorth() - b.getSouth());
@@ -1375,18 +1375,28 @@ function startWind() {
       if (sp < 0.5 || p.age > p.max || p.lat < bs || p.lat > bn || p.lon < bw || p.lon > be) { spawn(p); continue; }
       var step = sp * K * dt, ux = vv[0] / sp, uy = vv[1] / sp;
       p.lat += uy * step / pxA; p.lon += ux * step / pxL;
-      var q1 = map.latLngToContainerPoint([p.lat, p.lon]);
+      var q = map.latLngToContainerPoint([p.lat, p.lon]);
       var dx = ux * pxL, dy = -uy * pxA, dl = Math.sqrt(dx * dx + dy * dy) || 1;
-      var TL = 8 + sp * 0.6;
-      var qx = q1.x - dx / dl * TL, qy = q1.y - dy / dl * TL;
+      var nx = dx / dl, ny = dy / dl;
+      var AL = 13 + sp * 0.15, HS = 5.5;
+      var hx = q.x, hy = q.y;
+      var tx = hx - nx * AL, ty = hy - ny * AL;
+      var bx = hx - nx * HS, by = hy - ny * HS;
+      var pxn = -ny, pyn = nx;
       var fade = Math.min(1, p.age / 25) * Math.min(1, (p.max - p.age) / 25);
-      var a = (0.3 + Math.min(0.45, sp / 45)) * fade;
-      ctx.lineWidth = 3.2;
-      ctx.strokeStyle = "rgba(25,45,40," + (a * 0.45).toFixed(3) + ")";
-      ctx.beginPath(); ctx.moveTo(qx, qy); ctx.lineTo(q1.x, q1.y); ctx.stroke();
-      ctx.lineWidth = 1.6;
-      ctx.strokeStyle = "rgba(255,255,255," + a.toFixed(3) + ")";
-      ctx.beginPath(); ctx.moveTo(qx, qy); ctx.lineTo(q1.x, q1.y); ctx.stroke();
+      var a = (0.55 + Math.min(0.4, sp / 50)) * fade;
+      for (var pass = 0; pass < 2; pass++) {
+        var halo = pass === 0;
+        ctx.strokeStyle = halo ? "rgba(255,255,255," + (a * 0.85).toFixed(3) + ")" : "rgba(58,155,220," + a.toFixed(3) + ")";
+        ctx.fillStyle = ctx.strokeStyle;
+        ctx.lineWidth = halo ? 5 : 2.4;
+        ctx.beginPath(); ctx.moveTo(tx, ty); ctx.lineTo(bx, by); ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(hx, hy);
+        ctx.lineTo(bx + pxn * HS * 0.62, by + pyn * HS * 0.62);
+        ctx.lineTo(bx - pxn * HS * 0.62, by - pyn * HS * 0.62);
+        ctx.closePath(); ctx.fill();
+      }
     }
   }
   windRAF = requestAnimationFrame(frame);
