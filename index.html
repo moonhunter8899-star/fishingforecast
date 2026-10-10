@@ -336,15 +336,6 @@ function ratingWord(s, lang) {
   var S = STR[lang];
   return s >= 80 ? S.great : s >= 60 ? S.good : s >= 40 ? S.fair : S.poor;
 }
-function condIcon(code, isDay, lang) {
-  // at night show moon icons for clear/partly cloudy instead of the sun;
-  // rain/storm/fog codes are day-neutral and stay as-is
-  if (isDay === 0) {
-    if (code === 0) return "🌙";
-    if (code === 1 || code === 2) return "🌙☁️";
-  }
-  return STR[lang].condIcon[code] || "🌤️";
-}
 function moonPhaseInfo(deg) {
   // deg: MET Norway moonphase — 0=new, 90=first quarter, 180=full, 270=last quarter
   var p = ((((deg % 360) + 360) % 360) / 360);
@@ -862,7 +853,7 @@ function hourlyHTML(day) {
     var sc = Math.max(0, Math.min(100, Math.round(adjHourScore(i, mi, ms))));
     var c = ratingColor(sc);
     var code = wx.weather_code[i];
-    var sky = condIcon(code, (wx.is_day && wx.is_day[i] != null) ? wx.is_day[i] : 1, state.lang);
+    var sky = S.condName[code] || S.condName[2];
     var wsp = Math.round(wx.windspeed_10m[i]);
     var wdir = compass(wx.winddirection_10m[i]);
     var gst = (wx.wind_gusts_10m && wx.wind_gusts_10m[i] != null) ? Math.round(wx.wind_gusts_10m[i]) : null;
@@ -964,28 +955,27 @@ function renderAll() {
         catchRowHTML(day.date) + "</div>";
     }
   }
-  var ci = condIcon(day.condCode, day.condDay, state.lang);
   var cn = S.condName[day.condCode] || S.condName[2];
   var mph = (state.moonPhase && state.moonPhase[ymdDash(day.date)] != null) ? state.moonPhase[ymdDash(day.date)] : null;
   var moonTile;
   if (mph == null) {
-    moonTile = '<div class="tile"><div class="k">🌙 ' + S.moon + '</div><div class="v">—</div></div>';
+    moonTile = '<div class="tile"><div class="k">' + S.moon + '</div><div class="v">—</div></div>';
   } else {
     var mp = moonPhaseInfo(mph);
     var msub = mp.daysToFull === 0 ? S.fullTonight : S.fullIn(mp.daysToFull);
-    moonTile = '<div class="tile"><div class="k">🌙 ' + S.moon + '</div><div class="v">🌙 ' +
+    moonTile = '<div class="tile"><div class="k">' + S.moon + '</div><div class="v">' +
       Math.round(mp.illum * 100) + '%</div><div class="msub">' + msub + "</div></div>";
   }
   html += '<div class="tiles">' +
     '<div class="tile"><div class="k">💨 ' + S.wind + '</div><div class="v">' + day.wind + (day.gust != null ? " | " + day.gust : "") + " " + day.windDir + "</div></div>" +
     '<div class="tile"><div class="k">💧 ' + S.water + '</div><div class="v">' + day.water.toFixed(1) + "°F</div></div>" +
-    '<div class="tile"><div class="k">' + S.cond + '</div><div class="v">' + ci + " " + cn + "</div></div>" +
+    '<div class="tile"><div class="k">' + S.cond + '</div><div class="v">' + cn + "</div></div>" +
     '<div class="tile"><div class="k">🌧️ ' + S.rain + '</div><div class="v">' + day.rain + "%</div></div>" +
     moonTile +
     "</div>";
   // major/minor
   var moonRows = moonRowsHTML(day);
-  html += '<div class="moonsec"><div class="mh">🌙 ' + S.moonTitle + "</div>" +
+  html += '<div class="moonsec"><div class="mh">' + S.moonTitle + "</div>" +
     '<p class="cdline" id="moonCd">' + moonCountdownHTML() + "</p>" +
     (moonRows ? '<div id="moonRows">' + moonRows + "</div>"
               : '<p class="cdline">' + S.moonNote + "</p>") + "</div>";
