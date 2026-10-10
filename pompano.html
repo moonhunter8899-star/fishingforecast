@@ -44,6 +44,10 @@
   .locmsg { font-size: 11px; color: #8a7a5f; margin-top: 6px; }
   .locmsg:empty { display: none; }
   .regsn { font-size: 11px; font-weight: 700; color: #8a7a5f; }
+  .locbar { display: flex; align-items: center; gap: 8px; margin: 0 2px 8px; }
+  .locbar .locbtn { width: auto; flex: 1 1 auto; min-width: 0; margin: 0; overflow: hidden; text-overflow: ellipsis; }
+  .locgps { flex: none; font-size: 12px; font-weight: 700; padding: 7px 10px; border-radius: 9px; border: 1px solid #d8c9a8; background: #ede4cc; color: #22312b; cursor: pointer; font-family: inherit; white-space: nowrap; }
+
 
   .hd .t2 { color: #8a7a5f; font-size: 10px; margin-top: 2px; }
   .hd .brand { font-family: "Fraunces", serif; font-weight: 900; font-size: 15px; color: #22312b; }
@@ -249,7 +253,10 @@
       <button class="refresh" id="refBtn">Refresh</button>
     </div>
   </div>
-  <button class="locline locbtn" id="locName">…</button>
+  <div class="locbar">
+    <button class="locline locbtn" id="locName">…</button>
+    <button class="locgps" id="locGPS2"></button>
+  </div>
   <div class="locpanel" id="locPanel" hidden>
     <input class="locsearch" id="locSearch" type="search" autocomplete="off">
     <div class="locresults" id="locResults"></div>
@@ -362,6 +369,13 @@ function saveRecent(loc) {
   try { localStorage.setItem("ff_recents", JSON.stringify(r.slice(0, 5))); } catch (e) {}
 }
 function escHTML(t) { return String(t).replace(/[&<>"']/g, function(c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+
+function pinSVG(s) {
+  s = s || 13;
+  return '<svg width="' + s + '" height="' + Math.round(s * 1.25) + '" viewBox="0 0 24 30" fill="none" stroke="#3f3a32" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:6px">' +
+    '<path d="M12 2.8C7.3 2.8 3.7 6.4 3.7 11.1c0 6.3 8.3 16.1 8.3 16.1s8.3-9.8 8.3-16.1C20.3 6.4 16.7 2.8 12 2.8Z"/>' +
+    '<circle cx="12" cy="11" r="3.4"/></svg>';
+}
 function locMsg(t) { var el = $("locMsg"); if (el) el.textContent = t || ""; }
 function hideLocPanel() { var p = $("locPanel"); if (p) p.hidden = true; }
 function setLocation(loc) {
@@ -427,7 +441,8 @@ function renderRecents() {
 function wireLocUI() {
   var S = STR[state.lang];
   $("locSearch").placeholder = S.searchPh;
-  $("locGPS").textContent = S.useMyLoc;
+  $("locGPS").innerHTML = pinSVG(12) + escHTML(S.useMyLoc);
+  $("locGPS2").innerHTML = pinSVG(12) + escHTML(S.useMyLoc);
   $("locHome").textContent = S.homeBtn;
   renderRecents();
 }
@@ -439,7 +454,7 @@ var STR = {
     rating: "POMPANO BITE RATING", today: "TODAY",
     pickDay: "Pick a day", best: "★ BEST", bestWeek: "BEST DAY THIS WEEK", goDay: "GO DAY",
     goFish: "GO FISH", gotAway: "The one that got away! 🎣", wind: "WIND", water: "WATER", cond: "CONDITION", rain: "RAIN", moon: "MOON", sunrise: "SUNRISE", sunset: "SUNSET", catch: "Catch",
-    searchPh: "Search a beach or town…", useMyLoc: "📍 Use my location", homeBtn: "⌂ Jupiter Inlet",
+    searchPh: "Search a beach or town…", useMyLoc: "Use my location", homeBtn: "⌂ Jupiter Inlet",
     locating: "Locating…", geoDenied: "Location unavailable — check permission", geoUnsupported: "Geolocation not supported",
     currentLoc: "Current location", checkRegs: "Check local fishing regulations", noResults: "No places found",
     geoRough: "GPS fix is rough (\u00b1{mi} mi) \u2014 try again in the open",
@@ -481,7 +496,7 @@ var STR = {
     rating: "ĐIỂM CẮN CÂU POMPANO", today: "HÔM NAY",
     pickDay: "Chọn ngày", best: "★ ĐẸP NHẤT", bestWeek: "NGÀY ĐẸP NHẤT TUẦN", goDay: "ĐI NGAY",
     goFish: "ĐI CÂU NGAY", gotAway: "Cá chạy mất tiêu rồi! 🎣", wind: "GIÓ", water: "NƯỚC", cond: "THỜI TIẾT", rain: "MƯA", moon: "TRĂNG", sunrise: "BÌNH MINH", sunset: "HOÀNG HÔN", catch: "Cá câu được",
-    searchPh: "Tìm bãi biển hoặc thị trấn…", useMyLoc: "📍 Vị trí của tôi", homeBtn: "⌂ Jupiter Inlet",
+    searchPh: "Tìm bãi biển hoặc thị trấn…", useMyLoc: "Vị trí của tôi", homeBtn: "⌂ Jupiter Inlet",
     locating: "Đang định vị…", geoDenied: "Không lấy được vị trí — kiểm tra quyền", geoUnsupported: "Thiết bị không hỗ trợ định vị",
     currentLoc: "Vị trí hiện tại", checkRegs: "Kiểm tra quy định câu cá địa phương", noResults: "Không tìm thấy địa điểm",
     geoRough: "Định vị chưa chính xác (\u00b1{mi} dặm) — thử lại ở nơi thoáng",
@@ -1236,8 +1251,7 @@ function seasonPillHTML() {
 }
 function renderHeader() {
   var S = STR[state.lang], L = state.loc;
-  var name = "📌 " + L.name;
-  $("locName").textContent = name;
+  $("locName").innerHTML = pinSVG(13) + escHTML(L.name);
   var d = new Date();
   var ds = state.lang === "vi"
     ? d.getDate() + " " + S.months[d.getMonth()]
@@ -1470,6 +1484,7 @@ $("locName").addEventListener("click", function() {
   if (!p.hidden) { wireLocUI(); setTimeout(function() { $("locSearch").focus(); }, 60); }
 });
 $("locGPS").addEventListener("click", useMyLocation);
+$("locGPS2").addEventListener("click", function() { $("locPanel").hidden = false; wireLocUI(); useMyLocation(); });
 $("locHome").addEventListener("click", function() { setLocation({ name: PIN.name, lat: PIN.lat, lon: PIN.lon }); });
 $("locSearch").addEventListener("input", function(e) {
   clearTimeout(locSearchTimer);
