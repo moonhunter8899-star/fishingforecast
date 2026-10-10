@@ -1013,7 +1013,7 @@ function buildDays(wx, mar) {
       wind: Math.round(wx.hourly.windspeed_10m[wi]),
       windDir: compass(wx.hourly.winddirection_10m[wi]),
       gust: (wx.hourly.wind_gusts_10m && wi >= 0 && wx.hourly.wind_gusts_10m[wi] != null) ? Math.round(wx.hourly.wind_gusts_10m[wi]) : null,
-      water: Math.round(mar.hourly.sea_surface_temperature[mi2] * 10) / 10,
+      water: (function(w){ return (w == null || isNaN(w)) ? null : Math.round(w * 10) / 10; })(mar.hourly.sea_surface_temperature[mi2]),
       waveFt: Math.round(wv * 10) / 10,
       condCode: wx.hourly.weather_code[wi],
       condDay: (wx.hourly.is_day && wx.hourly.is_day[wi] != null) ? wx.hourly.is_day[wi] : 1,
@@ -1583,7 +1583,7 @@ function renderAll() {
     "</div></div>";
   html += '<div class="tiles">' +
     '<div class="tile"><div class="k">' + _lblWind() + ' ' + S.wind + '</div><div class="v">' + day.wind + (day.gust != null ? " | " + day.gust : "") + " " + day.windDir + "</div></div>" +
-    '<div class="tile"><div class="k">' + _lblWater() + ' ' + S.water + '</div><div class="v">' + day.water.toFixed(1) + "°F</div></div>" +
+    '<div class="tile"><div class="k">' + _lblWater() + ' ' + S.water + '</div><div class="v">' + (day.water == null ? "\u2014" : day.water.toFixed(1) + "\u00b0F") + "</div></div>" +
     '<div class="tile"><div class="k">' + S.cond + '</div><div class="v">' + cn + "</div></div>" +
     '<div class="tile"><div class="k">' + _lblRain() + ' ' + S.rain + '</div><div class="v">' + day.rain + "%</div></div>" +
     moonTile + sunTile +
