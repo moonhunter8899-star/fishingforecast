@@ -1359,7 +1359,7 @@ function startWind() {
     return [g[i00][0] * w00 + g[i00 + 1][0] * w10 + g[i00 + N][0] * w01 + g[i00 + N + 1][0] * w11,
             g[i00][1] * w00 + g[i00 + 1][1] * w10 + g[i00 + N][1] * w01 + g[i00 + N + 1][1] * w11];
   }
-  var P = [], COUNT = 200;
+  var P = [], COUNT = 150;
   function spawn(p) {
     var b = map.getBounds();
     p.lat = b.getSouth() + Math.random() * (b.getNorth() - b.getSouth());
@@ -1443,7 +1443,7 @@ function initRadar() {
   var el = $("radarmap");
   if (!el || typeof L === "undefined" || !state.days.length) return;
   var day = state.days[state.sel], c = ratingColor(day.score);
-  var map = L.map("radarmap", { scrollWheelZoom: false, attributionControl: false, maxZoom: 11 });
+  var map = L.map("radarmap", { scrollWheelZoom: false, attributionControl: false, maxZoom: 14 });
   radarMap = map;
   map.setView([state.loc.lat, state.loc.lon], 8);
   L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19, detectRetina: true }).addTo(map);
