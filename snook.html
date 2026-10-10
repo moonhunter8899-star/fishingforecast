@@ -476,7 +476,7 @@ var STR = {
     locating: "Locating…", geoDenied: "Location unavailable — check permission", geoUnsupported: "Geolocation not supported",
     currentLoc: "Current location", checkRegs: "Check local fishing regulations", noResults: "No places found",
     geoRough: "GPS fix is rough (\u00b1{mi} mi) \u2014 try again in the open",
-    chgLoc: "Change location", radar: "RADAR", wind: "WIND",
+    chgLoc: "Change location", radar: "RADAR", wind: "WIND", live: "LIVE",
     moonTitle: "🌙 Major / Minor bite times", major: "MAJOR", minor: "MINOR", now: "NOW",
     tide: "Tide", high: "High", low: "Low", refresh: "Refresh", back: "‹ Home",
     rules: "<b>Snook</b> — 1/day · 28–32″ slot · permit needed",
@@ -520,7 +520,7 @@ var STR = {
     locating: "Đang định vị…", geoDenied: "Không lấy được vị trí — kiểm tra quyền", geoUnsupported: "Thiết bị không hỗ trợ định vị",
     currentLoc: "Vị trí hiện tại", checkRegs: "Kiểm tra quy định câu cá địa phương", noResults: "Không tìm thấy địa điểm",
     geoRough: "Định vị chưa chính xác (\u00b1{mi} dặm) — thử lại ở nơi thoáng",
-    chgLoc: "Đổi địa điểm", radar: "RADAR", wind: "GIÓ",
+    chgLoc: "Đổi địa điểm", radar: "RADAR", wind: "GIÓ", live: "TRỰC TIẾP",
     moonTitle: "🌙 Giờ cá cắn câu chính / phụ", major: "CHÍNH", minor: "PHỤ", now: "NGAY BÂY GIỜ",
     tide: "Thủy triều", high: "Nước lên", low: "Nước xuống", refresh: "Làm mới", back: "‹ Trang chủ",
     rules: "<b>Snook</b> — 1 con/ngày · 28–32″ · cần permit",
@@ -1311,7 +1311,7 @@ function renderHeader() {
 /* ================= live map: radar (RainViewer) + wind particles (Open-Meteo) ================= */
 var radarMap = null, radarTimer = null, radarCache = { at: 0, frames: [] };
 var radarLayer = null, windCanvas = null, windRAF = null, windGrid = null;
-var windGridCache = { key: "", grid: null }, mapMode = "wind", windResizeBound = false;
+var windGridCache = { key: "", grid: null }, mapMode = "wind", windResizeBound = false, radarInCONUS = false;
 function frameTime(t) { return tstr(new Date(t * 1000), state.lang); }
 function radarTileURL(fr) { return "https://tilecache.rainviewer.com" + fr.path + "/256/{z}/{x}/{y}/2/1_1.png"; }
 function stopWind() { if (windRAF) { cancelAnimationFrame(windRAF); windRAF = null; } }
@@ -1430,12 +1430,17 @@ function setMapMode(m) {
   if (wB) wB.className = m === "wind" ? "on" : "";
   if (rB) rB.className = m === "radar" ? "on" : "";
   if (windCanvas) windCanvas.style.display = m === "wind" ? "block" : "none";
-  if (play) { play.hidden = m !== "radar"; if (m !== "radar" && radarTimer) { clearInterval(radarTimer); radarTimer = null; play.textContent = "\u25b6"; } }
-  if (radarLayer) radarLayer.setOpacity(m === "radar" ? 0.65 : 0);
+  if (play) { play.hidden = m !== "radar" || radarInCONUS; if (m !== "radar" && radarTimer) { clearInterval(radarTimer); radarTimer = null; play.textContent = "\u25b6"; } }
+  if (radarLayer) radarLayer.setOpacity(m === "radar" ? (radarInCONUS ? 0.75 : 0.65) : 0);
   if (m === "radar") {
     stopWind();
-    var fr = radarCache.frames, ft = $("radarFoot");
-    if (ft) ft.textContent = fr.length ? STR[state.lang].radar + " \u00b7 " + frameTime(fr[fr.length - 1].time) : STR[state.lang].radar;
+    var ft = $("radarFoot");
+    if (radarInCONUS) {
+      if (ft) ft.textContent = STR[state.lang].radar + " \u00b7 " + STR[state.lang].live;
+    } else {
+      var fr = radarCache.frames;
+      if (ft) ft.textContent = fr.length ? STR[state.lang].radar + " \u00b7 " + frameTime(fr[fr.length - 1].time) : STR[state.lang].radar;
+    }
   } else {
     startWind(); windFoot();
   }
@@ -1467,25 +1472,35 @@ function initRadar() {
   if (wB) wB.onclick = function() { setMapMode("wind"); };
   if (rB) rB.onclick = function() { setMapMode("radar"); };
   var show = function(frames) {
-    if (!frames || !frames.length || !radarMap) return;
-    radarLayer = L.tileLayer(radarTileURL(frames[frames.length - 1]),
-      { opacity: 0, zIndex: 10, maxNativeZoom: 7 }).addTo(radarMap);
-    var btn = $("radarPlay");
-    if (btn && frames.length > 1) {
-      var i = frames.length - 1;
-      btn.onclick = function() {
-        if (mapMode !== "radar") return;
-        if (radarTimer) { clearInterval(radarTimer); radarTimer = null; btn.textContent = "\u25b6"; return; }
-        btn.textContent = "\u23f8";
-        var ft = $("radarFoot");
-        radarTimer = setInterval(function() {
-          i = (i + 1) % frames.length;
-          try { radarLayer.setUrl(radarTileURL(frames[i])); } catch (e) {}
-          if (ft && mapMode === "radar") ft.textContent = STR[state.lang].radar + " \u00b7 " + frameTime(frames[i].time);
-        }, 800);
-      };
+    if (!radarMap) return;
+    radarInCONUS = state.loc.lat > 15 && state.loc.lat < 52 && state.loc.lon > -135 && state.loc.lon < -55;
+    var btn = $("radarPlay"), attr = $("radarAttr");
+    if (radarInCONUS) {
+      radarLayer = L.tileLayer("https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/nexrad-n0q-900913/{z}/{x}/{y}.png",
+        { opacity: 0, zIndex: 10, maxNativeZoom: 11 }).addTo(radarMap);
+      if (btn) { btn.hidden = true; btn.onclick = null; }
+      if (attr) attr.textContent = "\u00a9 OpenStreetMap \u00b7 IEM NEXRAD";
+    } else {
+      if (!frames || !frames.length) return;
+      radarLayer = L.tileLayer(radarTileURL(frames[frames.length - 1]),
+        { opacity: 0, zIndex: 10, maxNativeZoom: 7 }).addTo(radarMap);
+      if (btn && frames.length > 1) {
+        var i = frames.length - 1;
+        btn.onclick = function() {
+          if (mapMode !== "radar") return;
+          if (radarTimer) { clearInterval(radarTimer); radarTimer = null; btn.textContent = "\u25b6"; return; }
+          btn.textContent = "\u23f8";
+          var ft = $("radarFoot");
+          radarTimer = setInterval(function() {
+            i = (i + 1) % frames.length;
+            try { radarLayer.setUrl(radarTileURL(frames[i])); } catch (e) {}
+            if (ft && mapMode === "radar") ft.textContent = STR[state.lang].radar + " \u00b7 " + frameTime(frames[i].time);
+          }, 800);
+        };
+      }
+      if (attr) attr.textContent = "\u00a9 OpenStreetMap \u00b7 RainViewer";
     }
-    if (mapMode === "radar") setMapMode("radar");
+    setMapMode(mapMode);
   };
   loadWindGrid();
   setMapMode(mapMode);
@@ -1576,7 +1591,7 @@ function renderAll() {
   html += '<div class="radarcap"><div class="radarmap" id="radarmap"></div>' +
     '<div class="radarbar"><span class="seg"><button id="modeWind" class="on">' + S.wind + '</button><button id="modeRadar">' + S.radar + '</button></span>' +
     '<span id="radarFoot" class="radarfoot"></span>' +
-    '<span class="radarattr">\u00a9 OpenStreetMap \u00b7 RainViewer</span>' +
+    '<span class="radarattr" id="radarAttr">\u00a9 OpenStreetMap \u00b7 RainViewer</span>' +
     '<button class="radarplay" id="radarPlay" hidden>\u25b6</button></div></div>';
   // major/minor
   var moonRows = moonRowsHTML(day);
