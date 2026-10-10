@@ -40,6 +40,11 @@
   .langbtn b { color: #9a4a16; }
   .watchlink { text-decoration: none; display: inline-block; }
   .rules { font-size: 11px; font-weight: 700; color: #8a7a5f; margin: 2px 2px 10px; }
+  .season { display: inline-block; font-size: 10px; font-weight: 800; letter-spacing: .04em;
+    border-radius: 999px; padding: 3px 10px; margin-left: 6px; vertical-align: 1px;
+    color: #fff; white-space: nowrap; }
+  .season.open { background: #1d9e6c; }
+  .season.closed { background: #c0392b; }
   .rules b { color: #9a4a16; }
   .refresh {
     background: #bc5a1e; color: #fff; border: none; border-radius: 999px;
@@ -274,7 +279,8 @@ var STR = {
     goFish: "GO FISH", gotAway: "The one that got away! 🎣", wind: "WIND", water: "WATER", cond: "CONDITION", rain: "RAIN", moon: "MOON", catch: "Catch",
     moonTitle: "🌙 Major / Minor bite times", major: "MAJOR", minor: "MINOR", now: "NOW",
     tide: "Tide", high: "High", low: "Low", refresh: "Refresh", back: "‹ Home",
-    rules: "📏 <b>Pompano</b> — 6/day · min 11″ fork", todayWord: "Today",
+    rules: "📏 <b>Pompano</b> — 6/day · min 11″ fork",
+    seasonYear: "OPEN · year-round", todayWord: "Today",
     retry: "Try again", loadFail: "Could not load live data. Check your connection.",
     great: "Great", good: "Good", fair: "Fair", poor: "Poor",
     updated: function(d, t) { return "Updated " + d + " at " + t; },
@@ -311,7 +317,8 @@ var STR = {
     goFish: "ĐI CÂU NGAY", gotAway: "Cá chạy mất tiêu rồi! 🎣", wind: "GIÓ", water: "NƯỚC", cond: "THỜI TIẾT", rain: "MƯA", moon: "TRĂNG", catch: "Cá câu được",
     moonTitle: "🌙 Giờ cá cắn câu chính / phụ", major: "CHÍNH", minor: "PHỤ", now: "NGAY BÂY GIỜ",
     tide: "Thủy triều", high: "Nước lên", low: "Nước xuống", refresh: "Làm mới", back: "‹ Trang chủ",
-    rules: "📏 <b>Pompano</b> — 6 con/ngày · tối thiểu 11″ fork", todayWord: "Hôm nay",
+    rules: "📏 <b>Pompano</b> — 6 con/ngày · tối thiểu 11″ fork",
+    seasonYear: "MỞ · quanh năm", todayWord: "Hôm nay",
     retry: "Thử lại", loadFail: "Không tải được dữ liệu. Kiểm tra kết nối mạng.",
     great: "Tuyệt vời", good: "Tốt", fair: "Trung bình", poor: "Tệ",
     updated: function(d, t) { return "Cập nhật " + d + " lúc " + t; },
@@ -1061,6 +1068,10 @@ function hourlyHTML(day) {
     S.thSkyWind + '</th><th class="hrain">' + S.thRain + '</th><th class="htemp">' + S.thAirWtr + "</th></tr>" +
     rows + '</table></div><p class="hint">' + S.biteHint + "</p></div></div>";
 }
+function seasonPillHTML() {
+  // Pompano has no closed season in Florida state waters.
+  return '<span class="season open">' + STR[state.lang].seasonYear + "</span>";
+}
 function renderHeader() {
   var S = STR[state.lang], L = state.loc;
   var name = "📌 " + L.name;
@@ -1073,7 +1084,7 @@ function renderHeader() {
   $("langBtn").innerHTML = state.lang === "en" ? "<b>EN</b> | VI" : "EN | <b>VI</b>";
   $("refBtn").textContent = S.refresh;
   $("backBtn").textContent = S.back;
-  $("rules").innerHTML = S.rules;
+  $("rules").innerHTML = S.rules + " " + seasonPillHTML();
 }
 function renderAll() {
   var S = STR[state.lang];
