@@ -1305,6 +1305,7 @@ function renderHeader() {
 /* ================= live precipitation radar (RainViewer + Leaflet) ================= */
 var radarMap = null, radarTimer = null, radarCache = { at: 0, frames: [] };
 function frameTime(t) { return tstr(new Date(t * 1000), state.lang); }
+function radarTileURL(fr) { return "https://tilecache.rainviewer.com" + fr.path + "/256/{z}/{x}/{y}/2/1_1.png"; }
 function initRadar() {
   if (radarTimer) { clearInterval(radarTimer); radarTimer = null; }
   if (radarMap) { try { radarMap.remove(); } catch (e) {} radarMap = null; }
@@ -1323,10 +1324,11 @@ function initRadar() {
   }).addTo(map);
   var show = function(frames) {
     if (!frames || !frames.length || !radarMap) return;
-    var layer = L.tileLayer("https://tilecache.rainviewer.com/v2/radar/" + frames[frames.length - 1] + "/256/{z}/{x}/{y}/2/1_1.png",
-      { opacity: 0.65, zIndex: 10 }).addTo(map);
+    var last = frames[frames.length - 1];
+    var layer = L.tileLayer(radarTileURL(last),
+      { opacity: 0.65, zIndex: 10, maxNativeZoom: 7 }).addTo(map);
     var ft = $("radarFoot");
-    if (ft) ft.textContent = STR[state.lang].radar + " \u00b7 " + frameTime(frames[frames.length - 1]);
+    if (ft) ft.textContent = STR[state.lang].radar + " \u00b7 " + frameTime(last.time);
     var btn = $("radarPlay");
     if (btn && frames.length > 1) {
       btn.hidden = false;
@@ -1336,8 +1338,8 @@ function initRadar() {
         btn.textContent = "\u23f8";
         radarTimer = setInterval(function() {
           i = (i + 1) % frames.length;
-          try { layer.setUrl("https://tilecache.rainviewer.com/v2/radar/" + frames[i] + "/256/{z}/{x}/{y}/2/1_1.png"); } catch (e) {}
-          if (ft) ft.textContent = STR[state.lang].radar + " \u00b7 " + frameTime(frames[i]);
+          try { layer.setUrl(radarTileURL(frames[i])); } catch (e) {}
+          if (ft) ft.textContent = STR[state.lang].radar + " \u00b7 " + frameTime(frames[i].time);
         }, 800);
       };
     }
@@ -1345,7 +1347,7 @@ function initRadar() {
   var now = Date.now();
   if (radarCache.frames.length && now - radarCache.at < 600000) { show(radarCache.frames); return; }
   fetchJSON("https://api.rainviewer.com/public/weather-maps.json").then(function(j) {
-    var fr = ((j && j.radar && j.radar.past) || []).map(function(f) { return f.time; });
+    var fr = ((j && j.radar && j.radar.past) || []).filter(function(f) { return f && f.path; }).map(function(f) { return { time: f.time, path: f.path }; });
     radarCache = { at: Date.now(), frames: fr };
     show(fr);
   }).catch(function() {});
