@@ -47,6 +47,12 @@
   /* live precipitation radar */
   .radarcap { margin: 0 0 16px; border-radius: 14px; overflow: hidden; border: 1px solid #d8c9a8; }
   .radarmap { height: 230px; background: #dfe8ee; }
+  .radarmap { position: relative; }
+  .windcv { position: absolute; left: 0; top: 0; width: 100%; height: 100%; pointer-events: none; }
+  .seg { display: flex; border: 1px solid #d8c9a8; border-radius: 8px; overflow: hidden; flex: none; }
+  .seg button { border: 0; background: transparent; padding: 4px 10px; font-size: 10px; font-weight: 800; color: #8a7a5f; cursor: pointer; font-family: inherit; }
+  .seg button.on { background: #22312b; color: #fff; }
+  .radarfoot { flex: 1; }
   .radarbar { display: flex; align-items: center; gap: 8px; padding: 6px 10px; background: #f4ecda; font-size: 10px; font-weight: 700; color: #8a7a5f; }
   .radarattr { margin-left: auto; font-weight: 600; opacity: .75; }
   .radarplay { border: 1px solid #d8c9a8; background: #fff; border-radius: 8px; padding: 3px 10px; font-size: 11px; cursor: pointer; color: #22312b; }
@@ -471,7 +477,7 @@ var STR = {
     locating: "Locating…", geoDenied: "Location unavailable — check permission", geoUnsupported: "Geolocation not supported",
     currentLoc: "Current location", checkRegs: "Check local fishing regulations", noResults: "No places found",
     geoRough: "GPS fix is rough (\u00b1{mi} mi) \u2014 try again in the open",
-    chgLoc: "Change location", radar: "RADAR",
+    chgLoc: "Change location", radar: "RADAR", wind: "WIND",
     moonTitle: "🌙 Major / Minor bite times", major: "MAJOR", minor: "MINOR", now: "NOW",
     tide: "Tide", high: "High", low: "Low", refresh: "Refresh", back: "‹ Home",
     rules: "<b>Pompano</b> — 6/day · min 11″ fork",
@@ -514,7 +520,7 @@ var STR = {
     locating: "Đang định vị…", geoDenied: "Không lấy được vị trí — kiểm tra quyền", geoUnsupported: "Thiết bị không hỗ trợ định vị",
     currentLoc: "Vị trí hiện tại", checkRegs: "Kiểm tra quy định câu cá địa phương", noResults: "Không tìm thấy địa điểm",
     geoRough: "Định vị chưa chính xác (\u00b1{mi} dặm) — thử lại ở nơi thoáng",
-    chgLoc: "Đổi địa điểm", radar: "RADAR",
+    chgLoc: "Đổi địa điểm", radar: "RADAR", wind: "GIÓ",
     moonTitle: "🌙 Giờ cá cắn câu chính / phụ", major: "CHÍNH", minor: "PHỤ", now: "NGAY BÂY GIỜ",
     tide: "Thủy triều", high: "Nước lên", low: "Nước xuống", refresh: "Làm mới", back: "‹ Trang chủ",
     rules: "<b>Pompano</b> — 6 con/ngày · tối thiểu 11″ fork",
@@ -1280,13 +1286,124 @@ function renderHeader() {
   $("rules").innerHTML = state.loc.home ? S.rules + " " + seasonPillHTML() : '<span class="regsn">' + S.checkRegs + "</span>";
 }
 
-/* ================= live precipitation radar (RainViewer + Leaflet) ================= */
+/* ================= live map: radar (RainViewer) + wind particles (Open-Meteo) ================= */
 var radarMap = null, radarTimer = null, radarCache = { at: 0, frames: [] };
+var radarLayer = null, windCanvas = null, windRAF = null, windGrid = null;
+var windGridCache = { key: "", grid: null, txt: "" }, mapMode = "wind", spotWindTxt = "", windResizeBound = false;
 function frameTime(t) { return tstr(new Date(t * 1000), state.lang); }
 function radarTileURL(fr) { return "https://tilecache.rainviewer.com" + fr.path + "/256/{z}/{x}/{y}/2/1_1.png"; }
+function stopWind() { if (windRAF) { cancelAnimationFrame(windRAF); windRAF = null; } }
+
+function loadWindGrid() {
+  var key = state.loc.lat.toFixed(2) + "," + state.loc.lon.toFixed(2);
+  if (windGridCache.key === key && windGridCache.grid) {
+    windGrid = windGridCache.grid; spotWindTxt = windGridCache.txt;
+    if (mapMode === "wind") { startWind(); windFoot(); }
+    return;
+  }
+  var N = 5, lats = [], lons = [];
+  for (var i = 0; i < N; i++) for (var j = 0; j < N; j++) {
+    lats.push((state.loc.lat - 1.2 + i * 0.6).toFixed(2));
+    lons.push((state.loc.lon - 1.6 + j * 0.8).toFixed(2));
+  }
+  fetchJSON("https://api.open-meteo.com/v1/forecast?latitude=" + lats.join(",") + "&longitude=" + lons.join(",") +
+    "&current=wind_speed_10m,wind_direction_10m&wind_speed_unit=mph&forecast_days=1").then(function(d) {
+    var arr = Array.isArray(d) ? d : [d], v = [], csp = 0, cdr = 0;
+    for (var k = 0; k < arr.length && k < N * N; k++) {
+      var cur = arr[k].current || {}, sp = +cur.wind_speed_10m || 0, dr = +cur.wind_direction_10m || 0;
+      if (k === 12) { csp = sp; cdr = dr; }
+      var r = dr * Math.PI / 180;
+      v.push([-sp * Math.sin(r), -sp * Math.cos(r)]);
+    }
+    if (v.length === N * N) {
+      windGrid = { n: N, lat0: state.loc.lat - 1.2, lon0: state.loc.lon - 1.6, dlat: 0.6, dlon: 0.8, v: v };
+      spotWindTxt = STR[state.lang].wind + " \u00b7 " + Math.round(csp) + " mph " + compass(cdr);
+      windGridCache = { key: key, grid: windGrid, txt: spotWindTxt };
+      if (mapMode === "wind") { startWind(); windFoot(); }
+    }
+  }).catch(function() {});
+}
+function windFoot() { var ft = $("radarFoot"); if (ft && mapMode === "wind") ft.textContent = spotWindTxt || STR[state.lang].wind; }
+
+function startWind() {
+  stopWind();
+  if (!windCanvas || !radarMap || !windGrid) return;
+  var map = radarMap, cv = windCanvas, G = windGrid, N = G.n;
+  var dpr = Math.min(window.devicePixelRatio || 1, 2);
+  var W = cv.clientWidth || 300, H = cv.clientHeight || 230;
+  cv.width = W * dpr; cv.height = H * dpr;
+  var ctx = cv.getContext("2d");
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  if (!windResizeBound) { windResizeBound = true; window.addEventListener("resize", function() { if (mapMode === "wind" && windCanvas) startWind(); }); }
+  function vecAt(lat, lon) {
+    var fx = (lon - G.lon0) / G.dlon, fy = (lat - G.lat0) / G.dlat;
+    if (fx < 0) fx = 0; if (fy < 0) fy = 0;
+    if (fx > N - 1.001) fx = N - 1.001; if (fy > N - 1.001) fy = N - 1.001;
+    var ix = Math.floor(fx), iy = Math.floor(fy), ax = fx - ix, ay = fy - iy, g = G.v, i00 = iy * N + ix;
+    var w00 = (1 - ax) * (1 - ay), w10 = ax * (1 - ay), w01 = (1 - ax) * ay, w11 = ax * ay;
+    return [g[i00][0] * w00 + g[i00 + 1][0] * w10 + g[i00 + N][0] * w01 + g[i00 + N + 1][0] * w11,
+            g[i00][1] * w00 + g[i00 + 1][1] * w10 + g[i00 + N][1] * w01 + g[i00 + N + 1][1] * w11];
+  }
+  var P = [], COUNT = 220;
+  function spawn(p) {
+    var b = map.getBounds();
+    p.lat = b.getSouth() + Math.random() * (b.getNorth() - b.getSouth());
+    p.lon = b.getWest() + Math.random() * (b.getEast() - b.getWest());
+    p.plat = p.lat; p.plon = p.lon; p.age = 0; p.max = 80 + Math.random() * 160;
+    return p;
+  }
+  for (var i = 0; i < COUNT; i++) P.push(spawn({}));
+  var lastT = performance.now(), K = 3.2;
+  ctx.lineWidth = 1.3; ctx.lineCap = "round";
+  function frame(now) {
+    if (mapMode !== "wind") return;
+    windRAF = requestAnimationFrame(frame);
+    var dt = Math.min(0.05, (now - lastT) / 1000); lastT = now;
+    var c = map.getCenter(), p0 = map.latLngToContainerPoint([c.lat, c.lng]);
+    var pxL = Math.abs(map.latLngToContainerPoint([c.lat, c.lng + 0.1]).x - p0.x) / 0.1 || 1;
+    var pxA = Math.abs(map.latLngToContainerPoint([c.lat + 0.1, c.lng]).y - p0.y) / 0.1 || 1;
+    ctx.clearRect(0, 0, W, H);
+    var b = map.getBounds(), bs = b.getSouth(), bn = b.getNorth(), bw = b.getWest(), be = b.getEast();
+    for (var i = 0; i < P.length; i++) {
+      var p = P[i];
+      p.age++;
+      var vv = vecAt(p.lat, p.lon), sp = Math.sqrt(vv[0] * vv[0] + vv[1] * vv[1]);
+      if (sp < 0.5 || p.age > p.max || p.lat < bs || p.lat > bn || p.lon < bw || p.lon > be) { spawn(p); continue; }
+      var step = sp * K * dt, ux = vv[0] / sp, uy = vv[1] / sp;
+      p.lat += uy * step / pxA; p.lon += ux * step / pxL;
+      var q0 = map.latLngToContainerPoint([p.plat, p.plon]), q1 = map.latLngToContainerPoint([p.lat, p.lon]);
+      var fade = Math.min(1, p.age / 25) * Math.min(1, (p.max - p.age) / 25);
+      var a = (0.2 + Math.min(0.55, sp / 45)) * fade;
+      ctx.strokeStyle = "rgba(255,255,255," + a.toFixed(3) + ")";
+      ctx.beginPath(); ctx.moveTo(q0.x, q0.y); ctx.lineTo(q1.x, q1.y); ctx.stroke();
+      p.plat = p.lat; p.plon = p.lon;
+    }
+  }
+  windRAF = requestAnimationFrame(frame);
+}
+
+function setMapMode(m) {
+  mapMode = m;
+  var wB = $("modeWind"), rB = $("modeRadar"), play = $("radarPlay");
+  if (wB) wB.className = m === "wind" ? "on" : "";
+  if (rB) rB.className = m === "radar" ? "on" : "";
+  if (windCanvas) windCanvas.style.display = m === "wind" ? "block" : "none";
+  if (play) { play.hidden = m !== "radar"; if (m !== "radar" && radarTimer) { clearInterval(radarTimer); radarTimer = null; play.textContent = "\u25b6"; } }
+  if (radarLayer) radarLayer.setOpacity(m === "radar" ? 0.65 : 0);
+  if (m === "radar") {
+    stopWind();
+    var fr = radarCache.frames, ft = $("radarFoot");
+    if (ft) ft.textContent = fr.length ? STR[state.lang].radar + " \u00b7 " + frameTime(fr[fr.length - 1].time) : STR[state.lang].radar;
+  } else {
+    startWind(); windFoot();
+  }
+}
+
 function initRadar() {
   if (radarTimer) { clearInterval(radarTimer); radarTimer = null; }
+  stopWind();
   if (radarMap) { try { radarMap.remove(); } catch (e) {} radarMap = null; }
+  radarLayer = null; windCanvas = null;
   var el = $("radarmap");
   if (!el || typeof L === "undefined" || !state.days.length) return;
   var day = state.days[state.sel], c = ratingColor(day.score);
@@ -1300,28 +1417,36 @@ function initRadar() {
       iconSize: [16, 16], iconAnchor: [8, 8] }),
     interactive: false, keyboard: false
   }).addTo(map);
+  windCanvas = document.createElement("canvas");
+  windCanvas.className = "windcv";
+  windCanvas.style.zIndex = 500;
+  el.appendChild(windCanvas);
+  var wB = $("modeWind"), rB = $("modeRadar");
+  if (wB) wB.onclick = function() { setMapMode("wind"); };
+  if (rB) rB.onclick = function() { setMapMode("radar"); };
   var show = function(frames) {
     if (!frames || !frames.length || !radarMap) return;
-    var last = frames[frames.length - 1];
-    var layer = L.tileLayer(radarTileURL(last),
-      { opacity: 0.65, zIndex: 10, maxNativeZoom: 7 }).addTo(map);
-    var ft = $("radarFoot");
-    if (ft) ft.textContent = STR[state.lang].radar + " \u00b7 " + frameTime(last.time);
+    radarLayer = L.tileLayer(radarTileURL(frames[frames.length - 1]),
+      { opacity: 0, zIndex: 10, maxNativeZoom: 7 }).addTo(radarMap);
     var btn = $("radarPlay");
     if (btn && frames.length > 1) {
-      btn.hidden = false;
       var i = frames.length - 1;
       btn.onclick = function() {
+        if (mapMode !== "radar") return;
         if (radarTimer) { clearInterval(radarTimer); radarTimer = null; btn.textContent = "\u25b6"; return; }
         btn.textContent = "\u23f8";
+        var ft = $("radarFoot");
         radarTimer = setInterval(function() {
           i = (i + 1) % frames.length;
-          try { layer.setUrl(radarTileURL(frames[i])); } catch (e) {}
-          if (ft) ft.textContent = STR[state.lang].radar + " \u00b7 " + frameTime(frames[i].time);
+          try { radarLayer.setUrl(radarTileURL(frames[i])); } catch (e) {}
+          if (ft && mapMode === "radar") ft.textContent = STR[state.lang].radar + " \u00b7 " + frameTime(frames[i].time);
         }, 800);
       };
     }
+    if (mapMode === "radar") setMapMode("radar");
   };
+  loadWindGrid();
+  setMapMode(mapMode);
   var now = Date.now();
   if (radarCache.frames.length && now - radarCache.at < 600000) { show(radarCache.frames); return; }
   fetchJSON("https://api.rainviewer.com/public/weather-maps.json").then(function(j) {
@@ -1407,7 +1532,8 @@ function renderAll() {
     "</div>";
   // live precipitation radar with the day's score pinned at the spot
   html += '<div class="radarcap"><div class="radarmap" id="radarmap"></div>' +
-    '<div class="radarbar"><span id="radarFoot">' + S.radar + '</span>' +
+    '<div class="radarbar"><span class="seg"><button id="modeWind" class="on">' + S.wind + '</button><button id="modeRadar">' + S.radar + '</button></span>' +
+    '<span id="radarFoot" class="radarfoot"></span>' +
     '<span class="radarattr">\u00a9 OpenStreetMap \u00b7 RainViewer</span>' +
     '<button class="radarplay" id="radarPlay" hidden>\u25b6</button></div></div>';
   // major/minor
