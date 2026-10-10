@@ -376,14 +376,19 @@ function useMyLocation() {
   locMsg(S.locating);
   if (!navigator.geolocation) { locMsg(S.geoUnsupported); return; }
   navigator.geolocation.getCurrentPosition(function(pos) {
+    var acc = pos.coords.accuracy || 1e9;
+    if (acc > 2000) { // rough network/IP fix, not real GPS — don't save a wrong spot
+      locMsg(S.geoRough.replace("{mi}", Math.max(1, Math.round(acc / 1609))));
+      return;
+    }
     var lat = pos.coords.latitude, lon = pos.coords.longitude;
     fetchJSON("https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=" + lat + "&longitude=" + lon + "&localityLanguage=en")
       .then(function(j) {
-        var city = j.city || j.locality || "";
+        var place = j.locality || j.city || "";
         var st = (j.principalSubdivisionCode || "").split("-").pop();
-        setLocation({ name: city ? city + (st ? ", " + st : "") : S.currentLoc, lat: lat, lon: lon });
+        setLocation({ name: place ? place + (st ? ", " + st : "") : S.currentLoc, lat: lat, lon: lon });
       }).catch(function() { setLocation({ name: S.currentLoc, lat: lat, lon: lon }); });
-  }, function() { locMsg(S.geoDenied); }, { timeout: 12000, maximumAge: 600000 });
+  }, function() { locMsg(S.geoDenied); }, { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 });
 }
 var locSearchTimer = null;
 function doSearch(q) {
@@ -437,6 +442,7 @@ var STR = {
     searchPh: "Search a beach or town…", useMyLoc: "📍 Use my location", homeBtn: "⌂ Jupiter Inlet",
     locating: "Locating…", geoDenied: "Location unavailable — check permission", geoUnsupported: "Geolocation not supported",
     currentLoc: "Current location", checkRegs: "Check local fishing regulations", noResults: "No places found",
+    geoRough: "GPS fix is rough (\u00b1{mi} mi) \u2014 try again in the open",
     moonTitle: "🌙 Major / Minor bite times", major: "MAJOR", minor: "MINOR", now: "NOW",
     tide: "Tide", high: "High", low: "Low", refresh: "Refresh", back: "‹ Home",
     rules: "<b>Pompano</b> — 6/day · min 11″ fork",
@@ -478,6 +484,7 @@ var STR = {
     searchPh: "Tìm bãi biển hoặc thị trấn…", useMyLoc: "📍 Vị trí của tôi", homeBtn: "⌂ Jupiter Inlet",
     locating: "Đang định vị…", geoDenied: "Không lấy được vị trí — kiểm tra quyền", geoUnsupported: "Thiết bị không hỗ trợ định vị",
     currentLoc: "Vị trí hiện tại", checkRegs: "Kiểm tra quy định câu cá địa phương", noResults: "Không tìm thấy địa điểm",
+    geoRough: "Định vị chưa chính xác (\u00b1{mi} dặm) — thử lại ở nơi thoáng",
     moonTitle: "🌙 Giờ cá cắn câu chính / phụ", major: "CHÍNH", minor: "PHỤ", now: "NGAY BÂY GIỜ",
     tide: "Thủy triều", high: "Nước lên", low: "Nước xuống", refresh: "Làm mới", back: "‹ Trang chủ",
     rules: "<b>Pompano</b> — 6 con/ngày · tối thiểu 11″ fork",
