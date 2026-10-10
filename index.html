@@ -451,6 +451,31 @@ function moonSVG(em) {
     spark(24, 6.5, 3.1) + spark(18, 12.5, 2.3) + spark(25, 14, 1.9) +
     '</svg>';
 }
+/* Dynamic moon-phase icon (~30px): dark disc + accurately-shaped lit portion,
+   drawn from the MET Norway moonphase angle (0=new, 90=first quarter,
+   180=full, 270=last quarter). The terminator is a half-ellipse with
+   semi-minor axis r*|cos(phase)|; waxing lights the right side, waning the left.
+   Lit: warm pale yellow; dark: deep slate — reads on the warm-sand theme. */
+function moonPhaseSVG(deg, em) {
+  var th = ((((deg % 360) + 360) % 360) * Math.PI) / 180;
+  var r = 14, cx = 16, cy = 16;
+  var c = Math.cos(th);
+  if (Math.abs(c) < 1e-9) c = 0; // snap float noise at quarter points
+  var waxing = th <= Math.PI;
+  var rx = Math.abs(r * c).toFixed(2);
+  var outerSweep = waxing ? 1 : 0;
+  var termSweep = (c < 0) ? 1 : 0;
+  var s = em || 1.3;
+  var d = "M" + cx + " " + (cy - r) +
+    " A" + r + " " + r + " 0 0 " + outerSweep + " " + cx + " " + (cy + r) +
+    " A" + rx + " " + r + " 0 0 " + termSweep + " " + cx + " " + (cy - r) + " Z";
+  return '<svg width="' + s + 'em" height="' + s + 'em" viewBox="0 0 32 32" ' +
+    'style="vertical-align:-0.18em">' +
+    '<circle cx="16" cy="16" r="14" fill="#1f3a3a"/>' +
+    '<path d="' + d + '" fill="#f5e6b8"/>' +
+    '<circle cx="16" cy="16" r="13.2" fill="none" stroke="#0f766e" stroke-width="1.6"/>' +
+    '</svg>';
+}
 /* Condition icon for a weather code + is_day flag. Day icons are the classic
    emoji set; clear night skies get the line-art crescent moon above. */
 function condIcon(code, isDay) {
@@ -1013,7 +1038,7 @@ function renderAll() {
   } else {
     var mp = moonPhaseInfo(mph);
     var msub = mp.daysToFull === 0 ? S.fullTonight : S.fullIn(mp.daysToFull);
-    moonTile = '<div class="tile"><div class="k">' + S.moon + '</div><div class="v">' + moonSVG(1.3) + " " +
+    moonTile = '<div class="tile"><div class="k">' + S.moon + '</div><div class="v">' + moonPhaseSVG(mph, 1.3) + " " +
       Math.round(mp.illum * 100) + '%</div><div class="msub">' + msub + "</div></div>";
   }
   html += '<div class="tiles">' +
