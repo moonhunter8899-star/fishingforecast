@@ -129,20 +129,6 @@
     background: #6b4a1f; color: #ffe9a8; font-size: 8px; font-weight: 800;
     padding: 2px 6px; border-radius: 999px; letter-spacing: .06em; white-space: nowrap;
   }
-  .bestbanner {
-    display: flex; align-items: center; gap: 10px;
-    background: #fff3cf; border-radius: 12px; padding: 9px 12px; margin-bottom: 14px;
-    font-size: 12px; font-weight: 600; color: #6b4a1f;
-  }
-  .bestbanner .star {
-    width: 26px; height: 26px; border-radius: 50%; background: #d9a441; color: #fff;
-    display: flex; align-items: center; justify-content: center; font-size: 14px; flex: none;
-  }
-  .bestbanner .go {
-    margin-left: auto; background: #6b4a1f; color: #ffe9a8; border: none; border-radius: 999px;
-    font-size: 10px; font-weight: 800; padding: 6px 12px; cursor: pointer; letter-spacing: .06em; flex: none;
-  }
-  .bestbanner .bt { font-family: "Fraunces", serif; font-weight: 800; font-size: 11px; letter-spacing: .08em; }
 
   /* Day card */
   .card {
@@ -1454,7 +1440,7 @@ function initRadar() {
   var el = $("radarmap");
   if (!el || typeof L === "undefined" || !state.days.length) return;
   var day = state.days[state.sel], c = ratingColor(day.score);
-  var map = L.map("radarmap", { scrollWheelZoom: false, attributionControl: false });
+  var map = L.map("radarmap", { scrollWheelZoom: false, attributionControl: false, maxZoom: 11 });
   radarMap = map;
   map.setView([state.loc.lat, state.loc.lon], 8);
   L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19, detectRetina: true }).addTo(map);
@@ -1553,14 +1539,6 @@ function renderAll() {
       '<div class="dow2">' + ratingWord(d.score, state.lang) + "</div></div>";
   });
   html += "</div>";
-  // best-day banner
-  var bd = state.days[bestIdx];
-  html += '<div class="bestbanner"><div class="star">★</div><div>' +
-    '<div class="bt">' + S.bestWeek + "</div>" +
-    '<div>' + (bestIdx === 0 ? S.todayWord : S.days[bd.date.getDay()] + " " + bd.date.getDate()) +
-    " · " + S.months[bd.date.getMonth()] + " " + bd.date.getDate() +
-    " — " + ratingWord(bd.score, state.lang) + " (" + bd.score + ")</div></div>" +
-    '<button class="go" data-goday="' + bestIdx + '">' + S.goDay + "</button></div>";
   // day card
   var day = state.days[state.sel];
   var dc = ratingColor(day.score);
@@ -1618,8 +1596,6 @@ function renderAll() {
       el.addEventListener("click", function() { state.sel = +el.getAttribute("data-day"); renderAll(); });
     })(pills[i]);
   }
-  var go = app.querySelector("[data-goday]");
-  if (go) go.addEventListener("click", function() { state.sel = +go.getAttribute("data-goday"); renderAll(); });
   var cday = state.days[state.sel];
   var cmn = $("catchMinus"), cpl = $("catchPlus");
   if (cmn && cday) cmn.addEventListener("click", function() { bumpCatch(cday.date.getTime(), -1); });
