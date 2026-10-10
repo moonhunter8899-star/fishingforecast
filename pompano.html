@@ -1088,16 +1088,18 @@ function renderAll() {
   var app = $("app");
   if (!state.ready || !state.days.length) return;
   var d0 = state.days[0];
-  var c0 = ratingColor(d0.score);
+  var dx = state.days[state.sel];
+  var c0 = ratingColor(dx.score);
   var html = "";
   // top rating card
   html += '<div class="topcard" style="border-color:' + c0 + '">' +
     '<div class="wm">' + fishSVG(c0, 110) + "</div>" +
     '<div class="row"><div class="badge">' + fishSVG(c0, 40) + "</div>" +
     '<div><div class="lbl">' + S.rating + '</div>' +
-    '<div class="big">' + ratingWord(d0.score, state.lang).toUpperCase() +
-    ' <span class="sc" style="color:' + c0 + '">' + d0.score + '/100</span></div>' +
-    '<div class="ddate">' + fullDateStr(d0.date, state.lang) + ' · <span id="clock">' + clockStr(state.lang) + "</span></div>" +
+    '<div class="big">' + ratingWord(dx.score, state.lang).toUpperCase() +
+    ' <span class="sc" style="color:' + c0 + '">' + dx.score + '/100</span></div>' +
+    '<div class="ddate">' + fullDateStr(dx.date, state.lang) +
+    (state.sel === 0 ? ' · <span id="clock">' + clockStr(state.lang) + "</span>" : "") + "</div>" +
     "</div></div>" +
     "</div>";
   // pick-a-day strip
