@@ -461,7 +461,7 @@ var STR = {
     loading: "Checking pompano conditions…",
     rating: "POMPANO BITE RATING", today: "TODAY",
     pickDay: "Pick a day", best: "★ BEST", bestWeek: "BEST DAY THIS WEEK", goDay: "GO DAY",
-    goFish: "GO FISH", inFish: function(d) { return "in " + d; }, nowFish: "NOW", gotAway: "The one that got away! 🎣", wind: "WIND", water: "WATER", cond: "CONDITION", rain: "RAIN", moon: "MOON", sunrise: "SUNRISE", sunset: "SUNSET", catch: "Catch",
+    goFish: "BEST TIME TO FISH", inFish: function(d) { return "in " + d; }, nowFish: "NOW", gotAway: "The one that got away! 🎣", wind: "WIND", water: "WATER", cond: "CONDITION", rain: "RAIN", moon: "MOON", sunrise: "SUNRISE", sunset: "SUNSET", catch: "Catch",
     searchPh: "Search a beach or town…", useMyLoc: "Use my location", homeBtn: "⌂ Jupiter Inlet",
     locating: "Locating…", geoDenied: "Location unavailable — check permission", geoUnsupported: "Geolocation not supported",
     currentLoc: "Current location", checkRegs: "Check local fishing regulations", noResults: "No places found",
@@ -504,7 +504,7 @@ var STR = {
     loading: "Đang kiểm tra điều kiện câu cá…",
     rating: "ĐIỂM CẮN CÂU POMPANO", today: "HÔM NAY",
     pickDay: "Chọn ngày", best: "★ ĐẸP NHẤT", bestWeek: "NGÀY ĐẸP NHẤT TUẦN", goDay: "ĐI NGAY",
-    goFish: "ĐI CÂU NGAY", inFish: function(d) { return "sau " + d; }, nowFish: "BÂY GIỜ", gotAway: "Cá chạy mất tiêu rồi! 🎣", wind: "GIÓ", water: "NƯỚC", cond: "THỜI TIẾT", rain: "MƯA", moon: "TRĂNG", sunrise: "BÌNH MINH", sunset: "HOÀNG HÔN", catch: "Cá câu được",
+    goFish: "GIỜ CÂU TỐT NHẤT", inFish: function(d) { return "sau " + d; }, nowFish: "BÂY GIỜ", gotAway: "Cá chạy mất tiêu rồi! 🎣", wind: "GIÓ", water: "NƯỚC", cond: "THỜI TIẾT", rain: "MƯA", moon: "TRĂNG", sunrise: "BÌNH MINH", sunset: "HOÀNG HÔN", catch: "Cá câu được",
     searchPh: "Tìm bãi biển hoặc thị trấn…", useMyLoc: "Vị trí của tôi", homeBtn: "⌂ Jupiter Inlet",
     locating: "Đang định vị…", geoDenied: "Không lấy được vị trí — kiểm tra quyền", geoUnsupported: "Thiết bị không hỗ trợ định vị",
     currentLoc: "Vị trí hiện tại", checkRegs: "Kiểm tra quy định câu cá địa phương", noResults: "Không tìm thấy địa điểm",
@@ -1031,7 +1031,10 @@ function moonScore(w) {
 function moonRowsHTML(day) {
   var S = STR[state.lang], now = Date.now();
   var d0 = day.date.getTime(), d1 = d0 + 86400000;
-  var rows = state.moon.filter(function(w) { return w.end > d0 && w.start < d1; });
+  var isToday = now >= d0 && now < d1;
+  var rows = state.moon.filter(function(w) {
+    return w.end > d0 && w.start < d1 && (!isToday || w.end > now);
+  });
   rows.sort(function(a, b) { return a.start - b.start; });
   if (!rows.length) return "";
   var html = "";
@@ -1566,12 +1569,21 @@ function renderAll() {
     '<span id="radarFoot" class="radarfoot"></span>' +
     '<span class="radarattr" id="radarAttr">\u00a9 OpenStreetMap \u00b7 RainViewer</span>' +
     '<button class="radarplay" id="radarPlay" hidden>\u25b6</button></div></div>';
-  // major/minor
+  // major/minor — past windows disappear; countdown keeps pointing at the next bite
   var moonRows = moonRowsHTML(day);
-  html += '<div class="moonsec"><div class="mh">' + S.moonTitle + "</div>" +
-    '<p class="cdline" id="moonCd">' + moonCountdownHTML() + "</p>" +
-    (moonRows ? '<div id="moonRows">' + moonRows + "</div>"
-              : '<p class="cdline">' + S.moonNote + "</p>") + "</div>";
+  var moonSec = "";
+  if (moonRows) {
+    moonSec = '<div class="moonsec"><div class="mh">' + S.moonTitle + "</div>" +
+      '<p class="cdline" id="moonCd">' + moonCountdownHTML() + "</p>" +
+      '<div id="moonRows">' + moonRows + "</div></div>";
+  } else if (state.moon.some(function(w) { return w.end > day.date.getTime() && w.start < day.date.getTime() + 86400000; })) {
+    moonSec = '<div class="moonsec"><div class="mh">' + S.moonTitle + "</div>" +
+      '<p class="cdline" id="moonCd">' + moonCountdownHTML() + "</p></div>";
+  } else {
+    moonSec = '<div class="moonsec"><div class="mh">' + S.moonTitle + "</div>" +
+      '<p class="cdline">' + S.moonNote + "</p></div>";
+  }
+  html += moonSec;
   // tide
   html += '<div class="tidesec"><div class="th">🌊 ' + S.tide + " · " +
     (state.sel === 0 ? S.todayWord : S.days[day.date.getDay()] + " " + day.date.getDate()) + "</div>" +
@@ -1605,7 +1617,10 @@ function tick() {
   var tc = $("tideCd");
   if (tc) tc.textContent = tideCountdownHTML();
   var mr = $("moonRows");
-  if (mr && state.days[state.sel]) mr.innerHTML = moonRowsHTML(state.days[state.sel]);
+  if (mr && state.days[state.sel]) {
+    var nr = moonRowsHTML(state.days[state.sel]);
+    if (nr) mr.innerHTML = nr; else mr.remove();
+  }
   var gf = $("gofish");
   if (gf) {
     var gfn = Date.now(), gfe = +gf.getAttribute("data-end");
