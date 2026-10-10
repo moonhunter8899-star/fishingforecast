@@ -294,7 +294,6 @@ var STR = {
       73:"Snow", 75:"Snow", 77:"Snow", 80:"Showers", 81:"Showers", 82:"Showers",
       85:"Snow showers", 86:"Snow showers", 95:"Thunderstorm", 96:"Storm", 99:"Storm"
     },
-    condIcon: { 0:"☀️", 1:"🌤️", 2:"⛅", 3:"☁️", 45:"🌫️", 48:"🌫️", 61:"🌧️", 63:"🌧️", 65:"🌧️", 80:"🌦️", 81:"🌦️", 82:"🌦️", 95:"⛈️", 96:"⛈️", 99:"⛈️" }
   },
   vi: {
     loading: "Đang kiểm tra điều kiện câu cá…",
@@ -331,7 +330,6 @@ var STR = {
       73:"Tuyết", 75:"Tuyết", 77:"Tuyết", 80:"Mưa rào", 81:"Mưa rào", 82:"Mưa rào",
       85:"Mưa tuyết", 86:"Mưa tuyết", 95:"Dông", 96:"Dông", 99:"Dông"
     },
-    condIcon: { 0:"☀️", 1:"🌤️", 2:"⛅", 3:"☁️", 45:"🌫️", 48:"🌫️", 61:"🌧️", 63:"🌧️", 65:"🌧️", 80:"🌦️", 81:"🌦️", 82:"🌦️", 95:"⛈️", 96:"⛈️", 99:"⛈️" }
   }
 };
 
@@ -486,14 +484,92 @@ function moonPhaseSVG(deg, em) {
     '<circle cx="16" cy="16" r="13.2" fill="none" stroke="#0f766e" stroke-width="1.6"/>' +
     '</svg>';
 }
-/* Condition icon for a weather code + is_day flag. Day icons are the classic
-   emoji set; clear night skies get the line-art crescent moon above. */
+/* ============ Original line-art weather icons (drawn for this app) ============
+   One consistent style: 32x32 grid, deep teal #0f766e strokes, round caps/joins.
+   Sized ~1em for inline use; simple shapes stay crisp at 16px.
+   Night keeps Tien's crescent-moon-with-sparkles for clear skies. */
+var WXST = "#0f766e", WXSW = 2.2;
+function _wsvg(inner, em) {
+  var s = em || 1.15;
+  return '<svg width="' + s + 'em" height="' + s + 'em" viewBox="0 0 32 32" ' +
+    'style="vertical-align:-0.18em" fill="none" stroke="' + WXST + '" stroke-width="' + WXSW + '" ' +
+    'stroke-linecap="round" stroke-linejoin="round">' + inner + '</svg>';
+}
+function _wsun(cx, cy, r) {
+  var g = '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '"/>';
+  for (var i = 0; i < 8; i++) {
+    var a = i * Math.PI / 4;
+    g += '<line x1="' + (cx + (r + 2.2) * Math.cos(a)).toFixed(1) +
+         '" y1="' + (cy + (r + 2.2) * Math.sin(a)).toFixed(1) +
+         '" x2="' + (cx + (r + 4.6) * Math.cos(a)).toFixed(1) +
+         '" y2="' + (cy + (r + 4.6) * Math.sin(a)).toFixed(1) + '"/>';
+  }
+  return g;
+}
+/* Cloud body: bottom line, right bump, big top arc, left bump. Spans x~5..26, y~11..25. */
+function _wcloudP() { return '<path d="M10 25 h12 a4 4 0 0 0 0-8 a6 6 0 0 0-11.6-1.6 A4.5 4.5 0 0 0 10 25 Z"/>'; }
+function _wcloud(dy) { return '<g transform="translate(0 ' + (dy || 0) + ')">' + _wcloudP() + '</g>'; }
+function _wcloudSm() { return '<g transform="translate(6.5 7) scale(0.68)">' + _wcloudP() + '</g>'; }
+/* Small crescent for night combos (this app's own crescent geometry). */
+function _wcresSm() {
+  return '<g transform="translate(-1.5 -2.5) scale(0.6)">' +
+    '<path d="M13.7 6 A10 10 0 1 0 22.1 20.1 A8.2 8.2 0 0 1 13.7 6 Z"/></g>';
+}
+function _wrain(xs, y) {
+  var g = '';
+  for (var i = 0; i < xs.length; i++) {
+    var x = xs[i];
+    g += '<line x1="' + x + '" y1="' + y + '" x2="' + (x - 1.6).toFixed(1) + '" y2="' + (y + 4.2).toFixed(1) + '"/>';
+  }
+  return g;
+}
+function _wdriz(y) {
+  var g = '', xs = [12, 16.5, 21];
+  for (var i = 0; i < 3; i++)
+    g += '<circle cx="' + xs[i] + '" cy="' + (y + (i % 2)) + '" r="1.15" fill="' + WXST + '" stroke="none"/>';
+  return g;
+}
+function _wsnow(y) {
+  var g = '', xs = [11.5, 16.5, 21.5];
+  for (var i = 0; i < 3; i++) {
+    var x = xs[i];
+    g += '<path d="M' + x + ' ' + (y - 2.2) + 'V' + (y + 2.2) +
+      'M' + (x - 1.9).toFixed(1) + ' ' + (y - 1.1) + 'L' + (x + 1.9).toFixed(1) + ' ' + (y + 1.1) +
+      'M' + (x - 1.9).toFixed(1) + ' ' + (y + 1.1) + 'L' + (x + 1.9).toFixed(1) + ' ' + (y - 1.1) + '"/>';
+  }
+  return g;
+}
+function _wbolt() {
+  return '<path d="M18 23 L13 29 H16 L14.5 31.5 L20 26 H17.2 Z" fill="' + WXST + '" stroke="none"/>';
+}
+function _wfog(y) {
+  return '<line x1="9" y1="' + y + '" x2="23" y2="' + y + '"/>' +
+         '<line x1="11.5" y1="' + (y + 3) + '" x2="20.5" y2="' + (y + 3) + '"/>';
+}
+/* Condition icon for a weather code + is_day flag (same interface as before). */
 function condIcon(code, isDay) {
-  var night = (isDay === 0);
-  if (night && (code === 0 || code === 1)) return moonSVG(1.15);
-  var m = STR[state.lang].condIcon;
-  if (night && code === 2) return "🌙☁️";
-  return m[code] || m[2];
+  var night = (isDay === 0), inner = "";
+  var RC = _wcloud(-2);                              /* cloud shifted up, room for precip */
+  var sky = night ? _wcresSm() : _wsun(10, 9, 3.5);   /* small sky body for combos */
+  switch (code) {
+    case 0: return night ? moonSVG(1.15) : _wsvg(_wsun(16, 13, 5.5));
+    case 1: inner = (night ? _wcresSm() : _wsun(10.5, 9.5, 3.8)) + _wcloudSm(); break;
+    case 2: inner = sky + _wcloud(0); break;
+    case 3: inner = _wcloud(0); break;
+    case 45: case 48: inner = RC + _wfog(26); break;
+    case 51: case 53: case 55:
+    case 56: case 57: inner = RC + _wdriz(26.5); break;
+    case 61: inner = RC + _wrain([13.5, 18.5], 24.5); break;
+    case 63: case 66: case 67: inner = RC + _wrain([11.5, 16.5, 21.5], 24.5); break;
+    case 65: inner = RC + _wrain([9.5, 14, 18.5, 23], 24.5); break;
+    case 71: case 73: case 75: case 77: inner = RC + _wsnow(27); break;
+    case 80: case 81: case 82: inner = sky + RC + _wrain([13.5, 18.5], 24.5); break;
+    case 85: case 86: inner = sky + RC + _wsnow(27); break;
+    case 95: inner = RC + _wbolt(); break;
+    case 96: case 99: inner = RC + _wbolt() + _wrain([9.5, 22.5], 24.5); break;
+    default: inner = sky + _wcloud(0);
+  }
+  return _wsvg(inner);
 }
 /* ================= state ================= */
 var state = {
