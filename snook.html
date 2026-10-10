@@ -1409,7 +1409,7 @@ function startWind() {
       var a = (0.55 + Math.min(0.4, sp / 50)) * fade;
       for (var pass = 0; pass < 2; pass++) {
         var halo = pass === 0;
-        ctx.strokeStyle = halo ? "rgba(255,255,255," + (a * 0.85).toFixed(3) + ")" : "rgba(58,155,220," + a.toFixed(3) + ")";
+        ctx.strokeStyle = halo ? "rgba(255,255,255," + (a * 0.85).toFixed(3) + ")" : "rgba(143,149,155," + a.toFixed(3) + ")";
         ctx.fillStyle = ctx.strokeStyle;
         ctx.lineWidth = halo ? 3.6 : 1.6;
         ctx.beginPath(); ctx.moveTo(tx, ty); ctx.lineTo(bx, by); ctx.stroke();
