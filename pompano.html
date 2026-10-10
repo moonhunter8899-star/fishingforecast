@@ -1289,7 +1289,7 @@ function renderHeader() {
 /* ================= live map: radar (RainViewer) + wind particles (Open-Meteo) ================= */
 var radarMap = null, radarTimer = null, radarCache = { at: 0, frames: [] };
 var radarLayer = null, windCanvas = null, windRAF = null, windGrid = null;
-var windGridCache = { key: "", grid: null, txt: "" }, mapMode = "wind", spotWindTxt = "", windResizeBound = false;
+var windGridCache = { key: "", grid: null }, mapMode = "wind", windResizeBound = false;
 function frameTime(t) { return tstr(new Date(t * 1000), state.lang); }
 function radarTileURL(fr) { return "https://tilecache.rainviewer.com" + fr.path + "/256/{z}/{x}/{y}/2/1_1.png"; }
 function stopWind() { if (windRAF) { cancelAnimationFrame(windRAF); windRAF = null; } }
@@ -1297,8 +1297,8 @@ function stopWind() { if (windRAF) { cancelAnimationFrame(windRAF); windRAF = nu
 function loadWindGrid() {
   var key = state.loc.lat.toFixed(2) + "," + state.loc.lon.toFixed(2);
   if (windGridCache.key === key && windGridCache.grid) {
-    windGrid = windGridCache.grid; spotWindTxt = windGridCache.txt;
-    if (mapMode === "wind") { startWind(); windFoot(); }
+    windGrid = windGridCache.grid;
+    if (mapMode === "wind") startWind();
     return;
   }
   var N = 5, lats = [], lons = [];
@@ -1308,22 +1308,26 @@ function loadWindGrid() {
   }
   fetchJSON("https://api.open-meteo.com/v1/forecast?latitude=" + lats.join(",") + "&longitude=" + lons.join(",") +
     "&current=wind_speed_10m,wind_direction_10m&wind_speed_unit=mph&forecast_days=1").then(function(d) {
-    var arr = Array.isArray(d) ? d : [d], v = [], csp = 0, cdr = 0;
+    var arr = Array.isArray(d) ? d : [d], v = [];
     for (var k = 0; k < arr.length && k < N * N; k++) {
       var cur = arr[k].current || {}, sp = +cur.wind_speed_10m || 0, dr = +cur.wind_direction_10m || 0;
-      if (k === 12) { csp = sp; cdr = dr; }
       var r = dr * Math.PI / 180;
       v.push([-sp * Math.sin(r), -sp * Math.cos(r)]);
     }
     if (v.length === N * N) {
       windGrid = { n: N, lat0: state.loc.lat - 1.2, lon0: state.loc.lon - 1.6, dlat: 0.6, dlon: 0.8, v: v };
-      spotWindTxt = STR[state.lang].wind + " \u00b7 " + Math.round(csp) + " mph " + compass(cdr);
-      windGridCache = { key: key, grid: windGrid, txt: spotWindTxt };
-      if (mapMode === "wind") { startWind(); windFoot(); }
+      windGridCache = { key: key, grid: windGrid };
+      if (mapMode === "wind") startWind();
     }
   }).catch(function() {});
 }
-function windFoot() { var ft = $("radarFoot"); if (ft && mapMode === "wind") ft.textContent = spotWindTxt || STR[state.lang].wind; }
+function windFoot() {
+  var ft = $("radarFoot");
+  if (ft && mapMode === "wind" && state.days.length) {
+    var d = state.days[state.sel];
+    ft.textContent = STR[state.lang].wind + " \u00b7 " + d.wind + " mph " + d.windDir;
+  }
+}
 
 function startWind() {
   stopWind();
