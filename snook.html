@@ -202,9 +202,10 @@
   .hsec .hh2 { font-family: "Fraunces", serif; font-weight: 800; font-size: 15px; color: #9a4a16; margin-bottom: 6px; }
   .htable { width: 100%; border-collapse: collapse; font-size: 12px; table-layout: fixed; }
   th.hhour, td.hhour { width: 15%; }
-  th.hscore, td.hscore { width: 18%; }
-  th.hskyw, td.hskyw { width: 35%; }
-  th.hrain, td.hrain { width: 12%; }
+  th.hscore, td.hscore { width: 21%; }
+  .htable td.hscore { padding: 6px 4px; }
+  th.hskyw, td.hskyw { width: 33%; }
+  th.hrain, td.hrain { width: 11%; }
   th.htemp, td.htemp { width: 20%; }
   .htable th {
     font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em;
@@ -1061,7 +1062,7 @@ function hourlyHTML(day) {
     });
     rows += '<tr class="hrow' + (inbite ? " inbite" : "") + '">' +
       '<td class="hhour">' + hourLabel(dt) + "</td>" +
-      '<td class="hscore">' + snookSVG(c, 14) + ' <span style="color:' + c + '">' + sc + "</span></td>" +
+      '<td class="hscore">' + snookSVG(c, 13) + ' <span style="color:' + c + '">' + sc + "</span></td>" +
       "<td class=\"hskyw\">" + sky + "</td>" +
       "<td class=\"hrain\">" + rp + "%</td>" +
       "<td class=\"htemp\">" + air + "°/" + wtrS + "</td></tr>";
