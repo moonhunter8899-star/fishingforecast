@@ -187,12 +187,18 @@
 
   /* Hour by hour */
   .hsec .hh2 { font-family: "Fraunces", serif; font-weight: 800; font-size: 15px; color: #9a4a16; margin-bottom: 6px; }
-  .htable { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .htable { width: 100%; border-collapse: collapse; font-size: 12px; table-layout: fixed; }
+  th.hhour, td.hhour { width: 15%; }
+  th.hscore, td.hscore { width: 18%; }
+  th.hskyw, td.hskyw { width: 35%; }
+  th.hrain, td.hrain { width: 12%; }
+  th.htemp, td.htemp { width: 20%; }
   .htable th {
     font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em;
     color: #8a7a5f; text-align: left; padding: 4px 6px; border-bottom: 1px solid #e3d5b3;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
-  .htable td { padding: 6px; border-bottom: 1px solid #f0e7d2; white-space: nowrap; }
+  .htable td { padding: 6px; border-bottom: 1px solid #f0e7d2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .htable tr:last-child td { border-bottom: none; }
   .hrow.inbite td { background: rgba(29,158,108,.12); }
   .hhour { font-family: "Fraunces", serif; font-weight: 800; }
@@ -205,8 +211,8 @@
   .foot { text-align: center; color: #b3a37f; font-size: 10px; margin-top: 18px; }
 
   /* ===== responsive: phone -> desktop ===== */
-  .hwrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-  .htable { min-width: 560px; }
+  /* hourly table is fluid at every width: fixed layout + % columns, never scrolls */
+  .hwrap { overflow-x: visible; }
   .dpill { min-height: 48px; }
   @media (max-width: 700px) {
     .tiles { grid-template-columns: repeat(3, 1fr); }
@@ -218,6 +224,10 @@
     .dpill { padding: 8px 1px 7px; }
     .topcard .big { font-size: 26px; }
     .gofish { font-size: 17px; }
+    /* hourly table stays compact on phones (column widths are set globally above) */
+    .htable { font-size: 11px; }
+    .htable th, .htable td { padding: 5px 3px; }
+    .hscore svg { width: 16px; height: 16px; }
   }
   @media (min-width: 901px) {
     .wrap { padding: 16px 24px 48px; }
@@ -943,14 +953,14 @@ function hourlyHTML(day) {
     rows += '<tr class="hrow' + (inbite ? " inbite" : "") + '">' +
       '<td class="hhour">' + hourLabel(dt) + "</td>" +
       '<td class="hscore">' + fishSVG(c, 20) + ' <span style="color:' + c + '">' + sc + "</span></td>" +
-      "<td>" + sky + "</td>" +
-      "<td>" + rp + "%</td>" +
-      "<td>" + air + "°/" + wtrS + "</td></tr>";
+      "<td class=\"hskyw\">" + sky + "</td>" +
+      "<td class=\"hrain\">" + rp + "%</td>" +
+      "<td class=\"htemp\">" + air + "°/" + wtrS + "</td></tr>";
   }
   if (!rows) return "";
   return '<div class="card"><div class="hsec"><div class="hh2">🕐 ' + S.hourly + "</div>" +
-    '<div class="hwrap"><table class="htable"><tr><th>' + S.thHour + "</th><th>" + S.thScore + "</th><th>" +
-    S.thSkyWind + "</th><th>" + S.thRain + "</th><th>" + S.thAirWtr + "</th></tr>" +
+    '<div class="hwrap"><table class="htable"><tr><th class="hhour">' + S.thHour + '</th><th class="hscore">' + S.thScore + '</th><th class="hskyw">' +
+    S.thSkyWind + '</th><th class="hrain">' + S.thRain + '</th><th class="htemp">' + S.thAirWtr + "</th></tr>" +
     rows + '</table></div><p class="hint">' + S.biteHint + "</p></div></div>";
 }
 function renderHeader() {
