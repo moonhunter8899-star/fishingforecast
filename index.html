@@ -331,17 +331,6 @@ function fullDateStr(date, lang) { // EN: "Fri, Oct 9, 2026" · VI: "T6, 9 Th10 
   var dn = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][date.getDay()];
   return dn + ", " + S.months[date.getMonth()] + " " + date.getDate() + ", " + date.getFullYear();
 }
-function dayTitle(date, idx, lang, score) {
-  // date + live clock moved into the dark rating card; day card keeps badge + score only
-  var S = STR[lang];
-  var c = ratingColor(score);
-  var dw = idx === 0 ? S.todayWord : S.days[date.getDay()];
-  var dwHtml = idx === 0
-    ? '<span class="tday" style="background:' + c + '">' + dw.toUpperCase() + "</span>"
-    : "<b>" + dw + "</b>";
-  return dwHtml +
-    ' <span class="drate">' + fishSVG(c, 18) + "<b>" + score + "</b></span>";
-}
 function ratingColor(s) { return s >= 60 ? "#1d9e6c" : (s >= 40 ? "#d9a441" : "#c0392b"); }
 function ratingWord(s, lang) {
   var S = STR[lang];
@@ -356,29 +345,13 @@ function condIcon(code, isDay, lang) {
   }
   return STR[lang].condIcon[code] || "🌤️";
 }
-function moonPhaseSVG(deg) {
+function moonPhaseInfo(deg) {
   // deg: MET Norway moonphase — 0=new, 90=first quarter, 180=full, 270=last quarter
   var p = ((((deg % 360) + 360) % 360) / 360);
   var th = 2 * Math.PI * p;
   var illum = (1 - Math.cos(th)) / 2;
-  var cx = 12, cy = 12, r = 9;
-  var s = '<svg width="20" height="20" viewBox="0 0 24 24">';
-  s += '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="#5b5344"/>';
-  if (illum > 0.999) {
-    s += '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="#f2e3ac"/>';
-  } else if (illum > 0.001) {
-    var wax = p < 0.5, gib = illum > 0.5;
-    var limbSweep = wax ? 1 : 0;          // top->bottom: 1 = right limb lit
-    var termSweep = (wax === gib) ? 1 : 0; // bottom->top terminator bulge
-    var rx = Math.max(0.01, Math.abs(r * Math.cos(th)));
-    s += '<path d="M' + cx + ',' + (cy - r) +
-      ' A' + r + ',' + r + ' 0 0 ' + limbSweep + ' ' + cx + ',' + (cy + r) +
-      ' A' + rx.toFixed(2) + ',' + r + ' 0 0 ' + termSweep + ' ' + cx + ',' + (cy - r) +
-      ' Z" fill="#f2e3ac"/>';
-  }
-  s += '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="none" stroke="#8a7a5f" stroke-width="1"/></svg>';
-  var dFull = Math.round(((((180 - deg) % 360) + 360) % 360) / 360 * 29.53058867);
-  return { svg: s, illum: illum, daysToFull: dFull };
+  var dFull = Math.round((((180 - deg) % 360) + 360) % 360 / 360 * 29.53058867);
+  return { illum: illum, daysToFull: dFull };
 }
 function catchKey(date) { return "pf_catch_" + ymdDash(date); }
 function getCatch(date) {
@@ -975,8 +948,7 @@ function renderAll() {
   // day card
   var day = state.days[state.sel];
   var dc = ratingColor(day.score);
-  html += '<div class="card" style="border-color:' + dc + '">' +
-    "<h3>" + dayTitle(day.date, state.sel, state.lang, day.score) + "</h3>";
+  html += '<div class="card" style="border-color:' + dc + '">';
   if (day.best) {
     var bsc = day.best.score;
     var pastWindow = (state.sel === 0 && Date.now() > day.best.end.getTime());
@@ -999,10 +971,10 @@ function renderAll() {
   if (mph == null) {
     moonTile = '<div class="tile"><div class="k">🌙 ' + S.moon + '</div><div class="v">—</div></div>';
   } else {
-    var mp = moonPhaseSVG(mph);
+    var mp = moonPhaseInfo(mph);
     var msub = mp.daysToFull === 0 ? S.fullTonight : S.fullIn(mp.daysToFull);
-    moonTile = '<div class="tile"><div class="k">🌙 ' + S.moon + '</div><div class="v">' + mp.svg +
-      " " + Math.round(mp.illum * 100) + '%</div><div class="msub">' + msub + "</div></div>";
+    moonTile = '<div class="tile"><div class="k">🌙 ' + S.moon + '</div><div class="v">🌙 ' +
+      Math.round(mp.illum * 100) + '%</div><div class="msub">' + msub + "</div></div>";
   }
   html += '<div class="tiles">' +
     '<div class="tile"><div class="k">💨 ' + S.wind + '</div><div class="v">' + day.wind + (day.gust != null ? " | " + day.gust : "") + " " + day.windDir + "</div></div>" +
