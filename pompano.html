@@ -1,0 +1,1303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Fishing Forecast">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="manifest" href="manifest.json">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f6f0df">
+<title>Pompano Forecast — Tien Huynh</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,800;9..144,900&family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: #f6f0df; color: #2b2620;
+    font-family: "Public Sans", -apple-system, "Segoe UI", sans-serif;
+    font-variant-numeric: tabular-nums;
+  }
+  .wrap { max-width: 960px; margin: 0 auto; padding: 12px 16px 40px; }
+  html, body { overflow-x: hidden; }
+  h1, h2, h3, .serif { font-family: "Fraunces", Georgia, serif; }
+
+  /* Header */
+  .hd { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin: 4px 2px 12px; }
+  .hd .t1 { font-family: "Fraunces", serif; font-weight: 800; font-size: 16px; }
+  .hd .t2 { color: #8a7a5f; font-size: 10px; margin-top: 2px; }
+  .hd .brand { font-family: "Fraunces", serif; font-weight: 900; font-size: 15px; color: #22312b; }
+  .hd .nick { font-size: 11px; font-weight: 700; color: #9a4a16; margin: 1px 0 7px; letter-spacing: .02em; }
+  .hdBtns { display: flex; align-items: center; gap: 8px; flex: none; }
+  .langbtn {
+    background: #fffaf0; border: 1.5px solid #d9c9a3; border-radius: 999px;
+    font-size: 11px; font-weight: 800; padding: 7px 10px; cursor: pointer; color: #8a7a5f;
+  }
+  .langbtn b { color: #9a4a16; }
+  .watchlink { text-decoration: none; display: inline-block; }
+  .refresh {
+    background: #bc5a1e; color: #fff; border: none; border-radius: 999px;
+    font-family: "Fraunces", serif; font-weight: 800; font-size: 13px;
+    padding: 8px 16px; cursor: pointer; flex: none;
+  }
+
+  /* Top rating card */
+  .topcard {
+    position: relative; overflow: hidden;
+    background: #22312b; border-radius: 22px; padding: 18px;
+    border: 2px solid #1d9e6c;
+    box-shadow: 0 4px 14px rgba(34,49,43,.25);
+    margin-bottom: 14px; color: #fff;
+  }
+  .topcard .wm { position: absolute; top: -8px; right: 6px; opacity: .14; pointer-events: none; }
+  .topcard .row { display: flex; align-items: center; gap: 16px; position: relative; padding: 2px 4px; }
+  .badge {
+    width: 58px; height: 58px; border-radius: 50%; background: #fff; flex: none;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .topcard .lbl { color: #e8c76a; font-size: 10px; font-weight: 700; letter-spacing: .18em; }
+  .topcard .big { font-family: "Fraunces", serif; font-weight: 900; font-size: 30px; color: #fff; margin-top: 2px; }
+  .topcard .big .sc { font-size: 22px; }
+  .topcard .ddate { color: rgba(255,255,255,.78); font-size: 12px; font-weight: 600; margin-top: 6px; letter-spacing: .02em; }
+
+  /* Day strip */
+  .pick { display: flex; align-items: baseline; justify-content: space-between; margin: 2px 2px 8px; }
+  .pick .ph { font-family: "Fraunces", serif; font-weight: 800; font-size: 13px; color: #9a4a16; }
+  .pick .pr { font-size: 11px; color: #8a7a5f; }
+  .strip { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-bottom: 10px; }
+  .dpill {
+    background: #fffaf0; border: 1px solid #e3d5b3; border-radius: 12px; padding: 8px 2px 7px;
+    text-align: center; cursor: pointer; position: relative; font-family: "Public Sans", sans-serif;
+    color: #2b2620;
+  }
+  .dpill .dw { font-size: 10px; color: #8a7a5f; font-weight: 600; text-transform: uppercase; }
+  .dpill .dn { font-family: "Fraunces", serif; font-size: 18px; font-weight: 800; }
+  .dpill .dsc { font-size: 12px; font-weight: 800; }
+  .dpill .dow2 { font-size: 8px; color: #8a7a5f; white-space: nowrap; letter-spacing: 0; }
+  .dpill.sel { color: #fff; border-color: transparent; }
+  .dpill.sel .dw, .dpill.sel .dow2 { color: rgba(255,255,255,.85); }
+  .dpill.best { background: #fff3cf; border: 2px solid #d9a441; box-shadow: 0 0 8px rgba(217,164,65,.5); }
+  .dpill .bestbadge {
+    position: absolute; top: -9px; left: 50%; transform: translateX(-50%);
+    background: #6b4a1f; color: #ffe9a8; font-size: 8px; font-weight: 800;
+    padding: 2px 6px; border-radius: 999px; letter-spacing: .06em; white-space: nowrap;
+  }
+  .bestbanner {
+    display: flex; align-items: center; gap: 10px;
+    background: #fff3cf; border-radius: 12px; padding: 9px 12px; margin-bottom: 14px;
+    font-size: 12px; font-weight: 600; color: #6b4a1f;
+  }
+  .bestbanner .star {
+    width: 26px; height: 26px; border-radius: 50%; background: #d9a441; color: #fff;
+    display: flex; align-items: center; justify-content: center; font-size: 14px; flex: none;
+  }
+  .bestbanner .go {
+    margin-left: auto; background: #6b4a1f; color: #ffe9a8; border: none; border-radius: 999px;
+    font-size: 10px; font-weight: 800; padding: 6px 12px; cursor: pointer; letter-spacing: .06em; flex: none;
+  }
+  .bestbanner .bt { font-family: "Fraunces", serif; font-weight: 800; font-size: 11px; letter-spacing: .08em; }
+
+  /* Day card */
+  .card {
+    background: #fffaf0; border-radius: 20px; padding: 16px; margin-bottom: 14px;
+    border: 1.5px solid #1d9e6c;
+  }
+  .card h3 { margin: 0; font-size: 19px; font-weight: 900; }
+  .card h3 .dt { font-family: "Public Sans", sans-serif; font-size: 12px; font-weight: 600; color: #8a7a5f; }
+  .card h3 .tday { color: #fff; font-size: 12px; font-weight: 900; letter-spacing: .06em;
+    padding: 4px 11px; border-radius: 999px; vertical-align: 3px; white-space: nowrap; }
+  .card h3 .drate { display: inline-flex; align-items: center; gap: 4px; margin-left: 8px;
+    font-family: "Public Sans", sans-serif; font-size: 14px; font-weight: 800; white-space: nowrap; }
+  .card h3 .drate svg { vertical-align: -4px; }
+
+  /* GO FISH band */
+  .gofish {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    background: #bc5a1e; color: #fff; border-radius: 14px; padding: 11px 14px;
+    margin: 12px 0; font-family: "Fraunces", serif; font-weight: 900; font-size: 19px;
+    box-shadow: 0 3px 10px rgba(188,90,30,.35);
+  }
+  .gofish .gl { font-size: 15px; letter-spacing: .04em; }
+  .gofish .gt { margin-left: 2px; }
+  .gofish .gs { margin-left: auto; font-size: 17px; white-space: nowrap; }
+  .gofish.past { overflow: hidden; }
+  .gofish.past .swim { display: inline-block; margin-left: auto; animation: swimaway 6s ease-in-out infinite; }
+  @keyframes swimaway {
+    0%   { transform: translateX(0) translateY(0) rotate(0deg); opacity: 0; }
+    12%  { transform: translateX(6px) translateY(0) rotate(0deg); opacity: 1; }
+    30%  { transform: translateX(48px) translateY(-7px) rotate(6deg); opacity: 1; }
+    55%  { transform: translateX(92px) translateY(5px) rotate(-5deg); opacity: .85; }
+    78%  { transform: translateX(132px) translateY(-4px) rotate(4deg); opacity: .3; }
+    92%, 100% { transform: translateX(152px) translateY(0) rotate(0deg); opacity: 0; }
+  }
+  /* catch logger row inside the GO FISH band */
+  .catchrow {
+    display: flex; align-items: center; gap: 8px; width: 100%;
+    font-family: "Public Sans", sans-serif; font-size: 12px; font-weight: 700;
+  }
+  .catchrow .ck { opacity: .92; white-space: nowrap; }
+  .cbtn {
+    width: 26px; height: 26px; border-radius: 50%; border: none; padding: 0; flex: none;
+    background: rgba(255,255,255,.28); color: #fff;
+    font-size: 16px; font-weight: 800; line-height: 1; cursor: pointer;
+  }
+  .cnum { min-width: 22px; text-align: center; font-size: 15px; font-weight: 800; }
+  .cmsg { font-weight: 600; opacity: .96; }
+
+  /* 4 weather tiles */
+  .tiles { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 16px; }
+  .tile { background: #ede4cc; border-radius: 12px; padding: 10px 6px; text-align: center; }
+  .tile .k { font-size: 9px; font-weight: 700; letter-spacing: .06em; color: #8a7a5f; text-transform: uppercase; }
+  .tile .v { font-family: "Fraunces", serif; font-size: 15px; font-weight: 800; margin-top: 3px; white-space: nowrap; }
+  .tile .v svg { vertical-align: -4px; }
+  .tile .msub { font-size: 9px; font-weight: 700; color: #8a7a5f; margin-top: 2px; white-space: nowrap; }
+
+  /* Major / Minor section */
+  .moonsec { margin-bottom: 16px; }
+  .moonsec .mh { font-family: "Fraunces", serif; font-weight: 800; font-size: 15px; color: #9a4a16; margin-bottom: 2px; }
+  .cdline { font-size: 11px; color: #8a7a5f; margin: 0 0 8px; font-weight: 600; }
+  .mrow {
+    display: flex; align-items: center; gap: 10px;
+    background: #f3ecda; border: 1px solid #e0d2ae; border-radius: 12px;
+    padding: 9px 12px; margin-bottom: 7px; font-weight: 700; font-size: 14px;
+  }
+  .mrow.now { background: #fff3cf; border: 2px solid #d9a441; box-shadow: 0 0 8px rgba(217,164,65,.45); }
+  .mbadge {
+    font-size: 10px; font-weight: 800; letter-spacing: .06em; border-radius: 7px;
+    padding: 4px 8px; flex: none;
+  }
+  .mbadge.major { background: #bc5a1e; color: #fff; }
+  .mbadge.minor { background: #e3d5b3; color: #6b5f4c; }
+  .mrow .mt { font-family: "Fraunces", serif; font-weight: 800; }
+  .nowpill {
+    margin-left: auto; background: #1d9e6c; color: #fff; font-size: 10px; font-weight: 800;
+    border-radius: 999px; padding: 3px 10px; letter-spacing: .06em; flex: none;
+  }
+
+  /* Tide section */
+  .tidesec .th { font-family: "Fraunces", serif; font-weight: 800; font-size: 15px; color: #0f766e; margin-bottom: 2px; }
+  .tidechart { width: 100%; height: auto; display: block; margin: 4px 0 8px; }
+  .tchips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .tchip {
+    display: inline-flex; align-items: center; gap: 6px; border-radius: 999px;
+    padding: 6px 12px; font-size: 12px; font-weight: 700;
+    background: #ede4cc; border: 1px solid #d9c9a3; color: #2b2620;
+  }
+  .tchip.hi { background: #bc5a1e; border-color: #bc5a1e; color: #fff; }
+
+  /* Hour by hour */
+  .hsec .hh2 { font-family: "Fraunces", serif; font-weight: 800; font-size: 15px; color: #9a4a16; margin-bottom: 6px; }
+  .htable { width: 100%; border-collapse: collapse; font-size: 12px; table-layout: fixed; }
+  th.hhour, td.hhour { width: 15%; }
+  th.hscore, td.hscore { width: 18%; }
+  th.hskyw, td.hskyw { width: 35%; }
+  th.hrain, td.hrain { width: 12%; }
+  th.htemp, td.htemp { width: 20%; }
+  .htable th {
+    font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em;
+    color: #8a7a5f; text-align: left; padding: 4px 6px; border-bottom: 1px solid #e3d5b3;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .htable td { padding: 6px; border-bottom: 1px solid #f0e7d2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .htable tr:last-child td { border-bottom: none; }
+  .hrow.inbite td { background: rgba(29,158,108,.12); }
+  .hhour { font-family: "Fraunces", serif; font-weight: 800; }
+  .hscore { font-weight: 800; }
+  .hscore svg { vertical-align: -5px; }
+  .hint { font-size: 10px; color: #8a7a5f; margin: 8px 2px 0; font-weight: 600; }
+
+  .loading, .err { text-align: center; padding: 40px 16px; color: #8a7a5f; font-size: 14px; }
+  .err button { margin-top: 10px; }
+  .foot { text-align: center; color: #b3a37f; font-size: 10px; margin-top: 18px; }
+
+  /* ===== responsive: phone -> desktop ===== */
+  /* hourly table is fluid at every width: fixed layout + % columns, never scrolls */
+  .hwrap { overflow-x: visible; }
+  .dpill { min-height: 48px; }
+  @media (max-width: 700px) {
+    .tiles { grid-template-columns: repeat(3, 1fr); }
+  }
+  @media (max-width: 430px) {
+    .wrap { padding: 10px 10px 32px; }
+    .tiles { grid-template-columns: repeat(2, 1fr); }
+    .strip { gap: 4px; }
+    .dpill { padding: 8px 1px 7px; }
+    .topcard .big { font-size: 26px; }
+    .gofish { font-size: 17px; }
+    /* hourly table stays compact on phones (column widths are set globally above) */
+    .htable { font-size: 11px; }
+    .htable th, .htable td { padding: 5px 3px; }
+    .hscore svg { width: 16px; height: 16px; }
+  }
+  @media (min-width: 901px) {
+    .wrap { padding: 16px 24px 48px; }
+    .strip { gap: 8px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hd">
+    <div>
+      <div class="brand">🎣 Pompano Forecast · Tien Huynh</div>
+      <div class="nick">Tư Tò Tò – Nha Trang</div>
+      <div class="t1" id="locName">…</div>
+      <div class="t2" id="updLine"></div>
+    </div>
+    <div class="hdBtns">
+      <a class="langbtn watchlink" href="index.html" id="backBtn">‹ Fish</a>
+      <a class="langbtn watchlink" href="watch.html" title="Apple Watch version">⌚</a>
+      <button class="langbtn" id="langBtn" title="Language / Ngôn ngữ"></button>
+      <button class="refresh" id="refBtn">Refresh</button>
+    </div>
+  </div>
+  <div id="app"><div class="loading" id="loading">Checking pompano conditions…</div></div>
+  <div class="foot">Pompano Forecast · Tien Huynh</div>
+</div>
+<script>
+"use strict";
+/* ================= constants ================= */
+var PIN = { lat: 26.9165914, lon: -80.0641906, name: "Jupiter Inlet, FL", station: "8722495" };
+/* ================= i18n ================= */
+var STR = {
+  en: {
+    loading: "Checking pompano conditions…",
+    rating: "POMPANO BITE RATING", today: "TODAY",
+    pickDay: "Pick a day", best: "★ BEST", bestWeek: "BEST DAY THIS WEEK", goDay: "GO DAY",
+    goFish: "GO FISH", gotAway: "The one that got away! 🎣", wind: "WIND", water: "WATER", cond: "CONDITION", rain: "RAIN", moon: "MOON", catch: "Catch",
+    moonTitle: "🌙 Major / Minor bite times", major: "MAJOR", minor: "MINOR", now: "NOW",
+    tide: "Tide", high: "High", low: "Low", refresh: "Refresh", back: "‹ Fish", todayWord: "Today",
+    retry: "Try again", loadFail: "Could not load live data. Check your connection.",
+    great: "Great", good: "Good", fair: "Fair", poor: "Poor",
+    updated: function(d, t) { return "Updated " + d + " at " + t; },
+    dur: function(h, m) { return h > 0 ? h + "h " + m + "m" : m + "m"; },
+    nextMajor: function(d) { return "Next Major in " + d; },
+    nextMinor: function(d) { return "Next Minor in " + d; },
+    majorNow: "Major bite happening now", minorNow: "Minor bite happening now",
+    nextHigh: function(d) { return "High tide in " + d; },
+    nextLow: function(d) { return "Low tide in " + d; },
+    tideNote: "Tide data unavailable right now.", moonNote: "Moon bite times unavailable right now.",
+    catchT0: "Skunked! The pompano win today. 🎣",
+    catchT1: "Nice haul — dinner's on! 🐟",
+    catchT2: "Pompano master! 🏆",
+    catchT3: "Unreal — are you running a charter?! 😄",
+    fullIn: function(d) { return "Full in " + d + "d"; },
+    fullTonight: "Full tonight 🌕",
+    hourly: "Hour by hour", thHour: "Hour", thScore: "Bite", thSkyWind: "Sky · Wind",
+    thRain: "Rain", thAirWtr: "Air/Wtr", biteHint: "Tinted rows fall inside a bite window.",
+    days: ["SUN","MON","TUE","WED","THU","FRI","SAT"],
+    months: ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
+    condName: {
+      0:"Clear", 1:"Mostly clear", 2:"Partly cloudy", 3:"Overcast",
+      45:"Fog", 48:"Fog", 51:"Drizzle", 53:"Drizzle", 55:"Drizzle",
+      56:"Freezing drizzle", 57:"Freezing drizzle", 61:"Light rain", 63:"Rain",
+      65:"Heavy rain", 66:"Freezing rain", 67:"Freezing rain", 71:"Snow",
+      73:"Snow", 75:"Snow", 77:"Snow", 80:"Showers", 81:"Showers", 82:"Showers",
+      85:"Snow showers", 86:"Snow showers", 95:"Thunderstorm", 96:"Storm", 99:"Storm"
+    },
+  },
+  vi: {
+    loading: "Đang kiểm tra điều kiện câu cá…",
+    rating: "ĐIỂM CẮN CÂU POMPANO", today: "HÔM NAY",
+    pickDay: "Chọn ngày", best: "★ ĐẸP NHẤT", bestWeek: "NGÀY ĐẸP NHẤT TUẦN", goDay: "ĐI NGAY",
+    goFish: "ĐI CÂU NGAY", gotAway: "Cá chạy mất tiêu rồi! 🎣", wind: "GIÓ", water: "NƯỚC", cond: "THỜI TIẾT", rain: "MƯA", moon: "TRĂNG", catch: "Cá câu được",
+    moonTitle: "🌙 Giờ cá cắn câu chính / phụ", major: "CHÍNH", minor: "PHỤ", now: "NGAY BÂY GIỜ",
+    tide: "Thủy triều", high: "Nước lên", low: "Nước xuống", refresh: "Làm mới", back: "‹ Cá", todayWord: "Hôm nay",
+    retry: "Thử lại", loadFail: "Không tải được dữ liệu. Kiểm tra kết nối mạng.",
+    great: "Tuyệt vời", good: "Tốt", fair: "Trung bình", poor: "Tệ",
+    updated: function(d, t) { return "Cập nhật " + d + " lúc " + t; },
+    dur: function(h, m) { return h > 0 ? h + " giờ " + m + " phút" : m + " phút"; },
+    nextMajor: function(d) { return "Cá cắn mạnh sau " + d; },
+    nextMinor: function(d) { return "Cá cắn nhẹ sau " + d; },
+    majorNow: "Đang cắn mạnh ngay bây giờ", minorNow: "Đang cắn nhẹ ngay bây giờ",
+    nextHigh: function(d) { return "Nước lên sau " + d; },
+    nextLow: function(d) { return "Nước xuống sau " + d; },
+    tideNote: "Hiện chưa có dữ liệu thủy triều.", moonNote: "Hiện chưa có giờ cá cắn theo mặt trăng.",
+    catchT0: "Móm rồi! Hôm nay cá thắng rồi. 🎣",
+    catchT1: "Khá đấy — có cá ăn rồi! 🐟",
+    catchT2: "Cao thủ săn cá! 🏆",
+    catchT3: "Đỉnh quá — mở tàu câu luôn đi! 😄",
+    fullIn: function(d) { return "Trăng tròn sau " + d + "d"; },
+    fullTonight: "Trăng tròn tối nay 🌕",
+    hourly: "Từng giờ trong ngày", thHour: "Giờ", thScore: "Điểm cắn", thSkyWind: "Trời · Gió",
+    thRain: "Mưa", thAirWtr: "KK/Nước", biteHint: "Hàng tô màu nằm trong giờ cá cắn.",
+    days: ["CN","T2","T3","T4","T5","T6","T7"],
+    months: ["Th1","Th2","Th3","Th4","Th5","Th6","Th7","Th8","Th9","Th10","Th11","Th12"],
+    condName: {
+      0:"Trời quang", 1:"Ít mây", 2:"Mây rải rác", 3:"Nhiều mây",
+      45:"Sương mù", 48:"Sương mù", 51:"Mưa phùn", 53:"Mưa phùn", 55:"Mưa phùn",
+      56:"Mưa phùn", 57:"Mưa phùn", 61:"Mưa nhẹ", 63:"Mưa",
+      65:"Mưa to", 66:"Mưa đá", 67:"Mưa đá", 71:"Tuyết",
+      73:"Tuyết", 75:"Tuyết", 77:"Tuyết", 80:"Mưa rào", 81:"Mưa rào", 82:"Mưa rào",
+      85:"Mưa tuyết", 86:"Mưa tuyết", 95:"Dông", 96:"Dông", 99:"Dông"
+    },
+  }
+};
+
+/* ================= helpers ================= */
+function $(id) { return document.getElementById(id); }
+function pad(n) { return (n < 10 ? "0" : "") + n; }
+function compass(deg) {
+  var dirs = ["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSW","SW","WSW","W","WNW","NW","NNW"];
+  return dirs[Math.round(deg / 22.5) % 16];
+}
+function tstr(d, lang) { // 12h in both languages, e.g. "7:35p"
+  var h = d.getHours(), ap = h >= 12 ? "p" : "a";
+  h = h % 12; if (h === 0) h = 12;
+  return h + ":" + pad(d.getMinutes()) + ap;
+}
+function trange(a, b, lang) { return tstr(a, lang) + "–" + tstr(b, lang); }
+function clockStr(lang) { // 12h in both languages, e.g. "2:26 PM"
+  var d = new Date();
+  var h = d.getHours(), ap = h >= 12 ? "PM" : "AM";
+  h = h % 12; if (h === 0) h = 12;
+  return h + ":" + pad(d.getMinutes()) + " " + ap;
+}
+function fullDateStr(date, lang) { // EN: "Fri, Oct 9, 2026" · VI: "T6, 9 Th10 2026"
+  var S = STR[lang];
+  if (lang === "vi") {
+    return S.days[date.getDay()] + ", " + date.getDate() + " " + S.months[date.getMonth()] + " " + date.getFullYear();
+  }
+  var dn = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][date.getDay()];
+  return dn + ", " + S.months[date.getMonth()] + " " + date.getDate() + ", " + date.getFullYear();
+}
+function ratingColor(s) { return s >= 60 ? "#1d9e6c" : (s >= 40 ? "#d9a441" : "#c0392b"); }
+function ratingWord(s, lang) {
+  var S = STR[lang];
+  return s >= 80 ? S.great : s >= 60 ? S.good : s >= 40 ? S.fair : S.poor;
+}
+function moonPhaseInfo(deg) {
+  // deg: MET Norway moonphase — 0=new, 90=first quarter, 180=full, 270=last quarter
+  var p = ((((deg % 360) + 360) % 360) / 360);
+  var th = 2 * Math.PI * p;
+  var illum = (1 - Math.cos(th)) / 2;
+  var dFull = Math.round((((180 - deg) % 360) + 360) % 360 / 360 * 29.53058867);
+  return { illum: illum, daysToFull: dFull };
+}
+function catchKey(date) { return "pf_catch_" + ymdDash(date); }
+function getCatch(date) {
+  try {
+    var v = parseInt(localStorage.getItem(catchKey(date)) || "0", 10);
+    return (isNaN(v) || v < 0) ? 0 : v;
+  } catch (e) { return 0; }
+}
+function setCatch(date, n) {
+  try { localStorage.setItem(catchKey(date), String(Math.max(0, n))); } catch (e) {}
+}
+function catchMsg(n, lang) {
+  var S = STR[lang];
+  if (n <= 0) return S.catchT0;
+  if (n <= 5) return S.catchT1;
+  if (n <= 12) return S.catchT2;
+  return S.catchT3;
+}
+function catchRowHTML(date) {
+  var S = STR[state.lang];
+  var n = getCatch(date);
+  return '<div class="catchrow"><span class="ck">' + S.catch + ':</span>' +
+    '<button class="cbtn" id="catchMinus">−</button>' +
+    '<span class="cnum" id="catchNum">' + n + '</span>' +
+    '<button class="cbtn" id="catchPlus">+</button>' +
+    '<span class="cmsg" id="catchMsg">' + catchMsg(n, state.lang) + "</span></div>";
+}
+function bumpCatch(dateMs, d) {
+  var date = new Date(dateMs), n = Math.max(0, getCatch(date) + d);
+  setCatch(date, n);
+  var cn = $("catchNum"); if (cn) cn.textContent = n;
+  var cm = $("catchMsg"); if (cm) cm.textContent = catchMsg(n, state.lang);
+}
+function durText(ms, lang) {
+  if (ms < 0) ms = 0;
+  var m = Math.round(ms / 60000), h = Math.floor(m / 60);
+  return STR[lang].dur(h, m % 60);
+}
+function hx2rgb(h){h=h.replace("#","");if(h.length===3){h=h[0]+h[0]+h[1]+h[1]+h[2]+h[2];}return [parseInt(h.substr(0,2),16),parseInt(h.substr(2,2),16),parseInt(h.substr(4,2),16)];}
+function rgb2hx(r,g,b){function c(x){x=Math.max(0,Math.min(255,Math.round(x)));var s=x.toString(16);return s.length<2?"0"+s:s;}return "#"+c(r)+c(g)+c(b);}
+function shade(hex,p){var c=hx2rgb(hex);if(p>=0){return rgb2hx(c[0]+(255-c[0])*p/100,c[1]+(255-c[1])*p/100,c[2]+(255-c[2])*p/100);}var f=1+p/100;return rgb2hx(c[0]*f,c[1]*f,c[2]*f);}
+function mixc(h1,h2,p){var a=hx2rgb(h1),b=hx2rgb(h2);return rgb2hx(a[0]+(b[0]-a[0])*p/100,a[1]+(b[1]-a[1])*p/100,a[2]+(b[2]-a[2])*p/100);}
+function fishSVG(color, size) {
+  var u = (window.__fishUID = (window.__fishUID || 0) + 1);
+  var back = shade(color, -30), belly = mixc(color, "#f6dc8e", 62);
+  var tailA = mixc(color, "#d9a441", 55), tailB = mixc(color, "#9c742a", 35);
+  var finD = shade(color, -32), finDark = shade(color, -55);
+  return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 64 64">' +
+    '<defs>' +
+    '<linearGradient id="fbg' + u + '" x1="0" y1="0" x2="0" y2="1">' +
+    '<stop offset="0" stop-color="' + back + '"/><stop offset=".48" stop-color="' + color + '"/><stop offset="1" stop-color="' + belly + '"/>' +
+    '</linearGradient>' +
+    '<linearGradient id="ftg' + u + '" x1="0" y1="0" x2="1" y2="0">' +
+    '<stop offset="0" stop-color="' + tailA + '"/><stop offset="1" stop-color="' + tailB + '"/>' +
+    '</linearGradient>' +
+    '</defs>' +
+    '<path d="M47.5 27.5 C52 21, 56 16, 62 11 C59 19, 57.5 25.5, 56.5 32 C57.5 38.5, 59 45, 62 53 C56 48, 52 43, 47.5 36.5 Z" fill="url(#ftg' + u + ')"/>' +
+    '<path d="M8 28 C9 23, 11 20, 15 18 C24 13, 34 12.5, 42 19 C45.5 22, 48 25, 49.5 28.5 L49.5 35.5 C46 42, 40 46, 33 47.5 C25 49, 16 46, 9.5 40 C7.5 38, 7.5 30, 8 28 Z" fill="url(#fbg' + u + ')"/>' +
+    '<path d="M18 18 C26 10, 35 6, 44 4 C40 9, 39 13, 40 18.5 C32 14.5, 24 15, 18 18 Z" fill="' + finD + '"/>' +
+    '<path d="M40 44 C43 47, 45 50, 46 53 C44 50, 41 47, 39 44 Z" fill="' + finD + '"/>' +
+    '<path d="M29 47 C31 50.5, 33 53, 36 55 C34 51.5, 32 49, 30 47.5 Z" fill="' + finD + '"/>' +
+    '<path d="M20.5 35 C25 37, 28 41, 29 46 C25 44, 21.5 41, 19.5 37 Z" fill="' + finDark + '"/>' +
+    '<path d="M21 24.5 C24 29.5, 24 37, 21 42" stroke="rgba(255,255,255,.6)" stroke-width="1.6" fill="none" stroke-linecap="round"/>' +
+    '<path d="M26 33.5 C33 32, 41 32, 48 33.5" stroke="rgba(255,255,255,.35)" stroke-width="1" fill="none"/>' +
+    '<path d="M8 35 L11 36" stroke="' + finDark + '" stroke-width="1.4" stroke-linecap="round"/>' +
+    '<circle cx="13.5" cy="29" r="3.1" fill="#fff"/><circle cx="13.5" cy="29" r="1.7" fill="#22312b"/><circle cx="14.2" cy="28.3" r="0.7" fill="#fff"/>' +
+    '</svg>';
+}
+/* Original line-art crescent moon with three sparkle stars (Tien's reference style).
+   Clean strokes in deep teal to match the warm-sand/deep-green theme. */
+function moonSVG(em) {
+  var s = em || 1.15, st = "#0f766e", sw = 2.2;
+  function spark(cx, cy, r) {
+    var k = +(r * 0.18).toFixed(2);
+    return '<path d="M' + cx + ' ' + (cy - r) +
+      ' Q' + (cx + k) + ' ' + (cy - k) + ' ' + (cx + r) + ' ' + cy +
+      ' Q' + (cx + k) + ' ' + (cy + k) + ' ' + cx + ' ' + (cy + r) +
+      ' Q' + (cx - k) + ' ' + (cy + k) + ' ' + (cx - r) + ' ' + cy +
+      ' Q' + (cx - k) + ' ' + (cy - k) + ' ' + cx + ' ' + (cy - r) + ' Z"/>';
+  }
+  return '<svg width="' + s + 'em" height="' + s + 'em" viewBox="0 0 32 32" ' +
+    'style="vertical-align:-0.18em" fill="none" stroke="' + st + '" stroke-width="' + sw + '" ' +
+    'stroke-linecap="round" stroke-linejoin="round">' +
+    '<path d="M13.7 6 A10 10 0 1 0 22.1 20.1 A8.2 8.2 0 0 1 13.7 6 Z"/>' +
+    spark(24, 6.5, 3.1) + spark(18, 12.5, 2.3) + spark(25, 14, 1.9) +
+    '</svg>';
+}
+/* Dynamic moon-phase icon (~30px): dark disc + accurately-shaped lit portion,
+   drawn from the MET Norway moonphase angle (0=new, 90=first quarter,
+   180=full, 270=last quarter). The terminator is a half-ellipse with
+   semi-minor axis r*|cos(phase)|; waxing lights the right side, waning the left.
+   Lit: warm pale yellow; dark: deep slate — reads on the warm-sand theme. */
+function moonPhaseSVG(deg, em) {
+  var th = ((((deg % 360) + 360) % 360) * Math.PI) / 180;
+  var r = 14, cx = 16, cy = 16;
+  var c = Math.cos(th);
+  if (Math.abs(c) < 1e-9) c = 0; // snap float noise at quarter points
+  var waxing = th <= Math.PI;
+  var rx = Math.abs(r * c).toFixed(2);
+  var outerSweep = waxing ? 1 : 0;
+  var termSweep = (c < 0) ? 1 : 0;
+  var s = em || 1.3;
+  var d = "M" + cx + " " + (cy - r) +
+    " A" + r + " " + r + " 0 0 " + outerSweep + " " + cx + " " + (cy + r) +
+    " A" + rx + " " + r + " 0 0 " + termSweep + " " + cx + " " + (cy - r) + " Z";
+  return '<svg width="' + s + 'em" height="' + s + 'em" viewBox="0 0 32 32" ' +
+    'style="vertical-align:-0.18em">' +
+    '<circle cx="16" cy="16" r="14" fill="#1f3a3a"/>' +
+    '<path d="' + d + '" fill="#f5e6b8"/>' +
+    '<circle cx="16" cy="16" r="13.2" fill="none" stroke="#0f766e" stroke-width="1.6"/>' +
+    '</svg>';
+}
+/* ============ Original line-art weather icons (drawn for this app) ============
+   One consistent style: 32x32 grid, deep teal #0f766e strokes, round caps/joins.
+   Sized ~1em for inline use; simple shapes stay crisp at 16px.
+   Night keeps Tien's crescent-moon-with-sparkles for clear skies. */
+var WXST = "#0f766e", WXSW = 2.2;
+function _wsvg(inner, em) {
+  var s = em || 1.15;
+  return '<svg width="' + s + 'em" height="' + s + 'em" viewBox="0 0 32 32" ' +
+    'style="vertical-align:-0.18em" fill="none" stroke="' + WXST + '" stroke-width="' + WXSW + '" ' +
+    'stroke-linecap="round" stroke-linejoin="round">' + inner + '</svg>';
+}
+function _wsun(cx, cy, r) {
+  var g = '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '"/>';
+  for (var i = 0; i < 8; i++) {
+    var a = i * Math.PI / 4;
+    g += '<line x1="' + (cx + (r + 2.2) * Math.cos(a)).toFixed(1) +
+         '" y1="' + (cy + (r + 2.2) * Math.sin(a)).toFixed(1) +
+         '" x2="' + (cx + (r + 4.6) * Math.cos(a)).toFixed(1) +
+         '" y2="' + (cy + (r + 4.6) * Math.sin(a)).toFixed(1) + '"/>';
+  }
+  return g;
+}
+/* Cloud body: bottom line, right bump, big top arc, left bump. Spans x~5..26, y~11..25. */
+function _wcloudP() { return '<path d="M10 25 h12 a4 4 0 0 0 0-8 a6 6 0 0 0-11.6-1.6 A4.5 4.5 0 0 0 10 25 Z"/>'; }
+function _wcloud(dy) { return '<g transform="translate(0 ' + (dy || 0) + ')">' + _wcloudP() + '</g>'; }
+function _wcloudSm() { return '<g transform="translate(6.5 7) scale(0.68)">' + _wcloudP() + '</g>'; }
+/* Small crescent for night combos (this app's own crescent geometry). */
+function _wcresSm() {
+  return '<g transform="translate(-1.5 -2.5) scale(0.6)">' +
+    '<path d="M13.7 6 A10 10 0 1 0 22.1 20.1 A8.2 8.2 0 0 1 13.7 6 Z"/></g>';
+}
+function _wrain(xs, y) {
+  var g = '';
+  for (var i = 0; i < xs.length; i++) {
+    var x = xs[i];
+    g += '<line x1="' + x + '" y1="' + y + '" x2="' + (x - 1.6).toFixed(1) + '" y2="' + (y + 4.2).toFixed(1) + '"/>';
+  }
+  return g;
+}
+function _wdriz(y) {
+  var g = '', xs = [12, 16.5, 21];
+  for (var i = 0; i < 3; i++)
+    g += '<circle cx="' + xs[i] + '" cy="' + (y + (i % 2)) + '" r="1.15" fill="' + WXST + '" stroke="none"/>';
+  return g;
+}
+function _wsnow(y) {
+  var g = '', xs = [11.5, 16.5, 21.5];
+  for (var i = 0; i < 3; i++) {
+    var x = xs[i];
+    g += '<path d="M' + x + ' ' + (y - 2.2) + 'V' + (y + 2.2) +
+      'M' + (x - 1.9).toFixed(1) + ' ' + (y - 1.1) + 'L' + (x + 1.9).toFixed(1) + ' ' + (y + 1.1) +
+      'M' + (x - 1.9).toFixed(1) + ' ' + (y + 1.1) + 'L' + (x + 1.9).toFixed(1) + ' ' + (y - 1.1) + '"/>';
+  }
+  return g;
+}
+function _wbolt() {
+  return '<path d="M18 23 L13 29 H16 L14.5 31.5 L20 26 H17.2 Z" fill="' + WXST + '" stroke="none"/>';
+}
+function _wfog(y) {
+  return '<line x1="9" y1="' + y + '" x2="23" y2="' + y + '"/>' +
+         '<line x1="11.5" y1="' + (y + 3) + '" x2="20.5" y2="' + (y + 3) + '"/>';
+}
+/* Stat-tile label icons: original line-art in the same style (replaces emoji). */
+function _lblWind() {
+  return _wsvg('<path d="M4 10 h12 a2.8 2.8 0 1 0-2.8-2.8"/>' +
+    '<line x1="4" y1="16" x2="24" y2="16"/>' +
+    '<path d="M4 22 h12 a2.8 2.8 0 1 1-2.8 2.8"/>', 1.05);
+}
+function _lblWater() {
+  return _wsvg('<path d="M16 5 C16 5 9 14 9 19 a7 7 0 0 0 14 0 C23 14 16 5 16 5 Z"/>', 1.05);
+}
+function _lblRain() {
+  return _wsvg(_wcloudSm() + _wrain([12, 16.5, 21], 25.5), 1.05);
+}
+/* Condition icon for a weather code + is_day flag (same interface as before). */
+function condIcon(code, isDay) {
+  var night = (isDay === 0), inner = "";
+  var RC = _wcloud(-2);                              /* cloud shifted up, room for precip */
+  var sky = night ? _wcresSm() : _wsun(10, 9, 3.5);   /* small sky body for combos */
+  switch (code) {
+    case 0: return night ? moonSVG(1.15) : _wsvg(_wsun(16, 13, 5.5));
+    case 1: inner = (night ? _wcresSm() : _wsun(10.5, 9.5, 3.8)) + _wcloudSm(); break;
+    case 2: inner = sky + _wcloud(0); break;
+    case 3: inner = _wcloud(0); break;
+    case 45: case 48: inner = RC + _wfog(26); break;
+    case 51: case 53: case 55:
+    case 56: case 57: inner = RC + _wdriz(26.5); break;
+    case 61: inner = RC + _wrain([13.5, 18.5], 24.5); break;
+    case 63: case 66: case 67: inner = RC + _wrain([11.5, 16.5, 21.5], 24.5); break;
+    case 65: inner = RC + _wrain([9.5, 14, 18.5, 23], 24.5); break;
+    case 71: case 73: case 75: case 77: inner = RC + _wsnow(27); break;
+    case 80: case 81: case 82: inner = sky + RC + _wrain([13.5, 18.5], 24.5); break;
+    case 85: case 86: inner = sky + RC + _wsnow(27); break;
+    case 95: inner = RC + _wbolt(); break;
+    case 96: case 99: inner = RC + _wbolt() + _wrain([9.5, 22.5], 24.5); break;
+    default: inner = sky + _wcloud(0);
+  }
+  return _wsvg(inner);
+}
+/* ================= state ================= */
+var state = {
+  lang: localStorage.getItem("pf_lang") || "en",
+  ready: false, sel: 0, days: [], moon: [], tides: [], moonPhase: {},
+  loc: { name: PIN.name, lat: PIN.lat, lon: PIN.lon, station: PIN.station },
+  updatedAt: null
+};
+
+/* ================= data loading ================= */
+function fetchJSON(url) {
+  return fetch(url).then(function(r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); });
+}
+function ymd(d) { return d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()); }
+function ymdDash(d) { return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()); }
+
+function loadWeather(lat, lon) {
+  var u = "https://api.open-meteo.com/v1/forecast?latitude=" + lat + "&longitude=" + lon +
+    "&hourly=temperature_2m,precipitation_probability,precipitation,windspeed_10m,winddirection_10m,wind_gusts_10m,weather_code,is_day" +
+    "&daily=temperature_2m_max,temperature_2m_min,weather_code,precipitation_probability_max" +
+    "&timezone=auto&forecast_days=7&temperature_unit=fahrenheit&windspeed_unit=mph";
+  return fetchJSON(u);
+}
+function loadMarine(lat, lon) {
+  var u = "https://marine-api.open-meteo.com/v1/marine?latitude=" + lat + "&longitude=" + lon +
+    "&hourly=wave_height,sea_surface_temperature&timezone=auto&forecast_days=7&temperature_unit=fahrenheit";
+  return fetchJSON(u);
+}
+function loadTides(station, fromD, toD) {
+  var u = "https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?begin_date=" + ymd(fromD) +
+    "&end_date=" + ymd(toD) + "&station=" + station +
+    "&product=predictions&datum=MLLW&time_zone=lst_ldt&units=english&interval=hilo&format=json&application=pompano-forecast";
+  return fetchJSON(u).then(function(j) {
+    var out = [];
+    (j.predictions || []).forEach(function(p) {
+      // "2026-10-09 15:21" local station time
+      var m = /^(\d+)-(\d+)-(\d+) (\d+):(\d+)$/.exec(p.t);
+      if (!m) return;
+      out.push({ t: new Date(+m[1], +m[2] - 1, +m[3], +m[4], +m[5]).getTime(), type: p.type, v: parseFloat(p.v) });
+    });
+    out.sort(function(a, b) { return a.t - b.t; });
+    return out;
+  });
+}
+function loadMoonDay(lat, lon, date) {
+  // MET Norway sunrise API — the same moon source the Muse app uses.
+  // high_moon/low_moon -> Major (+/-1h); moonrise/moonset -> Minor (+/-30min).
+  // Times requested in UTC (+00:00) so daylight-saving can't shift them.
+  var u = "https://api.met.no/weatherapi/sunrise/3.0/moon?lat=" + lat + "&lon=" + lon +
+    "&date=" + ymdDash(date) + "&offset=" + encodeURIComponent("+00:00");
+  return fetchJSON(u).then(function(j) {
+    var p = (j && j.properties) || {}, wins = [];
+    // moonphase: phase angle in degrees (0=new, 90=first quarter, 180=full, 270=last quarter)
+    try {
+      state.moonPhase = state.moonPhase || {};
+      if (p.moonphase != null && !isNaN(+p.moonphase)) state.moonPhase[ymdDash(date)] = +p.moonphase;
+    } catch (e) {}
+    function T(ev) { return ev && ev.time ? new Date(ev.time).getTime() : null; }
+    [["high_moon"], ["low_moon"]].forEach(function(cfg) {
+      var t = T(p[cfg[0]]);
+      if (t != null && !isNaN(t)) wins.push({ type: "major", start: t - 3600000, end: t + 3600000, center: t });
+    });
+    [["moonrise"], ["moonset"]].forEach(function(cfg) {
+      var t = T(p[cfg[0]]);
+      if (t != null && !isNaN(t)) wins.push({ type: "minor", start: t - 1800000, end: t + 1800000, center: t });
+    });
+    return wins;
+  }).catch(function() { return []; });
+}
+function atHourly(hourly, isoIdx, key) { return hourly[key][isoIdx]; }
+function hourlyIndex(hourly, ms) {
+  // hourly.time entries "2026-10-09T14:00" local
+  var best = 0, bd = 1e15;
+  for (var i = 0; i < hourly.time.length; i++) {
+    var t = new Date(hourly.time[i]).getTime();
+    var d = Math.abs(t - ms);
+    if (d < bd) { bd = d; best = i; }
+  }
+  return best;
+}
+function tideAt(ms) {
+  // Cosine interpolation between hilo events: tides rise/fall fastest
+  // mid-tide and flatten at highs/lows, so the chart renders as a smooth
+  // natural curve instead of angular straight segments.
+  var T = state.tides;
+  if (!T.length) return 0;
+  if (ms <= T[0].t) return T[0].v;
+  for (var i = 0; i < T.length - 1; i++) {
+    if (ms >= T[i].t && ms <= T[i + 1].t) {
+      var f = (ms - T[i].t) / (T[i + 1].t - T[i].t);
+      var s = (1 - Math.cos(Math.PI * f)) / 2;
+      return T[i].v + s * (T[i + 1].v - T[i].v);
+    }
+  }
+  return T[T.length - 1].v;
+}
+/* ---- scoring (mirrors the Muse app's server/src/actions.ts) ----
+   Hourly score starts at 100 and subtracts penalties, clamped 0-100.
+   Tide adjustment is applied per hour afterwards, clamped to [-6, +14].
+   Moon boost applies ONLY to per-window bite ratings, never to day scores. */
+function hourScore(wi, mi) {
+  var wx = state.wx.hourly, mar = state.mar.hourly, s = 100;
+  var wsp = wx.windspeed_10m[wi];
+  if (wsp < 4) s -= 4;
+  else if (wsp <= 15) s -= 0;
+  else if (wsp <= 20) s -= 12;
+  else if (wsp <= 25) s -= 26;
+  else s -= 46;
+  var gust = wx.wind_gusts_10m ? wx.wind_gusts_10m[wi] : 0;
+  if (gust > wsp + 12) s -= 8;
+  if (gust > 30) s -= 18;
+  var rp = wx.precipitation_probability[wi];
+  if (rp >= 80) s -= 45; else if (rp >= 60) s -= 30; else if (rp >= 40) s -= 20; else if (rp >= 20) s -= 10;
+  var mm = wx.precipitation ? wx.precipitation[wi] : 0;
+  if (mm >= 2.5) s -= 30; else if (mm >= 0.5) s -= 15; else if (mm > 0) s -= 5;
+  var wt = mar.sea_surface_temperature[mi];
+  if (wt != null && !isNaN(wt)) {
+    if (wt >= 65 && wt <= 76) s -= 0;
+    else if ((wt >= 62 && wt < 65) || (wt > 76 && wt <= 80)) s -= 10;
+    else if ((wt >= 60 && wt < 62) || (wt > 80 && wt <= 84)) s -= 18;
+    else s -= 28;
+  }
+  var wv = mar.wave_height[mi] * 3.28084; // ft
+  if (!isNaN(wv)) {
+    if (wv < 0.5) s -= 6;
+    else if (wv <= 3) s -= 0;
+    else if (wv <= 4) s -= 8;
+    else if (wv <= 5) s -= 18;
+    else if (wv <= 6) s -= 28;
+    else s -= 40;
+  }
+  return Math.max(0, Math.min(100, Math.round(s)));
+}
+function tideAdj(ms) {
+  // +8 if the next tide event is a High (incoming), +2 if a Low (ebb).
+  // -8 within 0.5h of an event (slack), +2 within 1h, +6 within 3h (mid-tide flow).
+  var T = state.tides;
+  if (!T.length) return 0;
+  var next = null, nearest = 1e15, i, d;
+  for (i = 0; i < T.length; i++) {
+    d = Math.abs(T[i].t - ms);
+    if (d < nearest) nearest = d;
+    if (T[i].t > ms && !next) next = T[i];
+  }
+  var a = next ? (next.type === "H" ? 8 : 2) : 0;
+  if (nearest <= 1800000) a -= 8; else if (nearest <= 3600000) a += 2; else if (nearest <= 10800000) a += 6;
+  return Math.max(-6, Math.min(14, a));
+}
+function adjHourScore(wi, mi, ms) {
+  return hourScore(wi, mi) + tideAdj(ms);
+}
+function windowMoonBoost(startMs, endMs) {
+  // (any Major overlap ? 10 : any Minor overlap ? 5 : 0) + (High tide event in window ? 7 : 0)
+  var b = 0, minor = false, i;
+  for (i = 0; i < state.moon.length; i++) {
+    var w = state.moon[i];
+    if (w.end >= startMs && w.start <= endMs) {
+      if (w.type === "major") { b = 10; break; }
+      minor = true;
+    }
+  }
+  if (b === 0 && minor) b = 5;
+  for (i = 0; i < state.tides.length; i++) {
+    var e = state.tides[i];
+    if (e.type === "H" && e.t >= startMs && e.t <= endMs) { b += 7; break; }
+  }
+  return b;
+}
+function buildDays(wx, mar) {
+  var days = [];
+  var now = new Date();
+  for (var d = 0; d < 7; d++) {
+    var date = new Date(now.getFullYear(), now.getMonth(), now.getDate() + d);
+    // tide-adjusted hourly scores for this date (spot-local hours)
+    var hs = [];
+    for (var i = 0; i < wx.hourly.time.length; i++) {
+      var dt = new Date(wx.hourly.time[i]);
+      if (dt.getFullYear() === date.getFullYear() && dt.getMonth() === date.getMonth() &&
+          dt.getDate() === date.getDate()) {
+        var mi = hourlyIndex(mar.hourly, dt.getTime());
+        hs.push({ t: dt.getTime(), s: adjHourScore(i, mi, dt.getTime()) });
+      }
+    }
+    // day score = rounded mean of the 06:00-19:00 pool (else all hours) — no moon boost
+    var pool = hs.filter(function(h) { var hh = new Date(h.t).getHours(); return hh >= 6 && hh <= 19; });
+    if (!pool.length) pool = hs;
+    var dayScore = 0;
+    if (pool.length) {
+      var sum = 0;
+      pool.forEach(function(h) { sum += h.s; });
+      dayScore = Math.max(0, Math.min(100, Math.round(sum / pool.length)));
+    }
+    // bite windows: local maxima of hourly scores (>=40, >=2h apart, top 4), +/-1h each
+    var peaks = [];
+    for (var k = 1; k < hs.length - 1; k++) {
+      if (hs[k].s >= hs[k-1].s && hs[k].s >= hs[k+1].s && hs[k].s >= 40) {
+        var ok = true;
+        for (var q = 0; q < peaks.length; q++) {
+          if (Math.abs(peaks[q].t - hs[k].t) < 7200000) {
+            ok = false;
+            if (hs[k].s > peaks[q].s) peaks[q] = hs[k];
+          }
+        }
+        if (ok) peaks.push(hs[k]);
+      }
+    }
+    peaks.sort(function(a, b) { return b.s - a.s; });
+    peaks = peaks.slice(0, 4);
+    var windows = peaks.map(function(p) {
+      var st = p.t - 3600000, en = p.t + 3600000, wsum = 0, n = 0;
+      hs.forEach(function(h) { if (h.t >= st && h.t <= en) { wsum += h.s; n++; } });
+      var sc = n ? wsum / n : p.s;
+      sc = Math.min(100, Math.round(sc + windowMoonBoost(st, en)));
+      return { start: new Date(st), end: new Date(en), score: sc };
+    });
+    windows.sort(function(a, b) { return a.start - b.start; });
+    var best = null;
+    windows.forEach(function(w) { if (!best || w.score > best.score) best = w; });
+    // weather tiles at best-window peak (or noon)
+    var refT = best ? best.start.getTime() + 3600000 : date.getTime() + 43200000;
+    var wi = hourlyIndex(wx.hourly, refT), mi2 = hourlyIndex(mar.hourly, refT);
+    var wv = mar.hourly.wave_height[mi2] * 3.28084;
+    days.push({
+      date: date, score: dayScore, windows: windows, best: best,
+      wind: Math.round(wx.hourly.windspeed_10m[wi]),
+      windDir: compass(wx.hourly.winddirection_10m[wi]),
+      gust: (wx.hourly.wind_gusts_10m && wi >= 0 && wx.hourly.wind_gusts_10m[wi] != null) ? Math.round(wx.hourly.wind_gusts_10m[wi]) : null,
+      water: Math.round(mar.hourly.sea_surface_temperature[mi2] * 10) / 10,
+      waveFt: Math.round(wv * 10) / 10,
+      condCode: wx.hourly.weather_code[wi],
+      condDay: (wx.hourly.is_day && wx.hourly.is_day[wi] != null) ? wx.hourly.is_day[wi] : 1,
+      rain: wx.daily.precipitation_probability_max[d]
+    });
+  }
+  return days;
+}
+/* ================= render ================= */
+function moonScore(w) {
+  // App's solunarRatingForWindow: tide-adjusted hourly score at the window + 10 (Major) / 5 (Minor), capped at 100.
+  if (w._score == null) {
+    try {
+      var wi = hourlyIndex(state.wx.hourly, w.center), mi = hourlyIndex(state.mar.hourly, w.center);
+      w._score = Math.min(100, Math.round(adjHourScore(wi, mi, w.center) + (w.type === "major" ? 10 : 5)));
+    } catch (e) { w._score = 0; }
+  }
+  return w._score || 0;
+}
+function moonRowsHTML(day) {
+  var S = STR[state.lang], now = Date.now();
+  var d0 = day.date.getTime(), d1 = d0 + 86400000;
+  var rows = state.moon.filter(function(w) { return w.end > d0 && w.start < d1; });
+  rows.sort(function(a, b) { return a.start - b.start; });
+  if (!rows.length) return "";
+  var html = "";
+  rows.forEach(function(w) {
+    var sc = moonScore(w), c = ratingColor(sc);
+    var active = now >= w.start && now <= w.end;
+    html += '<div class="mrow' + (active ? " now" : "") + '">' +
+      '<span class="mbadge ' + w.type + '">' + (w.type === "major" ? S.major : S.minor) + "</span>" +
+      '<span class="mt">' + trange(new Date(w.start), new Date(w.end), state.lang) + "</span>" +
+      '<span style="display:inline-flex;align-items:center;gap:6px;margin-left:4px;">' +
+        fishSVG(c, 22) + '<span class="mt" style="color:' + c + '">' + sc + "</span></span>" +
+      (active ? '<span class="nowpill">' + S.now + "</span>" : "") +
+      "</div>";
+  });
+  return html;
+}
+function moonCountdownHTML() {
+  var S = STR[state.lang], now = Date.now();
+  function next(type) {
+    var best = null;
+    state.moon.forEach(function(w) {
+      if (w.type !== type || w.end <= now) return;
+      if (!best || w.start < best.start) best = w;
+    });
+    return best;
+  }
+  var parts = [];
+  [["major", S.nextMajor, S.majorNow], ["minor", S.nextMinor, S.minorNow]].forEach(function(cfg) {
+    var w = next(cfg[0]);
+    if (!w) return;
+    parts.push(now >= w.start ? cfg[2] : cfg[1](durText(w.start - now, state.lang)));
+  });
+  return parts.join(" · ");
+}
+function tideCountdownHTML() {
+  var S = STR[state.lang], now = Date.now();
+  var nh = null, nl = null;
+  state.tides.forEach(function(e) {
+    if (e.t <= now) return;
+    if (e.type === "H" && !nh) nh = e;
+    if (e.type === "L" && !nl) nl = e;
+  });
+  var parts = [];
+  if (nh) parts.push(S.nextHigh(durText(nh.t - now, state.lang)));
+  if (nl) parts.push(S.nextLow(durText(nl.t - now, state.lang)));
+  return parts.join(" · ");
+}
+function tideSVG(day) {
+  var W = 360, H = 176, pL = 8, pR = 8, pT = 56, pB = 22;
+  var d0 = day.date.getTime(), d1 = d0 + 86400000;
+  var pts = [];
+  for (var t = d0; t <= d1; t += 900000) pts.push([t, tideAt(t)]);
+  var vs = pts.map(function(p) { return p[1]; });
+  var mn = Math.min.apply(null, vs), mx = Math.max.apply(null, vs);
+  if (mx - mn < 0.3) { mx += 0.15; mn -= 0.15; }
+  function X(t) { return pL + (t - d0) / 86400000 * (W - pL - pR); }
+  function Y(v) { return pT + (1 - (v - mn) / (mx - mn)) * (H - pT - pB); }
+  // Catmull-Rom -> cubic Bezier for a smooth tide curve
+  function smoothPath() {
+    var d = "M" + X(pts[0][0]).toFixed(1) + "," + Y(pts[0][1]).toFixed(1);
+    for (var i = 0; i < pts.length - 1; i++) {
+      var p0 = pts[Math.max(0, i - 1)], p1 = pts[i],
+          p2 = pts[i + 1], p3 = pts[Math.min(pts.length - 1, i + 2)];
+      var c1x = X(p1[0]) + (X(p2[0]) - X(p0[0])) / 6,
+          c1y = Y(p1[1]) + (Y(p2[1]) - Y(p0[1])) / 6;
+      var c2x = X(p2[0]) - (X(p3[0]) - X(p1[0])) / 6,
+          c2y = Y(p2[1]) - (Y(p3[1]) - Y(p1[1])) / 6;
+      d += "C" + c1x.toFixed(1) + "," + c1y.toFixed(1) + " " +
+           c2x.toFixed(1) + "," + c2y.toFixed(1) + " " +
+           X(p2[0]).toFixed(1) + "," + Y(p2[1]).toFixed(1);
+    }
+    return d;
+  }
+  var line = smoothPath();
+  var svg = '<svg class="tidechart" viewBox="0 0 ' + W + " " + H + '">';
+  svg += '<defs><linearGradient id="tideg" x1="0" y1="0" x2="0" y2="1">' +
+    '<stop offset="0" stop-color="#14b8a6" stop-opacity=".30"/>' +
+    '<stop offset=".6" stop-color="#14b8a6" stop-opacity=".10"/>' +
+    '<stop offset="1" stop-color="#14b8a6" stop-opacity=".03"/>' +
+    "</linearGradient></defs>";
+  // soft panel backdrop so the chart sits gently on the warm-sand theme
+  svg += '<rect x="0" y="0" width="' + W + '" height="' + H + '" rx="14" fill="#f8f2e3"/>';
+  // shade bite windows
+  (day.windows || []).forEach(function(w, i) {
+    var isBest = day.best && w.start.getTime() === day.best.start.getTime();
+    svg += '<rect x="' + X(w.start.getTime()).toFixed(1) + '" y="' + (pT - 4) + '" width="' +
+      (X(w.end.getTime()) - X(w.start.getTime())).toFixed(1) + '" height="' + (H - pT - pB + 8) +
+      '" fill="' + (isBest ? "rgba(20,184,166,.20)" : "rgba(20,184,166,.09)") + '" rx="6"/>';
+  });
+  svg += '<path d="' + line + " L" + X(d1).toFixed(1) + "," + (H - pB) + " L" + X(d0).toFixed(1) + "," + (H - pB) +
+    ' Z" fill="url(#tideg)" stroke="none"/>';
+  svg += '<path d="' + line + '" fill="none" stroke="#14b8a6" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"/>';
+  // high / low dots
+  state.tides.forEach(function(e) {
+    if (e.t < d0 || e.t > d1) return;
+    svg += '<circle cx="' + X(e.t).toFixed(1) + '" cy="' + Y(e.v).toFixed(1) +
+      '" r="4.5" fill="#fff" stroke="#0f766e" stroke-width="2"/>';
+  });
+  // now line
+  var now = Date.now();
+  state.tideScale = null;
+  if (now >= d0 && now <= d1) {
+    svg += '<line x1="' + X(now).toFixed(1) + '" y1="' + (pT - 6) + '" x2="' + X(now).toFixed(1) + '" y2="' + (H - pB) +
+      '" stroke="#d9a441" stroke-width="1.75" stroke-dasharray="5,4" stroke-linecap="round"/>';
+    // remember the chart scale so the live fish marker can be repositioned as time passes
+    state.tideScale = { d0: d0, mn: mn, mx: mx, W: W, H: H, pL: pL, pR: pR, pT: pT, pB: pB };
+  }
+  // best-bite marker
+  if (day.best) {
+    var bt = day.best.start.getTime() + 3600000, bv = tideAt(bt);
+    svg += '<circle cx="' + X(bt).toFixed(1) + '" cy="' + (Y(bv) - 13).toFixed(1) +
+      '" r="9.5" fill="#fff" stroke="#bc5a1e" stroke-width="2"/>';
+    svg += '<text x="' + X(bt).toFixed(1) + '" y="' + (Y(bv) - 9.5).toFixed(1) +
+      '" text-anchor="middle" font-size="10">🎣</text>';
+  }
+  // Major bite markers: small rating-colored fish on the curve at each Major window's midpoint
+  var fcol = ratingColor(day.score);
+  state.moon.forEach(function(w) {
+    if (w.type !== "major") return;
+    if (w.end < d0 || w.start > d1) return;
+    var mid = (w.start + w.end) / 2;
+    var mx = X(mid), my = Y(tideAt(mid));
+    if (now >= w.start && now <= w.end) {
+      svg += '<circle cx="' + mx.toFixed(1) + '" cy="' + my.toFixed(1) + '" r="15" fill="none" stroke="' + fcol +
+        '" stroke-width="2" opacity="0.55"/>';
+    }
+    svg += '<g transform="translate(' + (mx - 10).toFixed(1) + "," + (my - 10).toFixed(1) + ')">' + fishSVG(fcol, 20) + "</g>";
+  });
+  // live fishing-rod marker riding the tide curve at the current time.
+  // Cartoon rod inspired by Tien's reference photo: brown tapered blank angled
+  // up-right, dark grip, spinning reel, 3 line guides, line hanging from the tip
+  // to a pink bobber + hook. Rating number above in rating color, live time below it.
+  if (state.tideScale) {
+    var fxx = X(now), fyy = Y(tideAt(now));
+    svg += '<g id="tiderod" transform="translate(' + fxx.toFixed(1) + ',' + fyy.toFixed(1) + ')">' +
+      '<text x="0" y="-34" text-anchor="middle" font-size="13" font-weight="700" fill="' + fcol + '">' + day.score + '</text>' +
+      '<text id="rodtim" x="0" y="-21" text-anchor="middle" font-size="9.5" font-weight="700" fill="#8a7a5f">' + clockStr(state.lang) + '</text>' +
+      '<g transform="scale(0.7)">' +
+      '<path d="M-17.5,17.5 L-9.5,9.5" stroke="#161616" stroke-width="8.6" stroke-linecap="round"/>' +
+      '<path d="M-17.5,17.5 L-9.5,9.5" stroke="#7c4f30" stroke-width="6.2" stroke-linecap="round"/>' +
+      '<polygon points="-11.2,14.8 -14.8,11.2 14.2,-15.8 15.8,-14.2" fill="#b07a52" stroke="#161616" stroke-width="1.4" stroke-linejoin="round"/>' +
+      '<path d="M-4.5,7.6 L-5.4,5.8" stroke="#161616" stroke-width="1.6"/>' +
+      '<circle cx="-4.5" cy="12" r="4.6" fill="#e9f2ff" stroke="#161616" stroke-width="1.6"/>' +
+      '<circle cx="-4.5" cy="12" r="2" fill="#1f2937"/>' +
+      '<path d="M-0.6,14.2 L2.8,16.2" stroke="#161616" stroke-width="1.6" stroke-linecap="round"/><circle cx="3.4" cy="16.5" r="1.5" fill="#1f2937"/>' +
+      '<circle cx="-1.8" cy="1.8" r="1.7" fill="#fffdf7" stroke="#161616" stroke-width="1.3"/>' +
+      '<circle cx="4.4" cy="-4.4" r="1.7" fill="#fffdf7" stroke="#161616" stroke-width="1.3"/>' +
+      '<circle cx="10.5" cy="-10.5" r="1.7" fill="#fffdf7" stroke="#161616" stroke-width="1.3"/>' +
+      '<path d="M-4.5,7.4 L-1.8,1.8 L4.4,-4.4 L10.5,-10.5 L15,-15 C16.5,-9 12,-2.5 3.5,-0.5" stroke="#161616" stroke-width="1.1" fill="none" stroke-linecap="round"/>' +
+      '<circle cx="5.5" cy="-1.1" r="2" fill="#f472a0" stroke="#161616" stroke-width="1"/>' +
+      '<path d="M3.5,-0.5 L3.5,3.5 Q3.5,6 1,6 Q-1,6 -1,4" stroke="#161616" stroke-width="1.4" fill="none" stroke-linecap="round"/></g></g>';
+  }
+  // x labels — 12h style in both languages
+  var S = STR[state.lang];
+  [["12a", 0], ["6a", 6], ["12p", 12], ["6p", 18]].forEach(function(l) {
+    var lab = l[0];
+    svg += '<text x="' + X(d0 + l[1] * 3600000).toFixed(1) + '" y="' + (H - 7) +
+      '" text-anchor="middle" font-size="9" fill="#a89a7c">' + lab + "</text>";
+  });
+  svg += '<text x="' + (W - pR) + '" y="' + (pT - 6) + '" text-anchor="end" font-size="9" fill="#a89a7c">ft</text>';
+  return svg + "</svg>";
+}
+function tideChipsHTML(day) {
+  var S = STR[state.lang];
+  var d0 = day.date.getTime(), d1 = d0 + 86400000;
+  var html = "";
+  state.tides.forEach(function(e) {
+    if (e.t < d0 || e.t > d1) return;
+    var hi = e.type === "H";
+    html += '<span class="tchip' + (hi ? " hi" : "") + '">' + (hi ? "▲" : "▼") + " " +
+      (hi ? S.high : S.low) + " " + tstr(new Date(e.t), state.lang) + " · " + e.v.toFixed(1) + " ft</span>";
+  });
+  return html;
+}
+function hourLabel(d) { // 12h in both languages, e.g. "2 PM" — never 24h/military
+  var h = d.getHours(), ap = h >= 12 ? "PM" : "AM";
+  h = h % 12; if (h === 0) h = 12;
+  return h + " " + ap;
+}
+function hourlyHTML(day) {
+  var S = STR[state.lang];
+  var wx = state.wx.hourly, mar = state.mar.hourly;
+  var rows = "";
+  for (var i = 0; i < wx.time.length; i++) {
+    var dt = new Date(wx.time[i]);
+    if (dt.getFullYear() !== day.date.getFullYear() || dt.getMonth() !== day.date.getMonth() ||
+        dt.getDate() !== day.date.getDate()) continue;
+    var ms = dt.getTime();
+    var mi = hourlyIndex(mar, ms);
+    var sc = Math.max(0, Math.min(100, Math.round(adjHourScore(i, mi, ms))));
+    var c = ratingColor(sc);
+    var code = wx.weather_code[i];
+    var isDay = (wx.is_day && wx.is_day[i] != null) ? wx.is_day[i] : 1;
+    var wsp = Math.round(wx.windspeed_10m[i]);
+    var wdir = compass(wx.winddirection_10m[i]);
+    var gst = (wx.wind_gusts_10m && wx.wind_gusts_10m[i] != null) ? Math.round(wx.wind_gusts_10m[i]) : null;
+    var sky = condIcon(code, isDay) + " " + wsp + (gst != null ? " | " + gst : "") + " " + wdir;
+    var rp = wx.precipitation_probability[i];
+    var air = Math.round(wx.temperature_2m[i]);
+    var wtr = mar.sea_surface_temperature[mi];
+    var wtrS = (wtr == null || isNaN(wtr)) ? "—" : (Math.round(wtr * 10) / 10) + "°";
+    var inbite = false;
+    (day.windows || []).forEach(function(w) {
+      if (ms >= w.start.getTime() && ms < w.end.getTime()) inbite = true;
+    });
+    rows += '<tr class="hrow' + (inbite ? " inbite" : "") + '">' +
+      '<td class="hhour">' + hourLabel(dt) + "</td>" +
+      '<td class="hscore">' + fishSVG(c, 20) + ' <span style="color:' + c + '">' + sc + "</span></td>" +
+      "<td class=\"hskyw\">" + sky + "</td>" +
+      "<td class=\"hrain\">" + rp + "%</td>" +
+      "<td class=\"htemp\">" + air + "°/" + wtrS + "</td></tr>";
+  }
+  if (!rows) return "";
+  return '<div class="card"><div class="hsec"><div class="hh2">🕐 ' + S.hourly + "</div>" +
+    '<div class="hwrap"><table class="htable"><tr><th class="hhour">' + S.thHour + '</th><th class="hscore">' + S.thScore + '</th><th class="hskyw">' +
+    S.thSkyWind + '</th><th class="hrain">' + S.thRain + '</th><th class="htemp">' + S.thAirWtr + "</th></tr>" +
+    rows + '</table></div><p class="hint">' + S.biteHint + "</p></div></div>";
+}
+function renderHeader() {
+  var S = STR[state.lang], L = state.loc;
+  var name = "📌 " + L.name;
+  $("locName").textContent = name;
+  var d = new Date();
+  var ds = state.lang === "vi"
+    ? d.getDate() + " " + S.months[d.getMonth()]
+    : S.months[d.getMonth()] + " " + d.getDate();
+  $("updLine").textContent = state.updatedAt ? S.updated(ds, clockStr(state.lang)) : "";
+  $("langBtn").innerHTML = state.lang === "en" ? "<b>EN</b> | VI" : "EN | <b>VI</b>";
+  $("refBtn").textContent = S.refresh;
+  $("backBtn").textContent = S.back;
+}
+function renderAll() {
+  var S = STR[state.lang];
+  renderHeader();
+  var app = $("app");
+  if (!state.ready || !state.days.length) return;
+  var d0 = state.days[0];
+  var c0 = ratingColor(d0.score);
+  var html = "";
+  // top rating card
+  html += '<div class="topcard" style="border-color:' + c0 + '">' +
+    '<div class="wm">' + fishSVG(c0, 110) + "</div>" +
+    '<div class="row"><div class="badge">' + fishSVG(c0, 40) + "</div>" +
+    '<div><div class="lbl">' + S.rating + '</div>' +
+    '<div class="big">' + ratingWord(d0.score, state.lang).toUpperCase() +
+    ' <span class="sc" style="color:' + c0 + '">' + d0.score + '/100</span></div>' +
+    '<div class="ddate">' + fullDateStr(d0.date, state.lang) + ' · <span id="clock">' + clockStr(state.lang) + "</span></div>" +
+    "</div></div>" +
+    "</div>";
+  // pick-a-day strip
+  var bestIdx = 0;
+  state.days.forEach(function(d, i) { if (d.score > state.days[bestIdx].score) bestIdx = i; });
+  html += '<div class="pick"><span class="ph">' + S.pickDay + "</span>" +
+    '<span class="pr">' + S.months[d0.date.getMonth()] + " " + d0.date.getDate() + " – " +
+    S.months[state.days[6].date.getMonth()] + " " + state.days[6].date.getDate() + "</span></div>";
+  html += '<div class="strip">';
+  state.days.forEach(function(d, i) {
+    var c = ratingColor(d.score);
+    var cls = "dpill" + (i === state.sel ? " sel" : "") + (i === bestIdx ? " best" : "");
+    var dw = i === 0 ? S.todayWord.toUpperCase() : S.days[d.date.getDay()];
+    html += '<div class="' + cls + '" data-day="' + i + '"' +
+      (i === state.sel ? ' style="background:' + c + '"' : "") + ">" +
+      (i === bestIdx ? '<span class="bestbadge">' + S.best + "</span>" : "") +
+      '<div class="dw">' + dw + '</div><div class="dn">' + d.date.getDate() + "</div>" +
+      '<div style="margin:2px 0">' + fishSVG(i === state.sel ? "#ffffff" : c, 22) + "</div>" +
+      '<div class="dsc" style="color:' + (i === state.sel ? "#fff" : c) + '">' + d.score + "</div>" +
+      '<div class="dow2">' + ratingWord(d.score, state.lang) + "</div></div>";
+  });
+  html += "</div>";
+  // best-day banner
+  var bd = state.days[bestIdx];
+  html += '<div class="bestbanner"><div class="star">★</div><div>' +
+    '<div class="bt">' + S.bestWeek + "</div>" +
+    '<div>' + (bestIdx === 0 ? S.todayWord : S.days[bd.date.getDay()] + " " + bd.date.getDate()) +
+    " · " + S.months[bd.date.getMonth()] + " " + bd.date.getDate() +
+    " — " + ratingWord(bd.score, state.lang) + " (" + bd.score + ")</div></div>" +
+    '<button class="go" data-goday="' + bestIdx + '">' + S.goDay + "</button></div>";
+  // day card
+  var day = state.days[state.sel];
+  var dc = ratingColor(day.score);
+  html += '<div class="card" style="border-color:' + dc + '">';
+  if (day.best) {
+    var bsc = day.best.score;
+    var pastWindow = (state.sel === 0 && Date.now() > day.best.end.getTime());
+    if (pastWindow) {
+      html += '<div class="gofish past">' +
+        '<span class="gl">' + S.gotAway + '</span>' +
+        '<span class="swim">' + fishSVG(ratingColor(bsc), 30) + "</span>" +
+        catchRowHTML(day.date) + "</div>";
+    } else {
+      html += '<div class="gofish">' +
+        '<span class="gl">🎣 ' + S.goFish + '</span><span class="gt">' +
+        trange(day.best.start, day.best.end, state.lang) + '</span><span class="gs">· 🐟 ' + bsc + "</span>" +
+        catchRowHTML(day.date) + "</div>";
+    }
+  }
+  var cn = condIcon(day.condCode, day.condDay) + " " + (S.condName[day.condCode] || S.condName[2]);
+  var mph = (state.moonPhase && state.moonPhase[ymdDash(day.date)] != null) ? state.moonPhase[ymdDash(day.date)] : null;
+  var moonTile;
+  if (mph == null) {
+    moonTile = '<div class="tile"><div class="k">' + S.moon + '</div><div class="v">—</div></div>';
+  } else {
+    var mp = moonPhaseInfo(mph);
+    var msub = mp.daysToFull === 0 ? S.fullTonight : S.fullIn(mp.daysToFull);
+    moonTile = '<div class="tile"><div class="k">' + S.moon + '</div><div class="v">' + moonPhaseSVG(mph, 1.3) + " " +
+      Math.round(mp.illum * 100) + '%</div><div class="msub">' + msub + "</div></div>";
+  }
+  html += '<div class="tiles">' +
+    '<div class="tile"><div class="k">' + _lblWind() + ' ' + S.wind + '</div><div class="v">' + day.wind + (day.gust != null ? " | " + day.gust : "") + " " + day.windDir + "</div></div>" +
+    '<div class="tile"><div class="k">' + _lblWater() + ' ' + S.water + '</div><div class="v">' + day.water.toFixed(1) + "°F</div></div>" +
+    '<div class="tile"><div class="k">' + S.cond + '</div><div class="v">' + cn + "</div></div>" +
+    '<div class="tile"><div class="k">' + _lblRain() + ' ' + S.rain + '</div><div class="v">' + day.rain + "%</div></div>" +
+    moonTile +
+    "</div>";
+  // major/minor
+  var moonRows = moonRowsHTML(day);
+  html += '<div class="moonsec"><div class="mh">' + S.moonTitle + "</div>" +
+    '<p class="cdline" id="moonCd">' + moonCountdownHTML() + "</p>" +
+    (moonRows ? '<div id="moonRows">' + moonRows + "</div>"
+              : '<p class="cdline">' + S.moonNote + "</p>") + "</div>";
+  // tide
+  html += '<div class="tidesec"><div class="th">🌊 ' + S.tide + " · " +
+    (state.sel === 0 ? S.todayWord : S.days[day.date.getDay()] + " " + day.date.getDate()) + "</div>" +
+    (state.tides.length
+      ? '<p class="cdline" id="tideCd">' + tideCountdownHTML() + "</p>" +
+        tideSVG(day) + '<div class="tchips">' + tideChipsHTML(day) + "</div>"
+      : '<p class="cdline">' + S.tideNote + "</p>") + "</div>";
+  html += "</div>";
+  // hour-by-hour card for the selected day, after the tide chart
+  html += hourlyHTML(day);
+  app.innerHTML = html;
+  // wire buttons
+  var pills = app.querySelectorAll("[data-day]");
+  for (var i = 0; i < pills.length; i++) {
+    (function(el) {
+      el.addEventListener("click", function() { state.sel = +el.getAttribute("data-day"); renderAll(); });
+    })(pills[i]);
+  }
+  var go = app.querySelector("[data-goday]");
+  if (go) go.addEventListener("click", function() { state.sel = +go.getAttribute("data-goday"); renderAll(); });
+  var cday = state.days[state.sel];
+  var cmn = $("catchMinus"), cpl = $("catchPlus");
+  if (cmn && cday) cmn.addEventListener("click", function() { bumpCatch(cday.date.getTime(), -1); });
+  if (cpl && cday) cpl.addEventListener("click", function() { bumpCatch(cday.date.getTime(), 1); });
+}
+function tick() {
+  if (!state.ready) return;
+  var clk = $("clock");
+  if (clk) clk.textContent = clockStr(state.lang);
+  var mc = $("moonCd");
+  if (mc) mc.textContent = moonCountdownHTML();
+  var tc = $("tideCd");
+  if (tc) tc.textContent = tideCountdownHTML();
+  var mr = $("moonRows");
+  if (mr && state.days[state.sel]) mr.innerHTML = moonRowsHTML(state.days[state.sel]);
+  renderHeader();
+  // if the phone's real clock has rolled past the rendered day (page left open
+  // across midnight), silently refetch so the rod, countdowns and scores match
+  // the real current day — never a stale or wrongly-placed marker
+  var nowMs = Date.now();
+  if (!state.loading && state.tideScale &&
+      (nowMs < state.tideScale.d0 || nowMs >= state.tideScale.d0 + 86400000)) {
+    startLoad();
+    return;
+  }
+  // move the live tide-chart rod every 30s so it rides the curve with the real time
+  if (++__tfN % 30 === 0) moveTideFish();
+}
+// repositions the #tiderod marker along the tide curve to the current time
+var __tfN = 0;
+function moveTideFish() {
+  var t = document.getElementById("tiderod"), sc = state.tideScale;
+  if (!t || !sc || !state.ready) return;
+  var now = Date.now(), d1 = sc.d0 + 86400000;
+  if (now < sc.d0 || now > d1) {
+    t.style.display = "none";
+    return;
+  }
+  t.style.display = "";
+  var fx = sc.pL + (now - sc.d0) / 86400000 * (sc.W - sc.pL - sc.pR);
+  var fy = sc.pT + (1 - (tideAt(now) - sc.mn) / (sc.mx - sc.mn)) * (sc.H - sc.pT - sc.pB);
+  t.setAttribute("transform", "translate(" + fx.toFixed(1) + "," + fy.toFixed(1) + ")");
+  var rt = document.getElementById("rodtim");
+  if (rt) rt.textContent = clockStr(state.lang);
+}
+function showError() {
+  var S = STR[state.lang];
+  $("app").innerHTML = '<div class="err">' + S.loadFail +
+    '<br><button class="refresh" onclick="boot(true)">' + S.retry + "</button></div>";
+}
+function dedupeMoon(wins) {
+  wins.sort(function(a, b) { return a.start - b.start; });
+  var out = [];
+  wins.forEach(function(w) {
+    var last = out[out.length - 1];
+    if (last && last.type === w.type && w.start <= last.end + 600000) {
+      last.end = Math.max(last.end, w.end);
+    } else out.push(w);
+  });
+  return out;
+}
+// Always pinned to Jupiter Inlet — no GPS, no location prompt.
+function startLoad() {
+  var lat = PIN.lat, lon = PIN.lon, station = PIN.station;
+  state.loading = true;
+  state.loc = {
+    name: PIN.name, lat: lat, lon: lon, station: station
+  };
+  try { localStorage.setItem("ff_species", "pompano"); } catch (e) {}
+  renderHeader();
+  var fromD = new Date(); fromD.setDate(fromD.getDate() - 1);
+  var toD = new Date(); toD.setDate(toD.getDate() + 7);
+  var moonPs = [];
+  for (var i = 0; i < 8; i++) {
+    var dt = new Date(); dt.setDate(dt.getDate() + i);
+    moonPs.push(loadMoonDay(lat, lon, dt));
+  }
+  // Each source is independent: weather+marine are essential, but tides and moon
+  // degrade gracefully (quiet note instead of a full-page error).
+  Promise.all([
+      loadWeather(lat, lon).catch(function(e) { return { _err: e }; }),
+      loadMarine(lat, lon).catch(function(e) { return { _err: e }; }),
+      loadTides(station, fromD, toD).catch(function() { return []; }),
+      Promise.all(moonPs)
+    ])
+    .then(function(r) {
+      try {
+        if (r[0]._err || r[1]._err) { state.loading = false; showError(); return; }
+        var wx = r[0], mar = r[1];
+        state.wx = wx; state.mar = mar;
+        state.tides = r[2];
+        var all = [];
+        r[3].forEach(function(arr) { arr.forEach(function(w) { all.push(w); }); });
+        state.moon = dedupeMoon(all);
+        state.days = buildDays(wx, mar);
+        state.sel = 0;
+        state.ready = true; state.loading = false;
+        state.updatedAt = new Date();
+        renderAll();
+      } catch (e) { state.loading = false; showError(); }
+    })
+    .catch(function() { state.loading = false; showError(); });
+}
+function boot() {
+  state.ready = false; state.sel = 0; state.days = []; state.moonPhase = {};
+  var S = STR[state.lang];
+  document.documentElement.lang = state.lang;
+  $("app").innerHTML = '<div class="loading">' + S.loading + "</div>";
+  renderHeader();
+  startLoad(); // always pinned to Jupiter Inlet — no GPS
+}
+$("langBtn").addEventListener("click", function() {
+  state.lang = state.lang === "en" ? "vi" : "en";
+  localStorage.setItem("pf_lang", state.lang);
+  document.documentElement.lang = state.lang;
+  if (state.ready) renderAll(); else boot();
+});
+$("refBtn").addEventListener("click", function() { boot(); });
+boot();
+setInterval(tick, 1000);
+</script>
+</body>
+</html>
