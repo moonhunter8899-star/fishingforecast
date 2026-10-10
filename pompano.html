@@ -44,6 +44,16 @@
   .locmsg { font-size: 11px; color: #8a7a5f; margin-top: 6px; }
   .locmsg:empty { display: none; }
   .regsn { font-size: 11px; font-weight: 700; color: #8a7a5f; }
+  /* live precipitation radar */
+  .radarcap { margin: 0 0 16px; border-radius: 14px; overflow: hidden; border: 1px solid #d8c9a8; }
+  .radarmap { height: 230px; background: #dfe8ee; }
+  .radarbar { display: flex; align-items: center; gap: 8px; padding: 6px 10px; background: #f4ecda; font-size: 10px; font-weight: 700; color: #8a7a5f; }
+  .radarattr { margin-left: auto; font-weight: 600; opacity: .75; }
+  .radarplay { border: 1px solid #d8c9a8; background: #fff; border-radius: 8px; padding: 3px 10px; font-size: 11px; cursor: pointer; color: #22312b; }
+  .scoremark { background: none; border: none; }
+  .scorebadge { width: 46px; height: 46px; border-radius: 50%; color: #fff; font-family: "Fraunces", serif; font-weight: 900; font-size: 20px; display: flex; align-items: center; justify-content: center; border: 3px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,.35); }
+  .leaflet-container { font-family: "Public Sans", sans-serif; }
+
   .locbar { display: flex; align-items: center; gap: 8px; margin: 0 2px 8px; }
   .locbar .locbtn { width: auto; flex: 1 1 auto; min-width: 0; margin: 0; overflow: hidden; text-overflow: ellipsis; }
   .locgps, .locchg { flex: none; font-size: 11px; font-weight: 700; padding: 7px 8px; border-radius: 9px; border: 1px solid #d8c9a8; background: #ede4cc; color: #22312b; cursor: pointer; font-family: inherit; white-space: nowrap; }
@@ -239,6 +249,8 @@
     .strip { gap: 8px; }
   }
 </style>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
 <body>
 <div class="wrap">
@@ -459,7 +471,7 @@ var STR = {
     locating: "Locating…", geoDenied: "Location unavailable — check permission", geoUnsupported: "Geolocation not supported",
     currentLoc: "Current location", checkRegs: "Check local fishing regulations", noResults: "No places found",
     geoRough: "GPS fix is rough (\u00b1{mi} mi) \u2014 try again in the open",
-    chgLoc: "Change location",
+    chgLoc: "Change location", radar: "RADAR",
     moonTitle: "🌙 Major / Minor bite times", major: "MAJOR", minor: "MINOR", now: "NOW",
     tide: "Tide", high: "High", low: "Low", refresh: "Refresh", back: "‹ Home",
     rules: "<b>Pompano</b> — 6/day · min 11″ fork",
@@ -502,7 +514,7 @@ var STR = {
     locating: "Đang định vị…", geoDenied: "Không lấy được vị trí — kiểm tra quyền", geoUnsupported: "Thiết bị không hỗ trợ định vị",
     currentLoc: "Vị trí hiện tại", checkRegs: "Kiểm tra quy định câu cá địa phương", noResults: "Không tìm thấy địa điểm",
     geoRough: "Định vị chưa chính xác (\u00b1{mi} dặm) — thử lại ở nơi thoáng",
-    chgLoc: "Đổi địa điểm",
+    chgLoc: "Đổi địa điểm", radar: "RADAR",
     moonTitle: "🌙 Giờ cá cắn câu chính / phụ", major: "CHÍNH", minor: "PHỤ", now: "NGAY BÂY GIỜ",
     tide: "Thủy triều", high: "Nước lên", low: "Nước xuống", refresh: "Làm mới", back: "‹ Trang chủ",
     rules: "<b>Pompano</b> — 6 con/ngày · tối thiểu 11″ fork",
@@ -1267,6 +1279,55 @@ function renderHeader() {
   $("locChange").textContent = S.chgLoc;
   $("rules").innerHTML = state.loc.home ? S.rules + " " + seasonPillHTML() : '<span class="regsn">' + S.checkRegs + "</span>";
 }
+
+/* ================= live precipitation radar (RainViewer + Leaflet) ================= */
+var radarMap = null, radarTimer = null, radarCache = { at: 0, frames: [] };
+function frameTime(t) { return tstr(new Date(t * 1000), state.lang); }
+function initRadar() {
+  if (radarTimer) { clearInterval(radarTimer); radarTimer = null; }
+  if (radarMap) { try { radarMap.remove(); } catch (e) {} radarMap = null; }
+  var el = $("radarmap");
+  if (!el || typeof L === "undefined" || !state.days.length) return;
+  var day = state.days[state.sel], c = ratingColor(day.score);
+  var map = L.map("radarmap", { scrollWheelZoom: false, attributionControl: false });
+  radarMap = map;
+  map.setView([state.loc.lat, state.loc.lon], 9);
+  L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19 }).addTo(map);
+  L.marker([state.loc.lat, state.loc.lon], {
+    icon: L.divIcon({ className: "scoremark",
+      html: '<div class="scorebadge" style="background:' + c + '">' + day.score + "</div>",
+      iconSize: [46, 46], iconAnchor: [23, 23] }),
+    interactive: false, keyboard: false
+  }).addTo(map);
+  var show = function(frames) {
+    if (!frames || !frames.length || !radarMap) return;
+    var layer = L.tileLayer("https://tilecache.rainviewer.com/v2/radar/" + frames[frames.length - 1] + "/256/{z}/{x}/{y}/2/1_1.png",
+      { opacity: 0.65, zIndex: 10 }).addTo(map);
+    var ft = $("radarFoot");
+    if (ft) ft.textContent = STR[state.lang].radar + " \u00b7 " + frameTime(frames[frames.length - 1]);
+    var btn = $("radarPlay");
+    if (btn && frames.length > 1) {
+      btn.hidden = false;
+      var i = frames.length - 1;
+      btn.onclick = function() {
+        if (radarTimer) { clearInterval(radarTimer); radarTimer = null; btn.textContent = "\u25b6"; return; }
+        btn.textContent = "\u23f8";
+        radarTimer = setInterval(function() {
+          i = (i + 1) % frames.length;
+          try { layer.setUrl("https://tilecache.rainviewer.com/v2/radar/" + frames[i] + "/256/{z}/{x}/{y}/2/1_1.png"); } catch (e) {}
+          if (ft) ft.textContent = STR[state.lang].radar + " \u00b7 " + frameTime(frames[i]);
+        }, 800);
+      };
+    }
+  };
+  var now = Date.now();
+  if (radarCache.frames.length && now - radarCache.at < 600000) { show(radarCache.frames); return; }
+  fetchJSON("https://api.rainviewer.com/public/weather-maps.json").then(function(j) {
+    var fr = ((j && j.radar && j.radar.past) || []).map(function(f) { return f.time; });
+    radarCache = { at: Date.now(), frames: fr };
+    show(fr);
+  }).catch(function() {});
+}
 function renderAll() {
   var S = STR[state.lang];
   renderHeader();
@@ -1342,6 +1403,11 @@ function renderAll() {
     '<div class="tile"><div class="k">' + _lblRain() + ' ' + S.rain + '</div><div class="v">' + day.rain + "%</div></div>" +
     moonTile + sunTile +
     "</div>";
+  // live precipitation radar with the day's score pinned at the spot
+  html += '<div class="radarcap"><div class="radarmap" id="radarmap"></div>' +
+    '<div class="radarbar"><span id="radarFoot">' + S.radar + '</span>' +
+    '<span class="radarattr">\u00a9 OpenStreetMap \u00b7 RainViewer</span>' +
+    '<button class="radarplay" id="radarPlay" hidden>\u25b6</button></div></div>';
   // major/minor
   var moonRows = moonRowsHTML(day);
   html += '<div class="moonsec"><div class="mh">' + S.moonTitle + "</div>" +
@@ -1372,6 +1438,7 @@ function renderAll() {
   var cmn = $("catchMinus"), cpl = $("catchPlus");
   if (cmn && cday) cmn.addEventListener("click", function() { bumpCatch(cday.date.getTime(), -1); });
   if (cpl && cday) cpl.addEventListener("click", function() { bumpCatch(cday.date.getTime(), 1); });
+  initRadar();
 }
 function tick() {
   if (!state.ready) return;
