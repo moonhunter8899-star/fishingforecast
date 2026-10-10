@@ -482,7 +482,7 @@ var STR = {
     majorNow: "Major bite happening now", minorNow: "Minor bite happening now",
     nextHigh: function(d) { return "High tide in " + d; },
     nextLow: function(d) { return "Low tide in " + d; },
-    tideNote: "Tide data unavailable right now.", moonNote: "Moon bite times unavailable right now.", freshMsg: "Looks like freshwater \u2014 we only do saltwater fish.",
+    tideNote: "Tide data unavailable right now.", moonNote: "Moon bite times unavailable right now.", freshMsg: "Looks like freshwater \u2014 we only do saltwater fish.", inlandMsg: "Looks like you\u2019re inland \u2014 we only rate shoreline fishing.",
     catchT0: "Skunked! The snook win today. 🎣",
     catchT1: "Nice haul — dinner's on! 🐟",
     catchT2: "Snook master! 🏆",
@@ -526,7 +526,7 @@ var STR = {
     majorNow: "Đang cắn mạnh ngay bây giờ", minorNow: "Đang cắn nhẹ ngay bây giờ",
     nextHigh: function(d) { return "Nước lên sau " + d; },
     nextLow: function(d) { return "Nước xuống sau " + d; },
-    tideNote: "Hiện chưa có dữ liệu thủy triều.", moonNote: "Hiện chưa có giờ cá cắn theo mặt trăng.", freshMsg: "Có vẻ là nước ngọt \u2014 chúng tôi chỉ câu cá nước mặn.",
+    tideNote: "Hiện chưa có dữ liệu thủy triều.", moonNote: "Hiện chưa có giờ cá cắn theo mặt trăng.", freshMsg: "Có vẻ là nước ngọt \u2014 chúng tôi chỉ câu cá nước mặn.", inlandMsg: "Có vẻ bạn đang ở trong đất liền \u2014 chúng tôi chỉ dự báo điểm câu ven bờ.",
     catchT0: "Móm rồi! Hôm nay cá snook thắng rồi. 🎣",
     catchT1: "Khá đấy — có cá ăn rồi! 🐟",
     catchT2: "Cao thủ săn snook! 🏆",
@@ -787,7 +787,7 @@ var state = {
   lang: localStorage.getItem("pf_lang") || "en",
   ready: false, sel: 0, days: [], moon: [], tides: [], moonPhase: {},
   loc: getSavedLoc(),
-  updatedAt: null, isOcean: true
+  updatedAt: null, isOcean: true, isShore: true
 };
 
 /* ================= data loading ================= */
@@ -1519,6 +1519,10 @@ function renderAll() {
     app.innerHTML = '<div class="freshmsg"><div class="femoji">🎣</div>' + S.freshMsg + "</div>";
     return;
   }
+  if (!state.isShore) {
+    app.innerHTML = '<div class="freshmsg"><div class="femoji">🎣</div>' + S.inlandMsg + "</div>";
+    return;
+  }
   var html = "";
   // top rating card
   html += '<div class="topcard" style="border-color:' + c0 + '">' +
@@ -1732,6 +1736,7 @@ function startLoad() {
         var wx = r[0], mar = r[1];
         state.wx = wx; state.mar = mar;
         state.isOcean = mar.hourly.sea_surface_temperature.some(function(v) { return v != null && !isNaN(v); });
+        state.isShore = state.isOcean && (mar.hourly.wave_height || []).some(function(v) { return v != null && !isNaN(v); });
         state.tides = r[2];
         var all = [];
         r[3].forEach(function(arr) { arr.forEach(function(w) { all.push(w); }); });
