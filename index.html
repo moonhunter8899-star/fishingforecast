@@ -546,6 +546,18 @@ function _wfog(y) {
   return '<line x1="9" y1="' + y + '" x2="23" y2="' + y + '"/>' +
          '<line x1="11.5" y1="' + (y + 3) + '" x2="20.5" y2="' + (y + 3) + '"/>';
 }
+/* Stat-tile label icons: original line-art in the same style (replaces emoji). */
+function _lblWind() {
+  return _wsvg('<path d="M4 10 h12 a2.8 2.8 0 1 0-2.8-2.8"/>' +
+    '<line x1="4" y1="16" x2="24" y2="16"/>' +
+    '<path d="M4 22 h12 a2.8 2.8 0 1 1-2.8 2.8"/>', 1.05);
+}
+function _lblWater() {
+  return _wsvg('<path d="M16 5 C16 5 9 14 9 19 a7 7 0 0 0 14 0 C23 14 16 5 16 5 Z"/>', 1.05);
+}
+function _lblRain() {
+  return _wsvg(_wcloudSm() + _wrain([12, 16.5, 21], 25.5), 1.05);
+}
 /* Condition icon for a weather code + is_day flag (same interface as before). */
 function condIcon(code, isDay) {
   var night = (isDay === 0), inner = "";
@@ -1128,10 +1140,10 @@ function renderAll() {
       Math.round(mp.illum * 100) + '%</div><div class="msub">' + msub + "</div></div>";
   }
   html += '<div class="tiles">' +
-    '<div class="tile"><div class="k">💨 ' + S.wind + '</div><div class="v">' + day.wind + (day.gust != null ? " | " + day.gust : "") + " " + day.windDir + "</div></div>" +
-    '<div class="tile"><div class="k">💧 ' + S.water + '</div><div class="v">' + day.water.toFixed(1) + "°F</div></div>" +
+    '<div class="tile"><div class="k">' + _lblWind() + ' ' + S.wind + '</div><div class="v">' + day.wind + (day.gust != null ? " | " + day.gust : "") + " " + day.windDir + "</div></div>" +
+    '<div class="tile"><div class="k">' + _lblWater() + ' ' + S.water + '</div><div class="v">' + day.water.toFixed(1) + "°F</div></div>" +
     '<div class="tile"><div class="k">' + S.cond + '</div><div class="v">' + cn + "</div></div>" +
-    '<div class="tile"><div class="k">🌧️ ' + S.rain + '</div><div class="v">' + day.rain + "%</div></div>" +
+    '<div class="tile"><div class="k">' + _lblRain() + ' ' + S.rain + '</div><div class="v">' + day.rain + "%</div></div>" +
     moonTile +
     "</div>";
   // major/minor
