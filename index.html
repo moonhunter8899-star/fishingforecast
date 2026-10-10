@@ -118,6 +118,16 @@
   .gofish .gl { font-size: 15px; letter-spacing: .04em; }
   .gofish .gt { margin-left: 2px; }
   .gofish .gs { margin-left: auto; font-size: 17px; white-space: nowrap; }
+  .gofish.past { overflow: hidden; }
+  .gofish.past .swim { display: inline-block; margin-left: auto; animation: swimaway 6s ease-in-out infinite; }
+  @keyframes swimaway {
+    0%   { transform: translateX(0) translateY(0) rotate(0deg); opacity: 0; }
+    12%  { transform: translateX(6px) translateY(0) rotate(0deg); opacity: 1; }
+    30%  { transform: translateX(48px) translateY(-7px) rotate(6deg); opacity: 1; }
+    55%  { transform: translateX(92px) translateY(5px) rotate(-5deg); opacity: .85; }
+    78%  { transform: translateX(132px) translateY(-4px) rotate(4deg); opacity: .3; }
+    92%, 100% { transform: translateX(152px) translateY(0) rotate(0deg); opacity: 0; }
+  }
 
   /* 4 weather tiles */
   .tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 16px; }
@@ -206,7 +216,7 @@ var STR = {
     loading: "Checking pompano conditions…",
     rating: "POMPANO BITE RATING", today: "TODAY",
     pickDay: "Pick a day", best: "★ BEST", bestWeek: "BEST DAY THIS WEEK", goDay: "GO DAY",
-    goFish: "GO FISH", wind: "WIND", water: "WATER", cond: "CONDITION", rain: "RAIN",
+    goFish: "GO FISH", gotAway: "The one that got away! 🎣", wind: "WIND", water: "WATER", cond: "CONDITION", rain: "RAIN",
     moonTitle: "Major / Minor bite times", major: "MAJOR", minor: "MINOR", now: "NOW",
     tide: "Tide", high: "High", low: "Low", refresh: "Refresh", todayWord: "Today",
     retry: "Try again", loadFail: "Could not load live data. Check your connection.",
@@ -237,7 +247,7 @@ var STR = {
     loading: "Đang kiểm tra điều kiện câu cá…",
     rating: "ĐIỂM CẮN CÂU POMPANO", today: "HÔM NAY",
     pickDay: "Chọn ngày", best: "★ ĐẸP NHẤT", bestWeek: "NGÀY ĐẸP NHẤT TUẦN", goDay: "ĐI NGAY",
-    goFish: "ĐI CÂU NGAY", wind: "GIÓ", water: "NƯỚC", cond: "THỜI TIẾT", rain: "MƯA",
+    goFish: "ĐI CÂU NGAY", gotAway: "Cá chạy mất tiêu rồi! 🎣", wind: "GIÓ", water: "NƯỚC", cond: "THỜI TIẾT", rain: "MƯA",
     moonTitle: "Giờ cá cắn câu chính / phụ", major: "CHÍNH", minor: "PHỤ", now: "NGAY BÂY GIỜ",
     tide: "Thủy triều", high: "Nước lên", low: "Nước xuống", refresh: "Làm mới", todayWord: "Hôm nay",
     retry: "Thử lại", loadFail: "Không tải được dữ liệu. Kiểm tra kết nối mạng.",
@@ -803,7 +813,7 @@ function hourlyHTML(day) {
     rows += '<tr class="hrow' + (inbite ? " inbite" : "") + '">' +
       '<td class="hhour">' + hourLabel(dt) + "</td>" +
       '<td class="hscore">' + fishSVG(c, 20) + ' <span style="color:' + c + '">' + sc + "</span></td>" +
-      "<td>" + sky + " " + wsp + (gst ? ' <span style="opacity:.65;font-size:.85em">G' + gst + "</span>" : "") + " " + wdir + "</td>" +
+      "<td>" + sky + " " + wsp + (gst != null ? " | " + gst : "") + " " + wdir + "</td>" +
       "<td>" + rp + "%</td>" +
       "<td>" + air + "°/" + wtrS + "</td></tr>";
   }
@@ -876,14 +886,21 @@ function renderAll() {
     "<h3>" + dayTitle(day.date, state.sel, state.lang, day.score) + "</h3>";
   if (day.best) {
     var bsc = day.best.score;
-    html += '<div class="gofish">' +
-      '<span class="gl">🎣 ' + S.goFish + '</span><span class="gt">' +
-      trange(day.best.start, day.best.end, state.lang) + '</span><span class="gs">· 🐟 ' + bsc + "</span></div>";
+    var pastWindow = (state.sel === 0 && Date.now() > day.best.end.getTime());
+    if (pastWindow) {
+      html += '<div class="gofish past">' +
+        '<span class="gl">' + S.gotAway + '</span>' +
+        '<span class="swim">' + fishSVG(ratingColor(bsc), 30) + "</span></div>";
+    } else {
+      html += '<div class="gofish">' +
+        '<span class="gl">🎣 ' + S.goFish + '</span><span class="gt">' +
+        trange(day.best.start, day.best.end, state.lang) + '</span><span class="gs">· 🐟 ' + bsc + "</span></div>";
+    }
   }
   var ci = S.condIcon[day.condCode] || "🌤️";
   var cn = S.condName[day.condCode] || S.condName[2];
   html += '<div class="tiles">' +
-    '<div class="tile"><div class="k">💨 ' + S.wind + '</div><div class="v">◣ ' + day.wind + (day.gust ? ' <span style="opacity:.65;font-size:.85em">G' + day.gust + '</span>' : '') + " " + day.windDir + "</div></div>" +
+    '<div class="tile"><div class="k">💨 ' + S.wind + '</div><div class="v">' + day.wind + (day.gust != null ? " | " + day.gust : "") + " " + day.windDir + "</div></div>" +
     '<div class="tile"><div class="k">💧 ' + S.water + '</div><div class="v">' + day.water.toFixed(1) + "°F</div></div>" +
     '<div class="tile"><div class="k">' + S.cond + '</div><div class="v">' + ci + " " + cn + "</div></div>" +
     '<div class="tile"><div class="k">🌧️ ' + S.rain + '</div><div class="v">' + day.rain + "%</div></div>" +
