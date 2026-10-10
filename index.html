@@ -110,7 +110,7 @@
 
   /* GO FISH band */
   .gofish {
-    display: flex; align-items: center; gap: 10px;
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
     background: #bc5a1e; color: #fff; border-radius: 14px; padding: 11px 14px;
     margin: 12px 0; font-family: "Fraunces", serif; font-weight: 900; font-size: 19px;
     box-shadow: 0 3px 10px rgba(188,90,30,.35);
@@ -128,12 +128,27 @@
     78%  { transform: translateX(132px) translateY(-4px) rotate(4deg); opacity: .3; }
     92%, 100% { transform: translateX(152px) translateY(0) rotate(0deg); opacity: 0; }
   }
+  /* catch logger row inside the GO FISH band */
+  .catchrow {
+    display: flex; align-items: center; gap: 8px; width: 100%;
+    font-family: "Public Sans", sans-serif; font-size: 12px; font-weight: 700;
+  }
+  .catchrow .ck { opacity: .92; white-space: nowrap; }
+  .cbtn {
+    width: 26px; height: 26px; border-radius: 50%; border: none; padding: 0; flex: none;
+    background: rgba(255,255,255,.28); color: #fff;
+    font-size: 16px; font-weight: 800; line-height: 1; cursor: pointer;
+  }
+  .cnum { min-width: 22px; text-align: center; font-size: 15px; font-weight: 800; }
+  .cmsg { font-weight: 600; opacity: .96; }
 
   /* 4 weather tiles */
-  .tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 16px; }
+  .tiles { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 16px; }
   .tile { background: #ede4cc; border-radius: 12px; padding: 10px 6px; text-align: center; }
   .tile .k { font-size: 9px; font-weight: 700; letter-spacing: .06em; color: #8a7a5f; text-transform: uppercase; }
   .tile .v { font-family: "Fraunces", serif; font-size: 15px; font-weight: 800; margin-top: 3px; white-space: nowrap; }
+  .tile .v svg { vertical-align: -4px; }
+  .tile .msub { font-size: 9px; font-weight: 700; color: #8a7a5f; margin-top: 2px; white-space: nowrap; }
 
   /* Major / Minor section */
   .moonsec { margin-bottom: 16px; }
@@ -216,7 +231,7 @@ var STR = {
     loading: "Checking pompano conditions…",
     rating: "POMPANO BITE RATING", today: "TODAY",
     pickDay: "Pick a day", best: "★ BEST", bestWeek: "BEST DAY THIS WEEK", goDay: "GO DAY",
-    goFish: "GO FISH", gotAway: "The one that got away! 🎣", wind: "WIND", water: "WATER", cond: "CONDITION", rain: "RAIN",
+    goFish: "GO FISH", gotAway: "The one that got away! 🎣", wind: "WIND", water: "WATER", cond: "CONDITION", rain: "RAIN", moon: "MOON", catch: "Catch",
     moonTitle: "Major / Minor bite times", major: "MAJOR", minor: "MINOR", now: "NOW",
     tide: "Tide", high: "High", low: "Low", refresh: "Refresh", todayWord: "Today",
     retry: "Try again", loadFail: "Could not load live data. Check your connection.",
@@ -229,6 +244,12 @@ var STR = {
     nextHigh: function(d) { return "High tide in " + d; },
     nextLow: function(d) { return "Low tide in " + d; },
     tideNote: "Tide data unavailable right now.", moonNote: "Moon bite times unavailable right now.",
+    catchT0: "Skunked! The pompano win today. 🎣",
+    catchT1: "Nice haul — dinner's on! 🐟",
+    catchT2: "Pompano master! 🏆",
+    catchT3: "Unreal — are you running a charter?! 😄",
+    fullIn: function(d) { return "Full in " + d + "d"; },
+    fullTonight: "Full tonight 🌕",
     hourly: "Hour by hour", thHour: "Hour", thScore: "Bite", thSkyWind: "Sky · Wind",
     thRain: "Rain", thAirWtr: "Air/Wtr", biteHint: "Tinted rows fall inside a bite window.",
     days: ["SUN","MON","TUE","WED","THU","FRI","SAT"],
@@ -247,7 +268,7 @@ var STR = {
     loading: "Đang kiểm tra điều kiện câu cá…",
     rating: "ĐIỂM CẮN CÂU POMPANO", today: "HÔM NAY",
     pickDay: "Chọn ngày", best: "★ ĐẸP NHẤT", bestWeek: "NGÀY ĐẸP NHẤT TUẦN", goDay: "ĐI NGAY",
-    goFish: "ĐI CÂU NGAY", gotAway: "Cá chạy mất tiêu rồi! 🎣", wind: "GIÓ", water: "NƯỚC", cond: "THỜI TIẾT", rain: "MƯA",
+    goFish: "ĐI CÂU NGAY", gotAway: "Cá chạy mất tiêu rồi! 🎣", wind: "GIÓ", water: "NƯỚC", cond: "THỜI TIẾT", rain: "MƯA", moon: "TRĂNG", catch: "Cá câu được",
     moonTitle: "Giờ cá cắn câu chính / phụ", major: "CHÍNH", minor: "PHỤ", now: "NGAY BÂY GIỜ",
     tide: "Thủy triều", high: "Nước lên", low: "Nước xuống", refresh: "Làm mới", todayWord: "Hôm nay",
     retry: "Thử lại", loadFail: "Không tải được dữ liệu. Kiểm tra kết nối mạng.",
@@ -260,6 +281,12 @@ var STR = {
     nextHigh: function(d) { return "Nước lên sau " + d; },
     nextLow: function(d) { return "Nước xuống sau " + d; },
     tideNote: "Hiện chưa có dữ liệu thủy triều.", moonNote: "Hiện chưa có giờ cá cắn theo mặt trăng.",
+    catchT0: "Móm rồi! Hôm nay cá thắng rồi. 🎣",
+    catchT1: "Khá đấy — có cá ăn rồi! 🐟",
+    catchT2: "Cao thủ săn cá! 🏆",
+    catchT3: "Đỉnh quá — mở tàu câu luôn đi! 😄",
+    fullIn: function(d) { return "Trăng tròn sau " + d + "d"; },
+    fullTonight: "Trăng tròn tối nay 🌕",
     hourly: "Từng giờ trong ngày", thHour: "Giờ", thScore: "Điểm cắn", thSkyWind: "Trời · Gió",
     thRain: "Mưa", thAirWtr: "KK/Nước", biteHint: "Hàng tô màu nằm trong giờ cá cắn.",
     days: ["CN","T2","T3","T4","T5","T6","T7"],
@@ -314,6 +341,71 @@ function ratingWord(s, lang) {
   var S = STR[lang];
   return s >= 80 ? S.great : s >= 60 ? S.good : s >= 40 ? S.fair : S.poor;
 }
+function condIcon(code, isDay, lang) {
+  // at night show moon icons for clear/partly cloudy instead of the sun;
+  // rain/storm/fog codes are day-neutral and stay as-is
+  if (isDay === 0) {
+    if (code === 0) return "🌙";
+    if (code === 1 || code === 2) return "🌙☁️";
+  }
+  return STR[lang].condIcon[code] || "🌤️";
+}
+function moonPhaseSVG(deg) {
+  // deg: MET Norway moonphase — 0=new, 90=first quarter, 180=full, 270=last quarter
+  var p = ((((deg % 360) + 360) % 360) / 360);
+  var th = 2 * Math.PI * p;
+  var illum = (1 - Math.cos(th)) / 2;
+  var cx = 12, cy = 12, r = 9;
+  var s = '<svg width="20" height="20" viewBox="0 0 24 24">';
+  s += '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="#5b5344"/>';
+  if (illum > 0.999) {
+    s += '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="#f2e3ac"/>';
+  } else if (illum > 0.001) {
+    var wax = p < 0.5, gib = illum > 0.5;
+    var limbSweep = wax ? 1 : 0;          // top->bottom: 1 = right limb lit
+    var termSweep = (wax === gib) ? 1 : 0; // bottom->top terminator bulge
+    var rx = Math.max(0.01, Math.abs(r * Math.cos(th)));
+    s += '<path d="M' + cx + ',' + (cy - r) +
+      ' A' + r + ',' + r + ' 0 0 ' + limbSweep + ' ' + cx + ',' + (cy + r) +
+      ' A' + rx.toFixed(2) + ',' + r + ' 0 0 ' + termSweep + ' ' + cx + ',' + (cy - r) +
+      ' Z" fill="#f2e3ac"/>';
+  }
+  s += '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="none" stroke="#8a7a5f" stroke-width="1"/></svg>';
+  var dFull = Math.round(((((180 - deg) % 360) + 360) % 360) / 360 * 29.53058867);
+  return { svg: s, illum: illum, daysToFull: dFull };
+}
+function catchKey(date) { return "pf_catch_" + ymdDash(date); }
+function getCatch(date) {
+  try {
+    var v = parseInt(localStorage.getItem(catchKey(date)) || "0", 10);
+    return (isNaN(v) || v < 0) ? 0 : v;
+  } catch (e) { return 0; }
+}
+function setCatch(date, n) {
+  try { localStorage.setItem(catchKey(date), String(Math.max(0, n))); } catch (e) {}
+}
+function catchMsg(n, lang) {
+  var S = STR[lang];
+  if (n <= 0) return S.catchT0;
+  if (n <= 5) return S.catchT1;
+  if (n <= 12) return S.catchT2;
+  return S.catchT3;
+}
+function catchRowHTML(date) {
+  var S = STR[state.lang];
+  var n = getCatch(date);
+  return '<div class="catchrow"><span class="ck">' + S.catch + ':</span>' +
+    '<button class="cbtn" id="catchMinus">−</button>' +
+    '<span class="cnum" id="catchNum">' + n + '</span>' +
+    '<button class="cbtn" id="catchPlus">+</button>' +
+    '<span class="cmsg" id="catchMsg">' + catchMsg(n, state.lang) + "</span></div>";
+}
+function bumpCatch(dateMs, d) {
+  var date = new Date(dateMs), n = Math.max(0, getCatch(date) + d);
+  setCatch(date, n);
+  var cn = $("catchNum"); if (cn) cn.textContent = n;
+  var cm = $("catchMsg"); if (cm) cm.textContent = catchMsg(n, state.lang);
+}
 function durText(ms, lang) {
   if (ms < 0) ms = 0;
   var m = Math.round(ms / 60000), h = Math.floor(m / 60);
@@ -352,7 +444,7 @@ function fishSVG(color, size) {
 /* ================= state ================= */
 var state = {
   lang: localStorage.getItem("pf_lang") || "en",
-  ready: false, sel: 0, days: [], moon: [], tides: [],
+  ready: false, sel: 0, days: [], moon: [], tides: [], moonPhase: {},
   loc: { name: PIN.name, lat: PIN.lat, lon: PIN.lon, station: PIN.station },
   updatedAt: null
 };
@@ -366,7 +458,7 @@ function ymdDash(d) { return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-"
 
 function loadWeather(lat, lon) {
   var u = "https://api.open-meteo.com/v1/forecast?latitude=" + lat + "&longitude=" + lon +
-    "&hourly=temperature_2m,precipitation_probability,precipitation,windspeed_10m,winddirection_10m,wind_gusts_10m,weather_code" +
+    "&hourly=temperature_2m,precipitation_probability,precipitation,windspeed_10m,winddirection_10m,wind_gusts_10m,weather_code,is_day" +
     "&daily=temperature_2m_max,temperature_2m_min,weather_code,precipitation_probability_max" +
     "&timezone=auto&forecast_days=7&temperature_unit=fahrenheit&windspeed_unit=mph";
   return fetchJSON(u);
@@ -400,6 +492,11 @@ function loadMoonDay(lat, lon, date) {
     "&date=" + ymdDash(date) + "&offset=" + encodeURIComponent("+00:00");
   return fetchJSON(u).then(function(j) {
     var p = (j && j.properties) || {}, wins = [];
+    // moonphase: phase angle in degrees (0=new, 90=first quarter, 180=full, 270=last quarter)
+    try {
+      state.moonPhase = state.moonPhase || {};
+      if (p.moonphase != null && !isNaN(+p.moonphase)) state.moonPhase[ymdDash(date)] = +p.moonphase;
+    } catch (e) {}
     function T(ev) { return ev && ev.time ? new Date(ev.time).getTime() : null; }
     [["high_moon"], ["low_moon"]].forEach(function(cfg) {
       var t = T(p[cfg[0]]);
@@ -573,6 +670,7 @@ function buildDays(wx, mar) {
       water: Math.round(mar.hourly.sea_surface_temperature[mi2] * 10) / 10,
       waveFt: Math.round(wv * 10) / 10,
       condCode: wx.hourly.weather_code[wi],
+      condDay: (wx.hourly.is_day && wx.hourly.is_day[wi] != null) ? wx.hourly.is_day[wi] : 1,
       rain: wx.daily.precipitation_probability_max[d]
     });
   }
@@ -708,18 +806,6 @@ function tideSVG(day) {
     svg += '<text x="' + X(bt).toFixed(1) + '" y="' + (Y(bv) - 9.5).toFixed(1) +
       '" text-anchor="middle" font-size="10">🎣</text>';
   }
-  // fishing line: connects the live rod to the active-or-next Major fish (drawn under the markers)
-  if (now >= d0 && now <= d1) {
-    var tm0 = majorTargetMid(d0, now);
-    if (tm0 != null) {
-      var rx0 = X(now), ry0 = Y(tideAt(now));
-      var tx0 = X(tm0), ty0 = Y(tideAt(tm0));
-      var cx0 = (rx0 + tx0) / 2, cy0 = (ry0 + ty0) / 2 + 12;
-      svg += '<path id="fishline" d="M' + rx0.toFixed(1) + "," + ry0.toFixed(1) +
-        " Q" + cx0.toFixed(1) + "," + cy0.toFixed(1) + " " + tx0.toFixed(1) + "," + ty0.toFixed(1) +
-        '" fill="none" stroke="#8a7a5c" stroke-width="1.5" opacity="0.65" stroke-linecap="round"/>';
-    }
-  }
   // Major bite markers: small rating-colored fish on the curve at each Major window's midpoint
   var fcol = ratingColor(day.score);
   state.moon.forEach(function(w) {
@@ -736,8 +822,7 @@ function tideSVG(day) {
   // live fishing-rod marker riding the tide curve at the current time.
   // Cartoon rod inspired by Tien's reference photo: brown tapered blank angled
   // up-right, dark grip, spinning reel, 3 line guides, line hanging from the tip
-  // to a pink bobber + hook that lands where #fishline begins (so the line reads
-  // as continuous to the Major fish). Rating number above in rating color.
+  // to a pink bobber + hook. Rating number above in rating color, live time below it.
   if (state.tideScale) {
     var fxx = X(now), fyy = Y(tideAt(now));
     svg += '<g id="tiderod" transform="translate(' + fxx.toFixed(1) + ',' + fyy.toFixed(1) + ')">' +
@@ -798,7 +883,7 @@ function hourlyHTML(day) {
     var sc = Math.max(0, Math.min(100, Math.round(adjHourScore(i, mi, ms))));
     var c = ratingColor(sc);
     var code = wx.weather_code[i];
-    var sky = S.condIcon[code] || "🌤️";
+    var sky = condIcon(code, (wx.hourly.is_day && wx.hourly.is_day[i] != null) ? wx.hourly.is_day[i] : 1, state.lang);
     var wsp = Math.round(wx.windspeed_10m[i]);
     var wdir = compass(wx.winddirection_10m[i]);
     var gst = (wx.wind_gusts_10m && wx.wind_gusts_10m[i] != null) ? Math.round(wx.wind_gusts_10m[i]) : null;
@@ -890,20 +975,33 @@ function renderAll() {
     if (pastWindow) {
       html += '<div class="gofish past">' +
         '<span class="gl">' + S.gotAway + '</span>' +
-        '<span class="swim">' + fishSVG(ratingColor(bsc), 30) + "</span></div>";
+        '<span class="swim">' + fishSVG(ratingColor(bsc), 30) + "</span>" +
+        catchRowHTML(day.date) + "</div>";
     } else {
       html += '<div class="gofish">' +
         '<span class="gl">🎣 ' + S.goFish + '</span><span class="gt">' +
-        trange(day.best.start, day.best.end, state.lang) + '</span><span class="gs">· 🐟 ' + bsc + "</span></div>";
+        trange(day.best.start, day.best.end, state.lang) + '</span><span class="gs">· 🐟 ' + bsc + "</span>" +
+        catchRowHTML(day.date) + "</div>";
     }
   }
-  var ci = S.condIcon[day.condCode] || "🌤️";
+  var ci = condIcon(day.condCode, day.condDay, state.lang);
   var cn = S.condName[day.condCode] || S.condName[2];
+  var mph = (state.moonPhase && state.moonPhase[ymdDash(day.date)] != null) ? state.moonPhase[ymdDash(day.date)] : null;
+  var moonTile;
+  if (mph == null) {
+    moonTile = '<div class="tile"><div class="k">🌙 ' + S.moon + '</div><div class="v">—</div></div>';
+  } else {
+    var mp = moonPhaseSVG(mph);
+    var msub = mp.daysToFull === 0 ? S.fullTonight : S.fullIn(mp.daysToFull);
+    moonTile = '<div class="tile"><div class="k">🌙 ' + S.moon + '</div><div class="v">' + mp.svg +
+      " " + Math.round(mp.illum * 100) + '%</div><div class="msub">' + msub + "</div></div>";
+  }
   html += '<div class="tiles">' +
     '<div class="tile"><div class="k">💨 ' + S.wind + '</div><div class="v">' + day.wind + (day.gust != null ? " | " + day.gust : "") + " " + day.windDir + "</div></div>" +
     '<div class="tile"><div class="k">💧 ' + S.water + '</div><div class="v">' + day.water.toFixed(1) + "°F</div></div>" +
     '<div class="tile"><div class="k">' + S.cond + '</div><div class="v">' + ci + " " + cn + "</div></div>" +
     '<div class="tile"><div class="k">🌧️ ' + S.rain + '</div><div class="v">' + day.rain + "%</div></div>" +
+    moonTile +
     "</div>";
   // major/minor
   var moonRows = moonRowsHTML(day);
@@ -931,6 +1029,10 @@ function renderAll() {
   }
   var go = app.querySelector("[data-goday]");
   if (go) go.addEventListener("click", function() { state.sel = +go.getAttribute("data-goday"); renderAll(); });
+  var cday = state.days[state.sel];
+  var cmn = $("catchMinus"), cpl = $("catchPlus");
+  if (cmn && cday) cmn.addEventListener("click", function() { bumpCatch(cday.date.getTime(), -1); });
+  if (cpl && cday) cpl.addEventListener("click", function() { bumpCatch(cday.date.getTime(), 1); });
 }
 function tick() {
   if (!state.ready) return;
@@ -955,35 +1057,14 @@ function tick() {
   // move the live tide-chart rod every 30s so it rides the curve with the real time
   if (++__tfN % 30 === 0) moveTideFish();
 }
-// midpoint (ms) of the active Major window, else the next upcoming Major, on the displayed day;
-// null when no Major is active or upcoming (line is then hidden)
-function majorTargetMid(d0, now) {
-  var d1 = d0 + 86400000, target = null, i, w;
-  for (i = 0; i < state.moon.length; i++) {
-    w = state.moon[i];
-    if (w.type !== "major" || w.end < d0 || w.start > d1) continue;
-    if (now >= w.start && now <= w.end) { target = w; break; }
-  }
-  if (!target) {
-    for (i = 0; i < state.moon.length; i++) {
-      w = state.moon[i];
-      if (w.type !== "major" || w.start <= now || w.start >= d1 || w.end <= d0) continue;
-      if (!target || w.start < target.start) target = w;
-    }
-  }
-  return target ? (target.start + target.end) / 2 : null;
-}
-// repositions the #tiderod marker along the tide curve to the current time,
-// and redraws the fishing line to the active-or-next Major fish
+// repositions the #tiderod marker along the tide curve to the current time
 var __tfN = 0;
 function moveTideFish() {
   var t = document.getElementById("tiderod"), sc = state.tideScale;
   if (!t || !sc || !state.ready) return;
   var now = Date.now(), d1 = sc.d0 + 86400000;
-  var ln = document.getElementById("fishline");
   if (now < sc.d0 || now > d1) {
     t.style.display = "none";
-    if (ln) ln.style.display = "none";
     return;
   }
   t.style.display = "";
@@ -992,18 +1073,6 @@ function moveTideFish() {
   t.setAttribute("transform", "translate(" + fx.toFixed(1) + "," + fy.toFixed(1) + ")");
   var rt = document.getElementById("rodtim");
   if (rt) rt.textContent = clockStr(state.lang);
-  if (ln) {
-    var tm = majorTargetMid(sc.d0, now);
-    if (tm == null) { ln.style.display = "none"; }
-    else {
-      ln.style.display = "";
-      var tx = sc.pL + (tm - sc.d0) / 86400000 * (sc.W - sc.pL - sc.pR);
-      var ty = sc.pT + (1 - (tideAt(tm) - sc.mn) / (sc.mx - sc.mn)) * (sc.H - sc.pT - sc.pB);
-      var cx = (fx + tx) / 2, cy = (fy + ty) / 2 + 12;
-      ln.setAttribute("d", "M" + fx.toFixed(1) + "," + fy.toFixed(1) +
-        " Q" + cx.toFixed(1) + "," + cy.toFixed(1) + " " + tx.toFixed(1) + "," + ty.toFixed(1));
-    }
-  }
 }
 function showError() {
   var S = STR[state.lang];
@@ -1063,7 +1132,7 @@ function startLoad() {
     .catch(function() { state.loading = false; showError(); });
 }
 function boot() {
-  state.ready = false; state.sel = 0; state.days = [];
+  state.ready = false; state.sel = 0; state.days = []; state.moonPhase = {};
   var S = STR[state.lang];
   document.documentElement.lang = state.lang;
   $("app").innerHTML = '<div class="loading">' + S.loading + "</div>";
