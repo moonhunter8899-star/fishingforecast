@@ -28,7 +28,8 @@
 
   /* Header */
   .hd { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin: 4px 2px 12px; }
-  .hd .t1 { font-family: "Fraunces", serif; font-weight: 800; font-size: 15px; white-space: nowrap; }
+  .locline { font-family: "Fraunces", serif; font-weight: 800; font-size: 15px;
+    white-space: nowrap; margin: 0 2px 8px; }
   .hd .t2 { color: #8a7a5f; font-size: 10px; margin-top: 2px; }
   .hd .brand { font-family: "Fraunces", serif; font-weight: 900; font-size: 15px; color: #22312b; }
   .hd .nick { font-size: 11px; font-weight: 700; color: #9a4a16; margin: 1px 0 7px; letter-spacing: .02em; }
@@ -252,7 +253,6 @@
     <div>
       <div class="brand">🎣 Pompano Forecast · Tien Huynh</div>
       <div class="nick">Tư Tò Tò – Nha Trang</div>
-      <div class="t1" id="locName">…</div>
       <div class="t2" id="updLine"></div>
     </div>
     <div class="hdBtns">
@@ -262,6 +262,7 @@
       <button class="refresh" id="refBtn">Refresh</button>
     </div>
   </div>
+  <div class="locline" id="locName">…</div>
   <div class="rules" id="rules"></div>
   <div id="app"><div class="loading" id="loading">Checking pompano conditions…</div></div>
   <div class="foot">Pompano Forecast · Tien Huynh</div>
