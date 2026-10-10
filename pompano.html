@@ -148,12 +148,14 @@
   .cmsg { font-weight: 600; opacity: .96; }
 
   /* 4 weather tiles */
-  .tiles { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 16px; }
+  .tiles { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-bottom: 16px; }
   .tile { background: #ede4cc; border-radius: 12px; padding: 10px 6px; text-align: center; }
   .tile .k { font-size: 9px; font-weight: 700; letter-spacing: .06em; color: #8a7a5f; text-transform: uppercase; }
   .tile .v { font-family: "Fraunces", serif; font-size: 15px; font-weight: 800; margin-top: 3px; white-space: nowrap; }
   .tile .v svg { vertical-align: -4px; }
   .tile .msub { font-size: 9px; font-weight: 700; color: #8a7a5f; margin-top: 2px; white-space: nowrap; }
+  .tile .sundrow { display: flex; align-items: stretch; justify-content: center; gap: 10px; }
+  .tile .sundiv { width: 1px; background: rgba(90,70,40,.25); }
 
   /* Major / Minor section */
   .moonsec { margin-bottom: 16px; }
@@ -272,7 +274,7 @@ var STR = {
     loading: "Checking pompano conditions…",
     rating: "POMPANO BITE RATING", today: "TODAY",
     pickDay: "Pick a day", best: "★ BEST", bestWeek: "BEST DAY THIS WEEK", goDay: "GO DAY",
-    goFish: "GO FISH", gotAway: "The one that got away! 🎣", wind: "WIND", water: "WATER", cond: "CONDITION", rain: "RAIN", moon: "MOON", catch: "Catch",
+    goFish: "GO FISH", gotAway: "The one that got away! 🎣", wind: "WIND", water: "WATER", cond: "CONDITION", rain: "RAIN", moon: "MOON", sunrise: "SUNRISE", sunset: "SUNSET", catch: "Catch",
     moonTitle: "🌙 Major / Minor bite times", major: "MAJOR", minor: "MINOR", now: "NOW",
     tide: "Tide", high: "High", low: "Low", refresh: "Refresh", back: "‹ Home",
     rules: "<b>Pompano</b> — 6/day · min 11″ fork",
@@ -310,7 +312,7 @@ var STR = {
     loading: "Đang kiểm tra điều kiện câu cá…",
     rating: "ĐIỂM CẮN CÂU POMPANO", today: "HÔM NAY",
     pickDay: "Chọn ngày", best: "★ ĐẸP NHẤT", bestWeek: "NGÀY ĐẸP NHẤT TUẦN", goDay: "ĐI NGAY",
-    goFish: "ĐI CÂU NGAY", gotAway: "Cá chạy mất tiêu rồi! 🎣", wind: "GIÓ", water: "NƯỚC", cond: "THỜI TIẾT", rain: "MƯA", moon: "TRĂNG", catch: "Cá câu được",
+    goFish: "ĐI CÂU NGAY", gotAway: "Cá chạy mất tiêu rồi! 🎣", wind: "GIÓ", water: "NƯỚC", cond: "THỜI TIẾT", rain: "MƯA", moon: "TRĂNG", sunrise: "BÌNH MINH", sunset: "HOÀNG HÔN", catch: "Cá câu được",
     moonTitle: "🌙 Giờ cá cắn câu chính / phụ", major: "CHÍNH", minor: "PHỤ", now: "NGAY BÂY GIỜ",
     tide: "Thủy triều", high: "Nước lên", low: "Nước xuống", refresh: "Làm mới", back: "‹ Trang chủ",
     rules: "<b>Pompano</b> — 6 con/ngày · tối thiểu 11″ fork",
@@ -599,7 +601,7 @@ function ymdDash(d) { return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-"
 function loadWeather(lat, lon) {
   var u = "https://api.open-meteo.com/v1/forecast?latitude=" + lat + "&longitude=" + lon +
     "&hourly=temperature_2m,precipitation_probability,precipitation,windspeed_10m,winddirection_10m,wind_gusts_10m,weather_code,is_day" +
-    "&daily=temperature_2m_max,temperature_2m_min,weather_code,precipitation_probability_max" +
+    "&daily=temperature_2m_max,temperature_2m_min,weather_code,precipitation_probability_max,sunrise,sunset" +
     "&timezone=auto&forecast_days=7&temperature_unit=fahrenheit&windspeed_unit=mph";
   return fetchJSON(u);
 }
@@ -811,7 +813,9 @@ function buildDays(wx, mar) {
       waveFt: Math.round(wv * 10) / 10,
       condCode: wx.hourly.weather_code[wi],
       condDay: (wx.hourly.is_day && wx.hourly.is_day[wi] != null) ? wx.hourly.is_day[wi] : 1,
-      rain: wx.daily.precipitation_probability_max[d]
+      rain: wx.daily.precipitation_probability_max[d],
+      sunrise: (wx.daily.sunrise && wx.daily.sunrise[d]) ? new Date(wx.daily.sunrise[d]) : null,
+      sunset: (wx.daily.sunset && wx.daily.sunset[d]) ? new Date(wx.daily.sunset[d]) : null
     });
   }
   return days;
@@ -1145,12 +1149,17 @@ function renderAll() {
     moonTile = '<div class="tile"><div class="k">' + S.moon + '</div><div class="v">' + moonPhaseSVG(mph, 1.3) + " " +
       Math.round(mp.illum * 100) + '%</div><div class="msub">' + msub + "</div></div>";
   }
+  var sunTile = '<div class="tile"><div class="sundrow">' +
+    '<div><div class="k">' + S.sunrise + '</div><div class="v">' + (day.sunrise ? tstr(day.sunrise, state.lang) : "—") + "</div></div>" +
+    '<div class="sundiv"></div>' +
+    '<div><div class="k">' + S.sunset + '</div><div class="v">' + (day.sunset ? tstr(day.sunset, state.lang) : "—") + "</div></div>" +
+    "</div></div>";
   html += '<div class="tiles">' +
     '<div class="tile"><div class="k">' + _lblWind() + ' ' + S.wind + '</div><div class="v">' + day.wind + (day.gust != null ? " | " + day.gust : "") + " " + day.windDir + "</div></div>" +
     '<div class="tile"><div class="k">' + _lblWater() + ' ' + S.water + '</div><div class="v">' + day.water.toFixed(1) + "°F</div></div>" +
     '<div class="tile"><div class="k">' + S.cond + '</div><div class="v">' + cn + "</div></div>" +
     '<div class="tile"><div class="k">' + _lblRain() + ' ' + S.rain + '</div><div class="v">' + day.rain + "%</div></div>" +
-    moonTile +
+    moonTile + sunTile +
     "</div>";
   // major/minor
   var moonRows = moonRowsHTML(day);
