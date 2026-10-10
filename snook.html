@@ -1504,6 +1504,7 @@ function initRadar() {
   };
   loadWindGrid();
   setMapMode(mapMode);
+  if (state.loc.lat > 15 && state.loc.lat < 52 && state.loc.lon > -135 && state.loc.lon < -55) { show([]); return; }
   var now = Date.now();
   if (radarCache.frames.length && now - radarCache.at < 600000) { show(radarCache.frames); return; }
   fetchJSON("https://api.rainviewer.com/public/weather-maps.json").then(function(j) {
