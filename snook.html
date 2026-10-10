@@ -40,6 +40,11 @@
   .langbtn b { color: #9a4a16; }
   .watchlink { text-decoration: none; display: inline-block; }
   .rules { font-size: 11px; font-weight: 700; color: #8a7a5f; margin: 2px 2px 10px; }
+  .season { display: inline-block; font-size: 10px; font-weight: 800; letter-spacing: .04em;
+    border-radius: 999px; padding: 3px 10px; margin-left: 6px; vertical-align: 1px;
+    color: #fff; white-space: nowrap; }
+  .season.open { background: #1d9e6c; }
+  .season.closed { background: #c0392b; }
   .rules b { color: #9a4a16; }
   .refresh {
     background: #bc5a1e; color: #fff; border: none; border-radius: 999px;
@@ -274,7 +279,9 @@ var STR = {
     goFish: "GO FISH", gotAway: "The one that got away! 🎣", wind: "WIND", water: "WATER", cond: "CONDITION", rain: "RAIN", moon: "MOON", catch: "Catch",
     moonTitle: "🌙 Major / Minor bite times", major: "MAJOR", minor: "MINOR", now: "NOW",
     tide: "Tide", high: "High", low: "Low", refresh: "Refresh", back: "‹ Home",
-    rules: "📏 <b>Snook</b> — 1/day · 28–32″ slot · permit needed", todayWord: "Today",
+    rules: "📏 <b>Snook</b> — 1/day · 28–32″ slot · permit needed",
+    seasonOpen: function(d) { return "OPEN · " + d + "d left"; },
+    seasonClosed: function(d) { return "CLOSED · opens in " + d + "d"; }, todayWord: "Today",
     retry: "Try again", loadFail: "Could not load live data. Check your connection.",
     great: "Great", good: "Good", fair: "Fair", poor: "Poor",
     updated: function(d, t) { return "Updated " + d + " at " + t; },
@@ -311,7 +318,9 @@ var STR = {
     goFish: "ĐI CÂU NGAY", gotAway: "Cá chạy mất tiêu rồi! 🎣", wind: "GIÓ", water: "NƯỚC", cond: "THỜI TIẾT", rain: "MƯA", moon: "TRĂNG", catch: "Cá câu được",
     moonTitle: "🌙 Giờ cá cắn câu chính / phụ", major: "CHÍNH", minor: "PHỤ", now: "NGAY BÂY GIỜ",
     tide: "Thủy triều", high: "Nước lên", low: "Nước xuống", refresh: "Làm mới", back: "‹ Trang chủ",
-    rules: "📏 <b>Snook</b> — 1 con/ngày · 28–32″ · cần permit", todayWord: "Hôm nay",
+    rules: "📏 <b>Snook</b> — 1 con/ngày · 28–32″ · cần permit",
+    seasonOpen: function(d) { return "MỞ · còn " + d + "n"; },
+    seasonClosed: function(d) { return "ĐÓNG · mở sau " + d + "n"; }, todayWord: "Hôm nay",
     retry: "Thử lại", loadFail: "Không tải được dữ liệu. Kiểm tra kết nối mạng.",
     great: "Tuyệt vời", good: "Tốt", fair: "Trung bình", poor: "Tệ",
     updated: function(d, t) { return "Cập nhật " + d + " lúc " + t; },
@@ -1057,6 +1066,25 @@ function hourlyHTML(day) {
     S.thSkyWind + '</th><th class="hrain">' + S.thRain + '</th><th class="htemp">' + S.thAirWtr + "</th></tr>" +
     rows + '</table></div><p class="hint">' + S.biteHint + "</p></div></div>";
 }
+/* FWC Atlantic snook harvest seasons (Jupiter Inlet is Atlantic):
+   open Feb 1-May 31 and Sep 1-Dec 14; closed Dec 15-Jan 31 and Jun 1-Aug 31. */
+function snookSeason() {
+  var now = new Date(); now.setHours(0, 0, 0, 0);
+  var y = now.getFullYear();
+  function D(m, d, yy) { return new Date(yy === undefined ? y : yy, m - 1, d); }
+  var open = false, target;
+  if (now >= D(2, 1) && now <= D(5, 31)) { open = true; target = D(5, 31); }
+  else if (now >= D(9, 1) && now <= D(12, 14)) { open = true; target = D(12, 14); }
+  else if (now >= D(12, 15)) { target = D(2, 1, y + 1); }
+  else if (now < D(2, 1)) { target = D(2, 1); }
+  else { target = D(9, 1); }
+  return { open: open, days: Math.max(0, Math.round((target - now) / 86400000)) };
+}
+function seasonPillHTML() {
+  var S = STR[state.lang], r = snookSeason();
+  return '<span class="season ' + (r.open ? "open" : "closed") + '">' +
+    (r.open ? S.seasonOpen(r.days) : S.seasonClosed(r.days)) + "</span>";
+}
 function renderHeader() {
   var S = STR[state.lang], L = state.loc;
   var name = "📌 " + L.name;
@@ -1069,7 +1097,7 @@ function renderHeader() {
   $("langBtn").innerHTML = state.lang === "en" ? "<b>EN</b> | VI" : "EN | <b>VI</b>";
   $("refBtn").textContent = S.refresh;
   $("backBtn").textContent = S.back;
-  $("rules").innerHTML = S.rules;
+  $("rules").innerHTML = S.rules + " " + seasonPillHTML();
 }
 function renderAll() {
   var S = STR[state.lang];
