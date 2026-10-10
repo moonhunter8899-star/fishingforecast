@@ -423,9 +423,9 @@ var SNOOK_URI = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAWgAAACJCAYAAAABi
 function snookSVG(color, h) {
   var w = Math.round(h * 2.64);
   var st = "display:inline-block;width:" + w + "px;height:" + h + "px;background:" + color + ";" +
-    "-webkit-mask-image:url(\"" + SNOOK_URI + "\");-webkit-mask-repeat:no-repeat;" +
+    "-webkit-mask-image:url(" + SNOOK_URI + ");-webkit-mask-repeat:no-repeat;" +
     "-webkit-mask-position:center;-webkit-mask-size:contain;" +
-    "mask-image:url(\"" + SNOOK_URI + "\");mask-repeat:no-repeat;" +
+    "mask-image:url(" + SNOOK_URI + ");mask-repeat:no-repeat;" +
     "mask-position:center;mask-size:contain;vertical-align:-4px;";
   return '<span style="' + st + '"></span>';
 }
