@@ -57,6 +57,7 @@
   .topcard .lbl { color: #e8c76a; font-size: 10px; font-weight: 700; letter-spacing: .18em; }
   .topcard .big { font-family: "Fraunces", serif; font-weight: 900; font-size: 30px; color: #fff; margin-top: 2px; }
   .topcard .big .sc { font-size: 22px; }
+  .topcard .ddate { color: rgba(255,255,255,.78); font-size: 12px; font-weight: 600; margin-top: 6px; letter-spacing: .02em; }
 
   /* Day strip */
   .pick { display: flex; align-items: baseline; justify-content: space-between; margin: 2px 2px 8px; }
@@ -322,18 +323,23 @@ function clockStr(lang) { // 12h in both languages, e.g. "2:26 PM"
   h = h % 12; if (h === 0) h = 12;
   return h + ":" + pad(d.getMinutes()) + " " + ap;
 }
+function fullDateStr(date, lang) { // EN: "Fri, Oct 9, 2026" · VI: "T6, 9 Th10 2026"
+  var S = STR[lang];
+  if (lang === "vi") {
+    return S.days[date.getDay()] + ", " + date.getDate() + " " + S.months[date.getMonth()] + " " + date.getFullYear();
+  }
+  var dn = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][date.getDay()];
+  return dn + ", " + S.months[date.getMonth()] + " " + date.getDate() + ", " + date.getFullYear();
+}
 function dayTitle(date, idx, lang, score) {
+  // date + live clock moved into the dark rating card; day card keeps badge + score only
   var S = STR[lang];
   var c = ratingColor(score);
   var dw = idx === 0 ? S.todayWord : S.days[date.getDay()];
-  var md = lang === "vi"
-    ? date.getDate() + " " + S.months[date.getMonth()]
-    : S.months[date.getMonth()] + " " + date.getDate();
   var dwHtml = idx === 0
     ? '<span class="tday" style="background:' + c + '">' + dw.toUpperCase() + "</span>"
     : "<b>" + dw + "</b>";
-  return dwHtml + " " + md + ", " + date.getFullYear() +
-    ' <span class="dt">· <span id="clock">' + clockStr(lang) + "</span></span>" +
+  return dwHtml +
     ' <span class="drate">' + fishSVG(c, 18) + "<b>" + score + "</b></span>";
 }
 function ratingColor(s) { return s >= 60 ? "#1d9e6c" : (s >= 40 ? "#d9a441" : "#c0392b"); }
@@ -934,8 +940,10 @@ function renderAll() {
     '<div class="row"><div class="badge">' + fishSVG(c0, 40) + "</div>" +
     '<div><div class="lbl">' + S.rating + '</div>' +
     '<div class="big">' + ratingWord(d0.score, state.lang).toUpperCase() +
-    ' <span class="sc" style="color:' + c0 + '">' + d0.score + '/100</span></div></div>' +
-    "</div></div>";
+    ' <span class="sc" style="color:' + c0 + '">' + d0.score + '/100</span></div>' +
+    '<div class="ddate">' + fullDateStr(d0.date, state.lang) + ' · <span id="clock">' + clockStr(state.lang) + "</span></div>" +
+    "</div></div>" +
+    "</div>";
   // pick-a-day strip
   var bestIdx = 0;
   state.days.forEach(function(d, i) { if (d.score > state.days[bestIdx].score) bestIdx = i; });
