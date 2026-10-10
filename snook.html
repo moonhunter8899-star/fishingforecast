@@ -1366,7 +1366,7 @@ function startWind() {
     return [g[i00][0] * w00 + g[i00 + 1][0] * w10 + g[i00 + N][0] * w01 + g[i00 + N + 1][0] * w11,
             g[i00][1] * w00 + g[i00 + 1][1] * w10 + g[i00 + N][1] * w01 + g[i00 + N + 1][1] * w11];
   }
-  var P = [], COUNT = 320;
+  var P = [], COUNT = 260;
   function spawn(p) {
     var b = map.getBounds();
     p.lat = b.getSouth() + Math.random() * (b.getNorth() - b.getSouth());
@@ -1375,7 +1375,7 @@ function startWind() {
     return p;
   }
   for (var i = 0; i < COUNT; i++) P.push(spawn({}));
-  var lastT = performance.now(), K = 3.6;
+  var lastT = performance.now(), K = 3.4;
   ctx.lineCap = "round";
   function frame(now) {
     if (mapMode !== "wind") return;
@@ -1395,14 +1395,14 @@ function startWind() {
       p.lat += uy * step / pxA; p.lon += ux * step / pxL;
       var q1 = map.latLngToContainerPoint([p.lat, p.lon]);
       var dx = ux * pxL, dy = -uy * pxA, dl = Math.sqrt(dx * dx + dy * dy) || 1;
-      var TL = 12 + sp * 1.1;
+      var TL = 8 + sp * 0.6;
       var qx = q1.x - dx / dl * TL, qy = q1.y - dy / dl * TL;
       var fade = Math.min(1, p.age / 25) * Math.min(1, (p.max - p.age) / 25);
-      var a = (0.35 + Math.min(0.5, sp / 40)) * fade;
-      ctx.lineWidth = 4.4;
+      var a = (0.3 + Math.min(0.45, sp / 45)) * fade;
+      ctx.lineWidth = 3.2;
       ctx.strokeStyle = "rgba(25,45,40," + (a * 0.45).toFixed(3) + ")";
       ctx.beginPath(); ctx.moveTo(qx, qy); ctx.lineTo(q1.x, q1.y); ctx.stroke();
-      ctx.lineWidth = 2.2;
+      ctx.lineWidth = 1.6;
       ctx.strokeStyle = "rgba(255,255,255," + a.toFixed(3) + ")";
       ctx.beginPath(); ctx.moveTo(qx, qy); ctx.lineTo(q1.x, q1.y); ctx.stroke();
     }
