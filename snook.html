@@ -123,29 +123,6 @@
     font-family: "Public Sans", sans-serif; font-size: 14px; font-weight: 800; white-space: nowrap; }
   .card h3 .drate svg { vertical-align: -4px; }
 
-  /* GO FISH band */
-  .gofish {
-    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
-    background: #bc5a1e; color: #fff; border-radius: 14px; padding: 11px 14px;
-    margin: 12px 0; font-family: "Fraunces", serif; font-weight: 900; font-size: 19px;
-    box-shadow: 0 3px 10px rgba(188,90,30,.35);
-  }
-  .gofish .gl { font-size: 15px; letter-spacing: .04em; }
-  .gofish .gt { margin-left: 2px; }
-  .gofish .gs { margin-left: auto; font-size: 17px; white-space: nowrap; }
-  /* catch logger row inside the GO FISH band */
-  .catchrow {
-    display: flex; align-items: center; gap: 8px; width: 100%;
-    font-family: "Public Sans", sans-serif; font-size: 12px; font-weight: 700;
-  }
-  .catchrow .ck { opacity: .92; white-space: nowrap; }
-  .cbtn {
-    width: 26px; height: 26px; border-radius: 50%; border: none; padding: 0; flex: none;
-    background: rgba(255,255,255,.28); color: #fff;
-    font-size: 16px; font-weight: 800; line-height: 1; cursor: pointer;
-  }
-  .cnum { min-width: 22px; text-align: center; font-size: 15px; font-weight: 800; }
-  .cmsg { font-weight: 600; opacity: .96; }
 
   /* 4 weather tiles */
   .tiles { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-bottom: 16px; }
@@ -233,7 +210,6 @@
     .strip { gap: 4px; }
     .dpill { padding: 8px 1px 7px; }
     .topcard .big { font-size: 26px; }
-    .gofish { font-size: 17px; }
     /* hourly table stays compact on phones (column widths are set globally above) */
     .htable { font-size: 11px; }
     .htable th, .htable td { padding: 5px 3px; }
@@ -1151,16 +1127,6 @@ function renderAll() {
   var day = state.days[state.sel];
   var dc = ratingColor(day.score);
   html += '<div class="card" style="border-color:' + dc + '">';
-  if (day.best) {
-    var bsc = day.best.score;
-    var pastWindow = (state.sel === 0 && Date.now() > day.best.end.getTime());
-    if (!pastWindow) {
-      html += '<div class="gofish">' +
-        '<span class="gl">🎣 ' + S.goFish + '</span><span class="gt">' +
-        trange(day.best.start, day.best.end, state.lang) + '</span><span class="gs">· 🐟 ' + bsc + "</span>" +
-        catchRowHTML(day.date) + "</div>";
-    }
-  }
   var cn = condIcon(day.condCode, day.condDay) + " " + (S.condName[day.condCode] || S.condName[2]);
   var mph = (state.moonPhase && state.moonPhase[ymdDash(day.date)] != null) ? state.moonPhase[ymdDash(day.date)] : null;
   var moonTile;
