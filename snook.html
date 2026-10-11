@@ -28,6 +28,7 @@
 
   /* Header */
   .hd { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin: 4px 2px 12px; }
+  .stickyhead { position: -webkit-sticky; position: sticky; top: 0; z-index: 1200; background: #f6f0df; margin: 0 -16px; padding: 10px 16px 4px; border-bottom: 1px solid #e7dcc2; }
   .hd > div:first-child { min-width: 0; }
   .locline { font-family: "Fraunces", serif; font-weight: 800; font-size: 15px;
     white-space: nowrap; margin: 0 2px 8px; }
@@ -253,6 +254,7 @@
 </head>
 <body>
 <div class="wrap">
+  <div class="stickyhead">
   <div class="hd">
     <div>
       <div class="brand">Snook Forecast</div>
@@ -276,6 +278,7 @@
     <div class="locrow"><button class="locact" id="locGPS"></button><button class="locact" id="locHome"></button></div>
     <div class="locchips" id="locRecents"></div>
     <div class="locmsg" id="locMsg"></div>
+  </div>
   </div>
   <div class="rules" id="rules"></div>
   <div id="app"><div class="loading" id="loading">Checking pompano conditions…</div></div>
