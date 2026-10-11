@@ -81,6 +81,7 @@
  .langbtn b{color:#9a4a16;}
  .watchlink{text-decoration:none;display:inline-block;}
  .rules{font-size:11px;font-weight:700;color:#8a7a5f;margin:2px 2px 10px;}
+ .regdis{font-size:10px;font-weight:400;color:#a08b6d;margin-top:2px;}
  .season{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.04em;
  border-radius:999px;padding:3px 10px;margin-left:6px;vertical-align:1px;
  color:#fff;white-space:nowrap;}
@@ -491,40 +492,40 @@ if (lat < -90 || lat > 90 || lon < -180 || lon > 180) return null;
 return { lat: lat, lon: lon };
 }
 function coordsFromMicrolink(j) {
-  var d = (j && j.data) || {}, m;
-  var img = "";
-  try { img = decodeURIComponent((d.image && d.image.url) || ""); } catch (e) {}
-  m = img.match(/[?&]center=(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/);
-  if (m) {
-    var lat = +m[1], lon = +m[2];
-    if (lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180) return { lat: lat, lon: lon };
-  }
-  var t = (d.title || "").toUpperCase().replace(/[\u00B0\u00BA]/g, " ").replace(/[\u2032'\u2019]/g, " ").replace(/[\u2033\u201D]/g, " ").replace(/\s+/g, " ").trim();
-  m = t.match(/(\d+(?:\.\d+)?)\s+(\d+(?:\.\d+)?)\s+(\d+(?:\.\d+)?)\s+([NS])\s+(\d+(?:\.\d+)?)\s+(\d+(?:\.\d+)?)\s+(\d+(?:\.\d+)?)\s+([EW])/);
-  if (m) {
-    var la = +m[1] + +m[2] / 60 + +m[3] / 3600; if (m[4] === "S") la = -la;
-    var lo = +m[5] + +m[6] / 60 + +m[7] / 3600; if (m[8] === "W") lo = -lo;
-    return { lat: la, lon: lo };
-  }
-  return null;
+var d = (j && j.data) || {}, m;
+var img = "";
+try { img = decodeURIComponent((d.image && d.image.url) || ""); } catch (e) {}
+m = img.match(/[?&]center=(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/);
+if (m) {
+var lat = +m[1], lon = +m[2];
+if (lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180) return { lat: lat, lon: lon };
+}
+var t = (d.title || "").toUpperCase().replace(/[\u00B0\u00BA]/g, " ").replace(/[\u2032'\u2019]/g, " ").replace(/[\u2033\u201D]/g, " ").replace(/\s+/g, " ").trim();
+m = t.match(/(\d+(?:\.\d+)?)\s+(\d+(?:\.\d+)?)\s+(\d+(?:\.\d+)?)\s+([NS])\s+(\d+(?:\.\d+)?)\s+(\d+(?:\.\d+)?)\s+(\d+(?:\.\d+)?)\s+([EW])/);
+if (m) {
+var la = +m[1] + +m[2] / 60 + +m[3] / 3600; if (m[4] === "S") la = -la;
+var lo = +m[5] + +m[6] / 60 + +m[7] / 3600; if (m[8] === "W") lo = -lo;
+return { lat: la, lon: lo };
+}
+return null;
 }
 function resolveMapLink(shortURL, done) {
-  var finished = false;
-  function fin(c) { if (!finished) { finished = true; done(c); } }
-  fetchJSON("https://api.microlink.io?url=" + encodeURIComponent(shortURL)).then(function(j) {
-    var c = coordsFromMicrolink(j);
-    if (c) fin(c); else expandFallback();
-    }).catch(expandFallback);
-    function expandFallback() {
-      var api = "https://api.allorigins.win/get?url=" + encodeURIComponent("https://unshorten.me/json/" + shortURL);
-      fetchJSON(api).then(function(j) {
-        var inner = null, c = null;
-        try { inner = JSON.parse(j.contents); } catch (e) {}
-        if (inner && inner.success && inner.resolved_url) c = extractCoordsFromURL(inner.resolved_url);
-        fin(c);
-        }).catch(function() { fin(null); });
-      }
-    }
+var finished = false;
+function fin(c) { if (!finished) { finished = true; done(c); } }
+fetchJSON("https://api.microlink.io?url=" + encodeURIComponent(shortURL)).then(function(j) {
+var c = coordsFromMicrolink(j);
+if (c) fin(c); else expandFallback();
+}).catch(expandFallback);
+function expandFallback() {
+var api = "https://api.allorigins.win/get?url=" + encodeURIComponent("https://unshorten.me/json/" + shortURL);
+fetchJSON(api).then(function(j) {
+var inner = null, c = null;
+try { inner = JSON.parse(j.contents); } catch (e) {}
+if (inner && inner.success && inner.resolved_url) c = extractCoordsFromURL(inner.resolved_url);
+fin(c);
+}).catch(function() { fin(null); });
+}
+}
 function doSearch(q) {
 var S = STR[state.lang], box = $("locResults");
 if (!q || q.length < 2) { box.innerHTML = ""; return; }
@@ -596,7 +597,7 @@ pickDay: "Pick a day", best: "★ BEST", bestWeek: "BEST DAY THIS WEEK", goDay: 
 goFish: "BEST TIME TO FISH", inFish: function(d) { return "in " + d; }, nowFish: "NOW", gotAway: "The one that got away! 🎣", wind: "WIND", water: "WATER", cond: "CONDITION", rain: "RAIN", moon: "MOON", sunrise: "SUNRISE", sunset: "SUNSET", catch: "Catch",
 searchPh: "Enter a beach, an inlet, or coordinates…", useMyLoc: "Use my location", homeBtn: "⌂ Jupiter Inlet",
 locating: "Locating…", geoDenied: "Location unavailable — check permission", geoUnsupported: "Geolocation not supported",
-currentLoc: "Current location", checkRegs: "Check local fishing regulations", noResults: "No places found", resolvingLink: "Resolving map link\u2026", linkFail: "Couldn\u2019t read that map link \u2014 try coordinates like 26.76, -80.11",
+currentLoc: "Current location", checkRegs: "Check local fishing regulations", regDis: "Info only, not legal advice \u2014 we are not responsible for your actions. Always verify current regulations yourself.", noResults: "No places found", resolvingLink: "Resolving map link\u2026", linkFail: "Couldn\u2019t read that map link \u2014 try coordinates like 26.76, -80.11",
 geoRough: "GPS fix is rough (\u00b1{mi} mi) \u2014 try again in the open",
 chgLoc: "Change location", radar: "RADAR", wind: "WIND", live: "LIVE",
 moonTitle: "🌙 Major / Minor bite times", major: "MAJOR", minor: "MINOR", now: "NOW",
@@ -639,7 +640,7 @@ pickDay: "Chọn ngày", best: "★ ĐẸP NHẤT", bestWeek: "NGÀY ĐẸP NH�
 goFish: "GIỜ CÂU TỐT NHẤT", inFish: function(d) { return "sau " + d; }, nowFish: "BÂY GIỜ", gotAway: "Cá chạy mất tiêu rồi! 🎣", wind: "GIÓ", water: "NƯỚC", cond: "THỜI TIẾT", rain: "MƯA", moon: "TRĂNG", sunrise: "BÌNH MINH", sunset: "HOÀNG HÔN", catch: "Cá câu được",
 searchPh: "Nhập bãi biển, cửa lạch hoặc tọa độ…", useMyLoc: "Vị trí của tôi", homeBtn: "⌂ Jupiter Inlet",
 locating: "Đang định vị…", geoDenied: "Không lấy được vị trí — kiểm tra quyền", geoUnsupported: "Thiết bị không hỗ trợ định vị",
-currentLoc: "Vị trí hiện tại", checkRegs: "Kiểm tra quy định câu cá địa phương", noResults: "Không tìm thấy địa điểm", resolvingLink: "Đang mở liên kết bản đồ\u2026", linkFail: "Không đọc được liên kết \u2014 thử tọa độ, ví dụ 26.76, -80.11",
+currentLoc: "Vị trí hiện tại", checkRegs: "Kiểm tra quy định câu cá địa phương", regDis: "Chỉ để tham khảo, không phải tư vấn pháp lý \u2014 chúng tôi không chịu trách nhiệm về hành động của bạn. Hãy tự kiểm tra quy định hiện hành.", noResults: "Không tìm thấy địa điểm", resolvingLink: "Đang mở liên kết bản đồ\u2026", linkFail: "Không đọc được liên kết \u2014 thử tọa độ, ví dụ 26.76, -80.11",
 geoRough: "Định vị chưa chính xác (\u00b1{mi} dặm) — thử lại ở nơi thoáng",
 chgLoc: "Đổi địa điểm", radar: "RADAR", wind: "GIÓ", live: "TRỰC TIẾP",
 moonTitle: "🌙 Giờ cá cắn câu chính / phụ", major: "CHÍNH", minor: "PHỤ", now: "NGAY BÂY GIỜ",
@@ -1431,7 +1432,7 @@ $("refBtn").textContent = S.refresh;
 $("backBtn").textContent = S.back;
 $("locGPS2").textContent = S.currentLoc;
 $("locChange").textContent = S.chgLoc;
-$("rules").innerHTML = state.loc.home ? S.rules + " " + seasonPillHTML() : '<span class="regsn">' + S.checkRegs + "</span>";
+$("rules").innerHTML = (state.loc.home ? S.rules + " " + seasonPillHTML() : '<span class="regsn">' + S.checkRegs + "</span>") + '<div class="regdis">' + S.regDis + "</div>";
 }
 
 /* ================= live map: radar (RainViewer) + wind particles (Open-Meteo) ================= */
