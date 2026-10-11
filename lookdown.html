@@ -916,9 +916,9 @@ function hourScore(wi, mi) {
     else if (wv <= 6) s -= 20;
     else s -= 32;
   }
-  // Lookdown gather under dock and bridge lights after dark.
+  // Lookdown feed hardest at night around dock and bridge lights (angler consensus).
   var isDayH = (wx.is_day && wx.is_day[wi] != null) ? wx.is_day[wi] : 1;
-  if (isDayH === 0) s += 6;
+  if (isDayH === 0) s += 8;
   return Math.max(0, Math.min(100, Math.round(s)));
 }
 function tideAdj(ms) {
