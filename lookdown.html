@@ -15,241 +15,241 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,800;9..144,900&family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  html, body { margin: 0; padding: 0; }
-  body {
-    background: #f6f0df; color: #2b2620;
-    font-family: "Public Sans", -apple-system, "Segoe UI", sans-serif;
-    font-variant-numeric: tabular-nums;
-  }
-  .wrap { max-width: 960px; margin: 0 auto; padding: 12px 16px 40px; }
-  html, body { overflow-x: clip; }
-  h1, h2, h3, .serif { font-family: "Fraunces", Georgia, serif; }
+ *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+ html,body{margin:0;padding:0;}
+ body{
+ background:#f6f0df;color:#2b2620;
+ font-family:"Public Sans",-apple-system,"Segoe UI",sans-serif;
+ font-variant-numeric:tabular-nums;
+}
+ .wrap{max-width:960px;margin:0 auto;padding:12px 16px 40px;}
+ html,body{overflow-x:clip;}
+ h1,h2,h3,.serif{font-family:"Fraunces",Georgia,serif;}
 
-  /* Header */
-  .hd { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin: 4px 2px 12px; }
-  .stickyhead { position: fixed; top: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 992px; box-sizing: border-box; z-index: 1200; background: #f6f0df; padding: 10px 16px 8px; border-bottom: 1px solid #e7dcc2; }
-  .hd > div:first-child { min-width: 0; }
-  .locline { font-family: "Fraunces", serif; font-weight: 800; font-size: 15px;
-    white-space: nowrap; margin: 0 2px 8px; }
-  .locbtn { background: none; border: none; padding: 0; width: 100%; text-align: left; cursor: pointer; font: inherit; color: inherit; }
-  .locbtn::after { content: " \25BE"; font-size: 11px; color: #8a7a5f; }
-  .locpanel { background: #f4ecda; border: 1px solid #d8c9a8; border-radius: 12px; padding: 10px; margin: -2px 2px 10px; }
-  .locsearch { width: 100%; box-sizing: border-box; font-size: 14px; padding: 8px 10px; border-radius: 9px; border: 1px solid #d8c9a8; background: #fff; font-family: inherit; color: #22312b; }
-  .locresults button { display: block; width: 100%; text-align: left; background: none; border: none; border-bottom: 1px solid #e7dcc2; padding: 8px 4px; font-size: 13px; font-weight: 600; color: #22312b; cursor: pointer; font-family: inherit; }
-  .locrow { display: flex; gap: 8px; margin-top: 8px; }
-  .locact { flex: 1; font-size: 12px; font-weight: 700; padding: 8px; border-radius: 9px; border: 1px solid #d8c9a8; background: #ede4cc; color: #22312b; cursor: pointer; font-family: inherit; }
-  .locchips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-  .locchips:empty { display: none; }
-  .locchip { font-size: 12px; font-weight: 700; padding: 6px 10px; border-radius: 20px; border: 1px solid #2e7d5b; background: #fff; color: #2e7d5b; cursor: pointer; font-family: inherit; }
-  .locmsg { font-size: 11px; color: #8a7a5f; margin-top: 6px; }
-  .locmsg:empty { display: none; }
-  .regsn { font-size: 11px; font-weight: 700; color: #8a7a5f; }
-  /* live precipitation radar */
-  .radarcap { margin: 0 0 16px; border-radius: 14px; overflow: hidden; border: 1px solid #d8c9a8; }
-  .radarmap { height: 230px; background: #dfe8ee; }
-  .radarmap { position: relative; }
-  .windcv { position: absolute; left: 0; top: 0; width: 100%; height: 100%; pointer-events: none; }
-  .seg { display: flex; border: 1px solid #d8c9a8; border-radius: 8px; overflow: hidden; flex: none; }
-  .seg button { border: 0; background: transparent; padding: 4px 10px; font-size: 10px; font-weight: 800; color: #8a7a5f; cursor: pointer; font-family: inherit; }
-  .seg button.on { background: #22312b; color: #fff; }
-  .radarfoot { display: none; }
-  .gofish { display: flex; align-items: center; gap: 8px; margin: 0 0 12px; padding: 9px 14px; border-radius: 12px; background: #f9ecd2; border: 1px solid #e6c877; font-size: 13px; color: #6d5416; }
-  .gofish b { letter-spacing: .05em; }
-  .gofish .gf-in { margin-left: auto; font-weight: 800; white-space: nowrap; }
-  .radarbar { display: flex; align-items: center; gap: 8px; padding: 6px 10px; background: #f4ecda; font-size: 10px; font-weight: 700; color: #8a7a5f; }
-  .radarattr { margin-left: auto; font-weight: 600; opacity: .5; font-size: 9px; }
-  .radarplay { border: 1px solid #d8c9a8; background: #fff; border-radius: 8px; padding: 3px 10px; font-size: 11px; cursor: pointer; color: #22312b; }
-  .scoremark { background: none; border: none; }
-  .scoredot { width: 16px; height: 16px; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,.4); }
-  .leaflet-container { font-family: "Public Sans", sans-serif; }
+ /* Header */
+ .hd{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin:4px 2px 12px;}
+ .stickyhead{position:fixed;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:992px;box-sizing:border-box;z-index:1200;background:#f6f0df;padding:10px 16px 8px;border-bottom:1px solid #e7dcc2;}
+ .hd > div:first-child{min-width:0;}
+ .locline{font-family:"Fraunces",serif;font-weight:800;font-size:15px;
+ white-space:nowrap;margin:0 2px 8px;}
+ .locbtn{background:none;border:none;padding:0;width:100%;text-align:left;cursor:pointer;font:inherit;color:inherit;}
+ .locbtn::after{content:" \25BE";font-size:11px;color:#8a7a5f;}
+ .locpanel{background:#f4ecda;border:1px solid #d8c9a8;border-radius:12px;padding:10px;margin:-2px 2px 10px;}
+ .locsearch{width:100%;box-sizing:border-box;font-size:14px;padding:8px 10px;border-radius:9px;border:1px solid #d8c9a8;background:#fff;font-family:inherit;color:#22312b;}
+ .locresults button{display:block;width:100%;text-align:left;background:none;border:none;border-bottom:1px solid #e7dcc2;padding:8px 4px;font-size:13px;font-weight:600;color:#22312b;cursor:pointer;font-family:inherit;}
+ .locrow{display:flex;gap:8px;margin-top:8px;}
+ .locact{flex:1;font-size:12px;font-weight:700;padding:8px;border-radius:9px;border:1px solid #d8c9a8;background:#ede4cc;color:#22312b;cursor:pointer;font-family:inherit;}
+ .locchips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+ .locchips:empty{display:none;}
+ .locchip{font-size:12px;font-weight:700;padding:6px 10px;border-radius:20px;border:1px solid #2e7d5b;background:#fff;color:#2e7d5b;cursor:pointer;font-family:inherit;}
+ .locmsg{font-size:11px;color:#8a7a5f;margin-top:6px;}
+ .locmsg:empty{display:none;}
+ .regsn{font-size:11px;font-weight:700;color:#8a7a5f;}
+ /* live precipitation radar */
+ .radarcap{margin:0 0 16px;border-radius:14px;overflow:hidden;border:1px solid #d8c9a8;}
+ .radarmap{height:230px;background:#dfe8ee;}
+ .radarmap{position:relative;}
+ .windcv{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;}
+ .seg{display:flex;border:1px solid #d8c9a8;border-radius:8px;overflow:hidden;flex:none;}
+ .seg button{border:0;background:transparent;padding:4px 10px;font-size:10px;font-weight:800;color:#8a7a5f;cursor:pointer;font-family:inherit;}
+ .seg button.on{background:#22312b;color:#fff;}
+ .radarfoot{display:none;}
+ .gofish{display:flex;align-items:center;gap:8px;margin:0 0 12px;padding:9px 14px;border-radius:12px;background:#f9ecd2;border:1px solid #e6c877;font-size:13px;color:#6d5416;}
+ .gofish b{letter-spacing:.05em;}
+ .gofish .gf-in{margin-left:auto;font-weight:800;white-space:nowrap;}
+ .radarbar{display:flex;align-items:center;gap:8px;padding:6px 10px;background:#f4ecda;font-size:10px;font-weight:700;color:#8a7a5f;}
+ .radarattr{margin-left:auto;font-weight:600;opacity:.5;font-size:9px;}
+ .radarplay{border:1px solid #d8c9a8;background:#fff;border-radius:8px;padding:3px 10px;font-size:11px;cursor:pointer;color:#22312b;}
+ .scoremark{background:none;border:none;}
+ .scoredot{width:16px;height:16px;border-radius:50%;border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.4);}
+ .leaflet-container{font-family:"Public Sans",sans-serif;}
 
-  .locbar { display: flex; align-items: center; gap: 8px; margin: 0 2px 8px; }
-  .locbar .locbtn { width: auto; flex: 1 1 auto; min-width: 0; margin: 0; overflow: hidden; text-overflow: ellipsis; }
-  .locgps, .locchg { flex: none; font-size: 11px; font-weight: 700; padding: 7px 8px; border-radius: 9px; border: 1px solid #d8c9a8; background: #ede4cc; color: #22312b; cursor: pointer; font-family: inherit; white-space: nowrap; }
-  .locchg { background: #fff; border-color: #2e7d5b; color: #2e7d5b; }
-
-
-  .hd .t2 { color: #8a7a5f; font-size: 10px; margin-top: 2px; }
-  .hd .brand { font-family: "Fraunces", serif; font-weight: 900; font-size: 15px; color: #22312b; }
-  .hd .nick { font-size: 11px; font-weight: 700; color: #9a4a16; margin: 1px 0 7px; letter-spacing: .02em; }
-  .hdBtns { display: flex; align-items: center; gap: 8px; flex: none; }
-  .langbtn {
-    background: #fffaf0; border: 1.5px solid #d9c9a3; border-radius: 999px;
-    font-size: 11px; font-weight: 800; padding: 7px 10px; cursor: pointer; color: #8a7a5f;
-  }
-  .langbtn b { color: #9a4a16; }
-  .watchlink { text-decoration: none; display: inline-block; }
-  .rules { font-size: 11px; font-weight: 700; color: #8a7a5f; margin: 2px 2px 10px; }
-  .season { display: inline-block; font-size: 10px; font-weight: 800; letter-spacing: .04em;
-    border-radius: 999px; padding: 3px 10px; margin-left: 6px; vertical-align: 1px;
-    color: #fff; white-space: nowrap; }
-  .season.open { background: #1d9e6c; }
-  .season.closed { background: #c0392b; }
-  .rules b { color: #9a4a16; }
-  .refresh {
-    background: #bc5a1e; color: #fff; border: none; border-radius: 999px;
-    font-family: "Fraunces", serif; font-weight: 800; font-size: 13px;
-    padding: 8px 16px; cursor: pointer; flex: none;
-  }
-
-  /* Top rating card */
-  .topcard {
-    position: relative; overflow: hidden;
-    background: #22312b; border-radius: 22px; padding: 18px;
-    border: 2px solid #1d9e6c;
-    box-shadow: 0 4px 14px rgba(34,49,43,.25);
-    margin-bottom: 14px; color: #fff;
-  }
-  .topcard .wm { position: absolute; top: -8px; right: 6px; opacity: .14; pointer-events: none; }
-  .topcard .row { display: flex; align-items: center; gap: 16px; position: relative; padding: 2px 4px; }
-  .badge {
-    width: 58px; height: 58px; border-radius: 50%; background: #fff; flex: none;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .topcard .lbl { color: #e8c76a; font-size: 10px; font-weight: 700; letter-spacing: .18em; }
-  .topcard .big { font-family: "Fraunces", serif; font-weight: 900; font-size: 30px; color: #fff; margin-top: 2px; }
-  .topcard .big .sc { font-size: 22px; }
-  .topcard .ddate { color: rgba(255,255,255,.78); font-size: 12px; font-weight: 600; margin-top: 6px; letter-spacing: .02em; }
-
-  /* Day strip */
-  .pick { display: flex; align-items: baseline; justify-content: space-between; margin: 2px 2px 8px; }
-  .pick .ph { font-family: "Fraunces", serif; font-weight: 800; font-size: 13px; color: #9a4a16; }
-  .pick .pr { font-size: 11px; color: #8a7a5f; }
-  .strip { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-bottom: 10px; }
-  .dpill {
-    background: #fffaf0; border: 1px solid #e3d5b3; border-radius: 12px; padding: 8px 2px 7px;
-    text-align: center; cursor: pointer; position: relative; font-family: "Public Sans", sans-serif;
-    color: #2b2620;
-  }
-  .dpill .dw { font-size: 10px; color: #8a7a5f; font-weight: 600; text-transform: uppercase; }
-  .dpill .dn { font-family: "Fraunces", serif; font-size: 18px; font-weight: 800; }
-  .dpill .dsc { font-size: 12px; font-weight: 800; }
-  .dpill .dow2 { font-size: 8px; color: #8a7a5f; white-space: nowrap; letter-spacing: 0; }
-  .dpill.sel { color: #fff; border-color: transparent; }
-  .dpill.sel .dw, .dpill.sel .dow2 { color: rgba(255,255,255,.85); }
-  .dpill.best { background: #fff3cf; border: 2px solid #d9a441; box-shadow: 0 0 8px rgba(217,164,65,.5); }
-  .dpill .bestbadge {
-    position: absolute; top: -9px; left: 50%; transform: translateX(-50%);
-    background: #6b4a1f; color: #ffe9a8; font-size: 8px; font-weight: 800;
-    padding: 2px 6px; border-radius: 999px; letter-spacing: .06em; white-space: nowrap;
-  }
-
-  /* Day card */
-  .card {
-    background: #fffaf0; border-radius: 20px; padding: 16px; margin-bottom: 14px;
-    border: 1.5px solid #1d9e6c;
-  }
-  .card h3 { margin: 0; font-size: 19px; font-weight: 900; }
-  .card h3 .dt { font-family: "Public Sans", sans-serif; font-size: 12px; font-weight: 600; color: #8a7a5f; }
-  .card h3 .tday { color: #fff; font-size: 12px; font-weight: 900; letter-spacing: .06em;
-    padding: 4px 11px; border-radius: 999px; vertical-align: 3px; white-space: nowrap; }
-  .card h3 .drate { display: inline-flex; align-items: center; gap: 4px; margin-left: 8px;
-    font-family: "Public Sans", sans-serif; font-size: 14px; font-weight: 800; white-space: nowrap; }
-  .card h3 .drate svg { vertical-align: -4px; }
+ .locbar{display:flex;align-items:center;gap:8px;margin:0 2px 8px;}
+ .locbar .locbtn{width:auto;flex:1 1 auto;min-width:0;margin:0;overflow:hidden;text-overflow:ellipsis;}
+ .locgps,.locchg{flex:none;font-size:11px;font-weight:700;padding:7px 8px;border-radius:9px;border:1px solid #d8c9a8;background:#ede4cc;color:#22312b;cursor:pointer;font-family:inherit;white-space:nowrap;}
+ .locchg{background:#fff;border-color:#2e7d5b;color:#2e7d5b;}
 
 
-  /* 4 weather tiles */
-  .tiles { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-bottom: 16px; }
-  .tile { background: #ede4cc; border-radius: 12px; padding: 10px 6px; text-align: center; }
-  .tile .k { font-size: 9px; font-weight: 700; letter-spacing: .06em; color: #8a7a5f; text-transform: uppercase; }
-  .tile .v { font-family: "Fraunces", serif; font-size: 15px; font-weight: 800; margin-top: 3px; white-space: nowrap; }
-  .tile .v svg { vertical-align: -4px; }
-  .tile .msub { font-size: 9px; font-weight: 700; color: #8a7a5f; margin-top: 2px; white-space: nowrap; }
-  .tile .sundrow { display: flex; align-items: stretch; justify-content: center; gap: 10px; }
-  .tile .sundiv { width: 1px; background: rgba(90,70,40,.25); }
+ .hd .t2{color:#8a7a5f;font-size:10px;margin-top:2px;}
+ .hd .brand{font-family:"Fraunces",serif;font-weight:900;font-size:15px;color:#22312b;}
+ .hd .nick{font-size:11px;font-weight:700;color:#9a4a16;margin:1px 0 7px;letter-spacing:.02em;}
+ .hdBtns{display:flex;align-items:center;gap:8px;flex:none;}
+ .langbtn{
+ background:#fffaf0;border:1.5px solid #d9c9a3;border-radius:999px;
+ font-size:11px;font-weight:800;padding:7px 10px;cursor:pointer;color:#8a7a5f;
+}
+ .langbtn b{color:#9a4a16;}
+ .watchlink{text-decoration:none;display:inline-block;}
+ .rules{font-size:11px;font-weight:700;color:#8a7a5f;margin:2px 2px 10px;}
+ .season{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.04em;
+ border-radius:999px;padding:3px 10px;margin-left:6px;vertical-align:1px;
+ color:#fff;white-space:nowrap;}
+ .season.open{background:#1d9e6c;}
+ .season.closed{background:#c0392b;}
+ .rules b{color:#9a4a16;}
+ .refresh{
+ background:#bc5a1e;color:#fff;border:none;border-radius:999px;
+ font-family:"Fraunces",serif;font-weight:800;font-size:13px;
+ padding:8px 16px;cursor:pointer;flex:none;
+}
 
-  /* Major / Minor section */
-  .moonsec { margin-bottom: 16px; }
-  .freshmsg { text-align:center; padding:64px 24px; color:#5a6b73; font-size:16px; line-height:1.7; }
-  .fmsg { margin-bottom:18px; }
-  .asklast { font-size:14px; font-weight:600; color:#5a6b73; margin-bottom:10px; }
-  .shorebtn { background:#0b6ea8; color:#fff; border:none; border-radius:999px; font-size:14px; font-weight:700; padding:10px 20px; cursor:pointer; box-shadow:0 4px 14px rgba(11,110,168,.35); }
-  .shorebtn:active { transform:scale(.97); }
-  .moonsec .mh { font-family: "Fraunces", serif; font-weight: 800; font-size: 15px; color: #9a4a16; margin-bottom: 2px; }
-  .cdline { font-size: 11px; color: #8a7a5f; margin: 0 0 8px; font-weight: 600; }
-  .mrow {
-    display: flex; align-items: center; gap: 10px;
-    background: #f3ecda; border: 1px solid #e0d2ae; border-radius: 12px;
-    padding: 9px 12px; margin-bottom: 7px; font-weight: 700; font-size: 14px;
-  }
-  .mrow.now { background: #fff3cf; border: 2px solid #d9a441; box-shadow: 0 0 8px rgba(217,164,65,.45); }
-  .mbadge {
-    font-size: 10px; font-weight: 800; letter-spacing: .06em; border-radius: 7px;
-    padding: 4px 8px; flex: none;
-  }
-  .mbadge.major { background: #bc5a1e; color: #fff; }
-  .mbadge.minor { background: #e3d5b3; color: #6b5f4c; }
-  .mrow .mt { font-family: "Fraunces", serif; font-weight: 800; }
-  .nowpill {
-    margin-left: auto; background: #1d9e6c; color: #fff; font-size: 10px; font-weight: 800;
-    border-radius: 999px; padding: 3px 10px; letter-spacing: .06em; flex: none;
-  }
+ /* Top rating card */
+ .topcard{
+ position:relative;overflow:hidden;
+ background:#22312b;border-radius:22px;padding:18px;
+ border:2px solid #1d9e6c;
+ box-shadow:0 4px 14px rgba(34,49,43,.25);
+ margin-bottom:14px;color:#fff;
+}
+ .topcard .wm{position:absolute;top:-8px;right:6px;opacity:.14;pointer-events:none;}
+ .topcard .row{display:flex;align-items:center;gap:16px;position:relative;padding:2px 4px;}
+ .badge{
+ width:58px;height:58px;border-radius:50%;background:#fff;flex:none;
+ display:flex;align-items:center;justify-content:center;
+}
+ .topcard .lbl{color:#e8c76a;font-size:10px;font-weight:700;letter-spacing:.18em;}
+ .topcard .big{font-family:"Fraunces",serif;font-weight:900;font-size:30px;color:#fff;margin-top:2px;}
+ .topcard .big .sc{font-size:22px;}
+ .topcard .ddate{color:rgba(255,255,255,.78);font-size:12px;font-weight:600;margin-top:6px;letter-spacing:.02em;}
 
-  /* Tide section */
-  .tidesec .th { font-family: "Fraunces", serif; font-weight: 800; font-size: 15px; color: #0f766e; margin-bottom: 2px; }
-  .tidechart { width: 100%; height: auto; display: block; margin: 4px 0 8px; }
-  .tchips { display: flex; flex-wrap: wrap; gap: 8px; }
-  .tchip {
-    display: inline-flex; align-items: center; gap: 6px; border-radius: 999px;
-    padding: 6px 12px; font-size: 12px; font-weight: 700;
-    background: #ede4cc; border: 1px solid #d9c9a3; color: #2b2620;
-  }
-  .tchip.hi { background: #bc5a1e; border-color: #bc5a1e; color: #fff; }
+ /* Day strip */
+ .pick{display:flex;align-items:baseline;justify-content:space-between;margin:2px 2px 8px;}
+ .pick .ph{font-family:"Fraunces",serif;font-weight:800;font-size:13px;color:#9a4a16;}
+ .pick .pr{font-size:11px;color:#8a7a5f;}
+ .strip{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:10px;}
+ .dpill{
+ background:#fffaf0;border:1px solid #e3d5b3;border-radius:12px;padding:8px 2px 7px;
+ text-align:center;cursor:pointer;position:relative;font-family:"Public Sans",sans-serif;
+ color:#2b2620;
+}
+ .dpill .dw{font-size:10px;color:#8a7a5f;font-weight:600;text-transform:uppercase;}
+ .dpill .dn{font-family:"Fraunces",serif;font-size:18px;font-weight:800;}
+ .dpill .dsc{font-size:12px;font-weight:800;}
+ .dpill .dow2{font-size:8px;color:#8a7a5f;white-space:nowrap;letter-spacing:0;}
+ .dpill.sel{color:#fff;border-color:transparent;}
+ .dpill.sel .dw,.dpill.sel .dow2{color:rgba(255,255,255,.85);}
+ .dpill.best{background:#fff3cf;border:2px solid #d9a441;box-shadow:0 0 8px rgba(217,164,65,.5);}
+ .dpill .bestbadge{
+ position:absolute;top:-9px;left:50%;transform:translateX(-50%);
+ background:#6b4a1f;color:#ffe9a8;font-size:8px;font-weight:800;
+ padding:2px 6px;border-radius:999px;letter-spacing:.06em;white-space:nowrap;
+}
 
-  /* Hour by hour */
-  .hsec .hh2 { font-family: "Fraunces", serif; font-weight: 800; font-size: 15px; color: #9a4a16; margin-bottom: 6px; }
-  .htable { width: 100%; border-collapse: collapse; font-size: 12px; table-layout: fixed; }
-  th.hhour, td.hhour { width: 15%; }
-  th.hscore, td.hscore { width: 21%; }
-  .htable td.hscore { padding: 6px 4px; }
-  th.hskyw, td.hskyw { width: 33%; }
-  th.hrain, td.hrain { width: 11%; }
-  th.htemp, td.htemp { width: 20%; }
-  .htable th {
-    font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em;
-    color: #8a7a5f; text-align: left; padding: 4px 6px; border-bottom: 1px solid #e3d5b3;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  }
-  .htable td { padding: 6px; border-bottom: 1px solid #f0e7d2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .htable tr:last-child td { border-bottom: none; }
-  .hrow.inbite td { background: rgba(29,158,108,.12); }
-  .htable tr.past { opacity: .45; }
-  .hhour { font-family: "Fraunces", serif; font-weight: 800; }
-  .hscore { font-weight: 800; }
-  .hscore svg { vertical-align: -5px; }
-  .hint { font-size: 10px; color: #8a7a5f; margin: 8px 2px 0; font-weight: 600; }
+ /* Day card */
+ .card{
+ background:#fffaf0;border-radius:20px;padding:16px;margin-bottom:14px;
+ border:1.5px solid #1d9e6c;
+}
+ .card h3{margin:0;font-size:19px;font-weight:900;}
+ .card h3 .dt{font-family:"Public Sans",sans-serif;font-size:12px;font-weight:600;color:#8a7a5f;}
+ .card h3 .tday{color:#fff;font-size:12px;font-weight:900;letter-spacing:.06em;
+ padding:4px 11px;border-radius:999px;vertical-align:3px;white-space:nowrap;}
+ .card h3 .drate{display:inline-flex;align-items:center;gap:4px;margin-left:8px;
+ font-family:"Public Sans",sans-serif;font-size:14px;font-weight:800;white-space:nowrap;}
+ .card h3 .drate svg{vertical-align:-4px;}
 
-  .loading, .err { text-align: center; padding: 40px 16px; color: #8a7a5f; font-size: 14px; }
-  .err button { margin-top: 10px; }
-  .foot { text-align: center; color: #b3a37f; font-size: 10px; margin-top: 18px; }
 
-  /* ===== responsive: phone -> desktop ===== */
-  /* hourly table is fluid at every width: fixed layout + % columns, never scrolls */
-  .hwrap { overflow-x: visible; }
-  .dpill { min-height: 48px; }
-  @media (max-width: 700px) {
-    .tiles { grid-template-columns: repeat(3, 1fr); }
-  }
-  @media (max-width: 430px) {
-    .wrap { padding: 10px 10px 32px; }
-    .hd { gap: 6px; }
-    .hdBtns { gap: 6px; }
-    .langbtn { padding: 6px 8px; font-size: 10px; }
-    .refresh { padding: 7px 12px; font-size: 12px; }
-    .tiles { grid-template-columns: repeat(2, 1fr); }
-    .strip { gap: 4px; }
-    .dpill { padding: 8px 1px 7px; }
-    .topcard .big { font-size: 26px; }
-    /* hourly table stays compact on phones (column widths are set globally above) */
-    .htable { font-size: 11px; }
-    .htable th, .htable td { padding: 5px 3px; }
-    .hscore svg { width: 16px; height: 16px; }
-  }
-  @media (min-width: 901px) {
-    .wrap { padding: 16px 24px 48px; }
-    .strip { gap: 8px; }
-  }
+ /* 4 weather tiles */
+ .tiles{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:16px;}
+ .tile{background:#ede4cc;border-radius:12px;padding:10px 6px;text-align:center;}
+ .tile .k{font-size:9px;font-weight:700;letter-spacing:.06em;color:#8a7a5f;text-transform:uppercase;}
+ .tile .v{font-family:"Fraunces",serif;font-size:15px;font-weight:800;margin-top:3px;white-space:nowrap;}
+ .tile .v svg{vertical-align:-4px;}
+ .tile .msub{font-size:9px;font-weight:700;color:#8a7a5f;margin-top:2px;white-space:nowrap;}
+ .tile .sundrow{display:flex;align-items:stretch;justify-content:center;gap:10px;}
+ .tile .sundiv{width:1px;background:rgba(90,70,40,.25);}
+
+ /* Major / Minor section */
+ .moonsec{margin-bottom:16px;}
+ .freshmsg{text-align:center;padding:64px 24px;color:#5a6b73;font-size:16px;line-height:1.7;}
+ .fmsg{margin-bottom:18px;}
+ .asklast{font-size:14px;font-weight:600;color:#5a6b73;margin-bottom:10px;}
+ .shorebtn{background:#0b6ea8;color:#fff;border:none;border-radius:999px;font-size:14px;font-weight:700;padding:10px 20px;cursor:pointer;box-shadow:0 4px 14px rgba(11,110,168,.35);}
+ .shorebtn:active{transform:scale(.97);}
+ .moonsec .mh{font-family:"Fraunces",serif;font-weight:800;font-size:15px;color:#9a4a16;margin-bottom:2px;}
+ .cdline{font-size:11px;color:#8a7a5f;margin:0 0 8px;font-weight:600;}
+ .mrow{
+ display:flex;align-items:center;gap:10px;
+ background:#f3ecda;border:1px solid #e0d2ae;border-radius:12px;
+ padding:9px 12px;margin-bottom:7px;font-weight:700;font-size:14px;
+}
+ .mrow.now{background:#fff3cf;border:2px solid #d9a441;box-shadow:0 0 8px rgba(217,164,65,.45);}
+ .mbadge{
+ font-size:10px;font-weight:800;letter-spacing:.06em;border-radius:7px;
+ padding:4px 8px;flex:none;
+}
+ .mbadge.major{background:#bc5a1e;color:#fff;}
+ .mbadge.minor{background:#e3d5b3;color:#6b5f4c;}
+ .mrow .mt{font-family:"Fraunces",serif;font-weight:800;}
+ .nowpill{
+ margin-left:auto;background:#1d9e6c;color:#fff;font-size:10px;font-weight:800;
+ border-radius:999px;padding:3px 10px;letter-spacing:.06em;flex:none;
+}
+
+ /* Tide section */
+ .tidesec .th{font-family:"Fraunces",serif;font-weight:800;font-size:15px;color:#0f766e;margin-bottom:2px;}
+ .tidechart{width:100%;height:auto;display:block;margin:4px 0 8px;}
+ .tchips{display:flex;flex-wrap:wrap;gap:8px;}
+ .tchip{
+ display:inline-flex;align-items:center;gap:6px;border-radius:999px;
+ padding:6px 12px;font-size:12px;font-weight:700;
+ background:#ede4cc;border:1px solid #d9c9a3;color:#2b2620;
+}
+ .tchip.hi{background:#bc5a1e;border-color:#bc5a1e;color:#fff;}
+
+ /* Hour by hour */
+ .hsec .hh2{font-family:"Fraunces",serif;font-weight:800;font-size:15px;color:#9a4a16;margin-bottom:6px;}
+ .htable{width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed;}
+ th.hhour,td.hhour{width:15%;}
+ th.hscore,td.hscore{width:21%;}
+ .htable td.hscore{padding:6px 4px;}
+ th.hskyw,td.hskyw{width:33%;}
+ th.hrain,td.hrain{width:11%;}
+ th.htemp,td.htemp{width:20%;}
+ .htable th{
+ font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;
+ color:#8a7a5f;text-align:left;padding:4px 6px;border-bottom:1px solid #e3d5b3;
+ white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+ .htable td{padding:6px;border-bottom:1px solid #f0e7d2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+ .htable tr:last-child td{border-bottom:none;}
+ .hrow.inbite td{background:rgba(29,158,108,.12);}
+ .htable tr.past{opacity:.45;}
+ .hhour{font-family:"Fraunces",serif;font-weight:800;}
+ .hscore{font-weight:800;}
+ .hscore svg{vertical-align:-5px;}
+ .hint{font-size:10px;color:#8a7a5f;margin:8px 2px 0;font-weight:600;}
+
+ .loading,.err{text-align:center;padding:40px 16px;color:#8a7a5f;font-size:14px;}
+ .err button{margin-top:10px;}
+ .foot{text-align:center;color:#b3a37f;font-size:10px;margin-top:18px;}
+
+ /* ===== responsive:phone -> desktop ===== */
+ /* hourly table is fluid at every width:fixed layout + % columns,never scrolls */
+ .hwrap{overflow-x:visible;}
+ .dpill{min-height:48px;}
+ @media (max-width:700px){
+ .tiles{grid-template-columns:repeat(3,1fr);}
+}
+ @media (max-width:430px){
+ .wrap{padding:10px 10px 32px;}
+ .hd{gap:6px;}
+ .hdBtns{gap:6px;}
+ .langbtn{padding:6px 8px;font-size:10px;}
+ .refresh{padding:7px 12px;font-size:12px;}
+ .tiles{grid-template-columns:repeat(2,1fr);}
+ .strip{gap:4px;}
+ .dpill{padding:8px 1px 7px;}
+ .topcard .big{font-size:26px;}
+ /* hourly table stays compact on phones (column widths are set globally above) */
+ .htable{font-size:11px;}
+ .htable th,.htable td{padding:5px 3px;}
+ .hscore svg{width:16px;height:16px;}
+}
+ @media (min-width:901px){
+ .wrap{padding:16px 24px 48px;}
+ .strip{gap:8px;}
+}
 </style>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -612,7 +612,7 @@ nextMinor: function(d) { return "Next Minor in " + d; },
 majorNow: "Major bite happening now", minorNow: "Minor bite happening now",
 nextHigh: function(d) { return "High tide in " + d; },
 nextLow: function(d) { return "Low tide in " + d; },
-tideNote: "Tide data unavailable right now.", moonNote: "Moon bite times unavailable right now.", freshMsg: "Looks like freshwater \u2014 we only do saltwater fish.", inlandMsg: "Out of the lookdown zone! They hang around piers \u2014 not couches.", askLast: "Would you like to go to your last location?",
+tideNote: "Tide data unavailable right now.", moonNote: "Moon bite times unavailable right now.", freshMsg: "Looks like freshwater \u2014 we only do saltwater fish.", inlandMsg: "Out of the lookdown zone! They hang around piers \u2014 not couches.", askLast: "Would you like to go to your last location?", onWaterAsk: "Dock, pier, or bridge?", onWater: "Fish here anyway",
 catchT0: "Skunked! The lookdown win today. 🎣",
 catchT1: "Nice haul — dinner's on! 🐟",
 catchT2: "Lookdown master! 🏆",
@@ -655,7 +655,7 @@ nextMinor: function(d) { return "Cá cắn nhẹ sau " + d; },
 majorNow: "Đang cắn mạnh ngay bây giờ", minorNow: "Đang cắn nhẹ ngay bây giờ",
 nextHigh: function(d) { return "Nước lên sau " + d; },
 nextLow: function(d) { return "Nước xuống sau " + d; },
-tideNote: "Hiện chưa có dữ liệu thủy triều.", moonNote: "Hiện chưa có giờ cá cắn theo mặt trăng.", freshMsg: "Có vẻ là nước ngọt \u2014 chúng tôi chỉ câu cá nước mặn.", inlandMsg: "Ra khỏi vùng lookdown rồi! Chúng tụ tập quanh cầu cảng \u2014 chứ không phải ghế sofa.", askLast: "Bạn có muốn về lại điểm câu gần nhất không?",
+tideNote: "Hiện chưa có dữ liệu thủy triều.", moonNote: "Hiện chưa có giờ cá cắn theo mặt trăng.", freshMsg: "Có vẻ là nước ngọt \u2014 chúng tôi chỉ câu cá nước mặn.", inlandMsg: "Ra khỏi vùng lookdown rồi! Chúng tụ tập quanh cầu cảng \u2014 chứ không phải ghế sofa.", askLast: "Bạn có muốn về lại điểm câu gần nhất không?", onWaterAsk: "Cầu tàu hay cầu cảng?", onWater: "Cứ câu ở đây",
 catchT0: "Móm rồi! Hôm nay cá thắng rồi. 🎣",
 catchT1: "Khá đấy — có cá ăn rồi! 🐟",
 catchT2: "Cao thủ săn cá! 🏆",
@@ -1640,6 +1640,18 @@ show(fr);
 }).catch(function() {});
 }
 function lastShore() { try { return JSON.parse(localStorage.getItem("ff_last_shore")); } catch (e) { return null; } }
+function waterKey(loc) { return loc.lat.toFixed(3) + "," + loc.lon.toFixed(3); }
+function hasWaterOverride(loc) {
+  try { return !!JSON.parse(localStorage.getItem("ff_water") || "{}")[waterKey(loc)]; }
+  catch (e) { return false; }
+}
+function saveWaterOverride(loc) {
+  try {
+    var o = JSON.parse(localStorage.getItem("ff_water") || "{}");
+    o[waterKey(loc)] = 1;
+    localStorage.setItem("ff_water", JSON.stringify(o));
+  } catch (e) {}
+}
 function renderAll() {
 var S = STR[state.lang];
 renderHeader();
@@ -1648,18 +1660,22 @@ if (!state.ready || !state.days.length) return;
 var d0 = state.days[0];
 var dx = state.days[state.sel];
 var c0 = ratingColor(dx.score);
-function guardScreen(msg) {
+function guardScreen(msg, allowOverride) {
 var btn = "", ls = lastShore();
 if (ls && ls.name && (ls.lat !== state.loc.lat || ls.lon !== state.loc.lon))
 btn = '<div class="asklast">' + S.askLast + '</div><button class="shorebtn" id="backShore">' + escHTML(ls.name) + " \u2192</button>";
+if (allowOverride)
+btn += '<div class="asklast">' + S.onWaterAsk + '</div><button class="shorebtn" id="waterBtn">' + escHTML(S.onWater) + " \u2192</button>";
 return '<div class="freshmsg"><div class="fmsg">' + msg + "</div>" + btn + "</div>";
 }
 function wireBackShore() {
 var b = $("backShore");
 if (b) b.onclick = function() { var ls = lastShore(); if (ls) setLocation(ls); };
+var w = $("waterBtn");
+if (w) w.onclick = function() { saveWaterOverride(state.loc); boot(); };
 }
 if (!state.isOcean) { app.innerHTML = guardScreen(S.freshMsg); wireBackShore(); return; }
-if (!state.isShore) { app.innerHTML = guardScreen(S.inlandMsg); wireBackShore(); return; }
+if (!state.isShore) { app.innerHTML = guardScreen(S.inlandMsg, true); wireBackShore(); return; }
 var html = "";
 // top rating card
 html += '<div class="topcard" style="border-color:' + c0 + '">' +
@@ -1883,7 +1899,7 @@ if (r[0]._err || r[1]._err) { state.loading = false; showError(); return; }
 var wx = r[0], mar = r[1];
 state.wx = wx; state.mar = mar;
 state.isOcean = mar.hourly.sea_surface_temperature.some(function(v) { return v != null && !isNaN(v); });
-state.isShore = state.isOcean && (mar.hourly.wave_height || []).some(function(v) { return v != null && !isNaN(v); });
+state.isShore = state.isOcean && (hasWaterOverride(state.loc) || (mar.hourly.wave_height || []).some(function(v) { return v != null && !isNaN(v); }));
 if (state.isShore) { try { localStorage.setItem("ff_last_shore", JSON.stringify({ name: state.loc.name, lat: state.loc.lat, lon: state.loc.lon })); } catch (e) {} }
 state.tides = r[2];
 var all = [];
