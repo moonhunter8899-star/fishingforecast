@@ -28,7 +28,7 @@
 
   /* Header */
   .hd { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin: 4px 2px 12px; }
-  .stickyhead { position: -webkit-sticky; position: sticky; top: 0; z-index: 1200; background: #f6f0df; margin: 0 -16px; padding: 10px 16px 4px; border-bottom: 1px solid #e7dcc2; }
+  .stickyhead { position: fixed; top: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 992px; box-sizing: border-box; z-index: 1200; background: #f6f0df; padding: 10px 16px 8px; border-bottom: 1px solid #e7dcc2; }
   .hd > div:first-child { min-width: 0; }
   .locline { font-family: "Fraunces", serif; font-weight: 800; font-size: 15px;
     white-space: nowrap; margin: 0 2px 8px; }
@@ -287,6 +287,21 @@
 </div>
 <script>
 "use strict";
+/* Fixed header: spacer keeps page flow; sync after panel toggles/resize */
+var stickyHeadEl = document.querySelector('.stickyhead');
+var stickySpacerEl = null;
+function syncSticky() {
+  if (!stickyHeadEl) return;
+  if (!stickySpacerEl) {
+    stickySpacerEl = document.createElement('div');
+    stickyHeadEl.parentNode.insertBefore(stickySpacerEl, stickyHeadEl);
+  }
+  stickySpacerEl.style.height = stickyHeadEl.offsetHeight + 'px';
+}
+syncSticky();
+window.addEventListener('resize', syncSticky);
+window.addEventListener('load', syncSticky);
+setTimeout(syncSticky, 600);
 /* ================= constants ================= */
 var PIN = { lat: 26.943311, lon: -80.070517, name: "Jupiter Inlet, FL", station: "8722495" };
 var TIDE_STATIONS = [
@@ -394,7 +409,7 @@ function pinSVG(s) {
     '<circle cx="12" cy="11" r="3.4"/></svg>';
 }
 function locMsg(t) { var el = $("locMsg"); if (el) el.textContent = t || ""; }
-function hideLocPanel() { var p = $("locPanel"); if (p) p.hidden = true; }
+function hideLocPanel() { var p = $("locPanel"); if (p) p.hidden = true; syncSticky(); }
 function setLocation(loc) {
   state.loc = resolveLoc({ name: loc.name, lat: loc.lat, lon: loc.lon });
   try { localStorage.setItem("ff_loc", JSON.stringify({ name: state.loc.name, lat: state.loc.lat, lon: state.loc.lon })); } catch (e) {}
@@ -1782,13 +1797,13 @@ $("langBtn").addEventListener("click", function() {
 });
 $("refBtn").addEventListener("click", function() { boot(); });
 $("locName").addEventListener("click", function() {
-  var p = $("locPanel"); p.hidden = !p.hidden;
+  var p = $("locPanel"); p.hidden = !p.hidden; syncSticky();
   if (!p.hidden) { wireLocUI(); setTimeout(function() { $("locSearch").focus(); }, 60); }
 });
 $("locGPS").addEventListener("click", useMyLocation);
-$("locGPS2").addEventListener("click", function() { $("locPanel").hidden = false; wireLocUI(); useMyLocation(); });
+$("locGPS2").addEventListener("click", function() { $("locPanel").hidden = false; syncSticky(); wireLocUI(); useMyLocation(); });
 $("locChange").addEventListener("click", function() {
-  var p = $("locPanel"); p.hidden = !p.hidden;
+  var p = $("locPanel"); p.hidden = !p.hidden; syncSticky();
   if (!p.hidden) { wireLocUI(); setTimeout(function() { $("locSearch").focus(); }, 60); }
 });
 $("locHome").addEventListener("click", function() { var _l = lastShore(); setLocation((_l && _l.name) ? _l : { name: PIN.name, lat: PIN.lat, lon: PIN.lon }); });
