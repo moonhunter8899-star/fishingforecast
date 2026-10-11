@@ -292,12 +292,12 @@
 var stickyHeadEl = document.querySelector('.stickyhead');
 var stickySpacerEl = null;
 function syncSticky() {
-  if (!stickyHeadEl) return;
-  if (!stickySpacerEl) {
-    stickySpacerEl = document.createElement('div');
-    stickyHeadEl.parentNode.insertBefore(stickySpacerEl, stickyHeadEl);
-  }
-  stickySpacerEl.style.height = stickyHeadEl.offsetHeight + 'px';
+if (!stickyHeadEl) return;
+if (!stickySpacerEl) {
+stickySpacerEl = document.createElement('div');
+stickyHeadEl.parentNode.insertBefore(stickySpacerEl, stickyHeadEl);
+}
+stickySpacerEl.style.height = stickyHeadEl.offsetHeight + 'px';
 }
 syncSticky();
 window.addEventListener('resize', syncSticky);
@@ -306,346 +306,396 @@ setTimeout(syncSticky, 600);
 /* ================= constants ================= */
 var PIN = { lat: 26.943311, lon: -80.070517, name: "Jupiter Inlet, FL", station: "8722495" };
 var TIDE_STATIONS = [
-  ["8729333",30.468,-86.138],
-  ["8720213",30.42,-81.728],
-  ["8729572",30.406,-86.65],
-  ["8729806",30.337,-87.14],
-  ["8720291",30.283,-81.387],
-  ["8729210",30.214,-85.879],
-  ["8720434",30.08,-81.762],
-  ["8728130",30.078,-84.178],
-  ["8728957",29.997,-85.37],
-  ["8720554",29.917,-81.3],
-  ["8728412",29.878,-84.595],
-  ["8727792",29.797,-83.584],
-  ["8728786",29.707,-85.153],
-  ["8720767",29.595,-81.682],
-  ["8727648",29.437,-83.293],
-  ["8727520",29.135,-83.032],
-  ["8721147",29.063,-80.916],
-  ["8727328",28.863,-82.667],
-  ["8727151",28.533,-82.65],
-  ["8721604",28.416,-80.593],
-  ["8721843",28.083,-80.592],
-  ["8726724",27.978,-82.832],
-  ["8726667",27.913,-82.425],
-  ["8722125",27.632,-80.372],
-  ["8726347",27.602,-82.76],
-  ["8722329",27.252,-80.218],
-  ["8725899",27.123,-82.47],
-  ["8725791",26.988,-81.993],
-  ["8722495",26.943,-80.073],
-  ["8722588",26.77,-80.052],
-  ["8725541",26.707,-82.163],
-  ["8722761",26.447,-80.065],
-  ["8725351",26.438,-81.918],
-  ["8725110",26.132,-81.808],
-  ["8723080",25.903,-80.12],
-  ["8724963",25.895,-81.558],
-  ["8723465",25.373,-80.29],
-  ["8723962",24.718,-81.017],
-  ["8724698",24.632,-82.92],
-  ["8724493",24.575,-81.708],
-  ["8671946",31.89,-81.062],
-  ["8674301",31.575,-81.19],
-  ["8677406",31.145,-81.497],
-  ["8679598",30.778,-81.491],
-  ["8651370",36.183,-75.747],
-  ["8652437",35.845,-75.655],
-  ["8653244",35.585,-76.486],
-  ["8653471",35.509,-75.989],
-  ["8654400",35.223,-75.635],
-  ["8656201",34.797,-76.455],
-  ["8656613",34.687,-77.118],
-  ["8658163",34.213,-77.787],
-  ["8659182",33.902,-78.082],
-  ["8659897",33.865,-78.507],
-  ["8661070",33.655,-78.918],
-  ["8662245",33.352,-79.187],
-  ["8664022",33.008,-79.923],
-  ["8665763",32.747,-80.165],
-  ["8668498",32.34,-80.465],
-  ["8669246",32.214,-80.846]
+["8729333",30.468,-86.138],
+["8720213",30.42,-81.728],
+["8729572",30.406,-86.65],
+["8729806",30.337,-87.14],
+["8720291",30.283,-81.387],
+["8729210",30.214,-85.879],
+["8720434",30.08,-81.762],
+["8728130",30.078,-84.178],
+["8728957",29.997,-85.37],
+["8720554",29.917,-81.3],
+["8728412",29.878,-84.595],
+["8727792",29.797,-83.584],
+["8728786",29.707,-85.153],
+["8720767",29.595,-81.682],
+["8727648",29.437,-83.293],
+["8727520",29.135,-83.032],
+["8721147",29.063,-80.916],
+["8727328",28.863,-82.667],
+["8727151",28.533,-82.65],
+["8721604",28.416,-80.593],
+["8721843",28.083,-80.592],
+["8726724",27.978,-82.832],
+["8726667",27.913,-82.425],
+["8722125",27.632,-80.372],
+["8726347",27.602,-82.76],
+["8722329",27.252,-80.218],
+["8725899",27.123,-82.47],
+["8725791",26.988,-81.993],
+["8722495",26.943,-80.073],
+["8722588",26.77,-80.052],
+["8725541",26.707,-82.163],
+["8722761",26.447,-80.065],
+["8725351",26.438,-81.918],
+["8725110",26.132,-81.808],
+["8723080",25.903,-80.12],
+["8724963",25.895,-81.558],
+["8723465",25.373,-80.29],
+["8723962",24.718,-81.017],
+["8724698",24.632,-82.92],
+["8724493",24.575,-81.708],
+["8671946",31.89,-81.062],
+["8674301",31.575,-81.19],
+["8677406",31.145,-81.497],
+["8679598",30.778,-81.491],
+["8651370",36.183,-75.747],
+["8652437",35.845,-75.655],
+["8653244",35.585,-76.486],
+["8653471",35.509,-75.989],
+["8654400",35.223,-75.635],
+["8656201",34.797,-76.455],
+["8656613",34.687,-77.118],
+["8658163",34.213,-77.787],
+["8659182",33.902,-78.082],
+["8659897",33.865,-78.507],
+["8661070",33.655,-78.918],
+["8662245",33.352,-79.187],
+["8664022",33.008,-79.923],
+["8665763",32.747,-80.165],
+["8668498",32.34,-80.465],
+["8669246",32.214,-80.846]
 ];
 
 /* ================= locations: GPS, search, saved spots ================= */
 function distMi(lat1, lon1, lat2, lon2) {
-  var p = Math.PI / 180, a = Math.sin((lat2 - lat1) * p / 2), b = Math.sin((lon2 - lon1) * p / 2);
-  var h = a * a + Math.cos(lat1 * p) * Math.cos(lat2 * p) * b * b;
-  return 2 * 3959 * Math.asin(Math.sqrt(h));
+var p = Math.PI / 180, a = Math.sin((lat2 - lat1) * p / 2), b = Math.sin((lon2 - lon1) * p / 2);
+var h = a * a + Math.cos(lat1 * p) * Math.cos(lat2 * p) * b * b;
+return 2 * 3959 * Math.asin(Math.sqrt(h));
 }
 function nearestStation(lat, lon) {
-  var best = null, bd = 1e9, i, t, d;
-  for (i = 0; i < TIDE_STATIONS.length; i++) {
-    t = TIDE_STATIONS[i]; d = distMi(lat, lon, t[1], t[2]);
-    if (d < bd) { bd = d; best = t[0]; }
-  }
-  return bd <= 45 ? best : null;
+var best = null, bd = 1e9, i, t, d;
+for (i = 0; i < TIDE_STATIONS.length; i++) {
+t = TIDE_STATIONS[i]; d = distMi(lat, lon, t[1], t[2]);
+if (d < bd) { bd = d; best = t[0]; }
+}
+return bd <= 45 ? best : null;
 }
 function resolveLoc(l) {
-  l.station = nearestStation(l.lat, l.lon);
-  l.home = distMi(l.lat, l.lon, PIN.lat, PIN.lon) < 30;
-  return l;
+l.station = nearestStation(l.lat, l.lon);
+l.home = distMi(l.lat, l.lon, PIN.lat, PIN.lon) < 30;
+return l;
 }
 function getSavedLoc() {
-  try {
-    var l = JSON.parse(localStorage.getItem("ff_loc"));
-    if (l && isFinite(l.lat) && isFinite(l.lon) && l.name)
-      return resolveLoc({ name: String(l.name).slice(0, 60), lat: +l.lat, lon: +l.lon });
-  } catch (e) {}
-  return resolveLoc({ name: PIN.name, lat: PIN.lat, lon: PIN.lon });
+try {
+var l = JSON.parse(localStorage.getItem("ff_loc"));
+if (l && isFinite(l.lat) && isFinite(l.lon) && l.name)
+return resolveLoc({ name: String(l.name).slice(0, 60), lat: +l.lat, lon: +l.lon });
+} catch (e) {}
+return resolveLoc({ name: PIN.name, lat: PIN.lat, lon: PIN.lon });
 }
 function getRecents() { try { return JSON.parse(localStorage.getItem("ff_recents")) || []; } catch (e) { return []; } }
 function saveRecent(loc) {
-  var r = getRecents().filter(function(x) { return distMi(x.lat, x.lon, loc.lat, loc.lon) > 1; });
-  r.unshift({ name: loc.name, lat: loc.lat, lon: loc.lon });
-  try { localStorage.setItem("ff_recents", JSON.stringify(r.slice(0, 5))); } catch (e) {}
+var r = getRecents().filter(function(x) { return distMi(x.lat, x.lon, loc.lat, loc.lon) > 1; });
+r.unshift({ name: loc.name, lat: loc.lat, lon: loc.lon });
+try { localStorage.setItem("ff_recents", JSON.stringify(r.slice(0, 5))); } catch (e) {}
 }
 function escHTML(t) { return String(t).replace(/[&<>"']/g, function(c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
 
 function pinSVG(s) {
-  s = s || 13;
-  return '<svg width="' + s + '" height="' + Math.round(s * 1.25) + '" viewBox="0 0 24 30" fill="none" stroke="#3f3a32" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:6px">' +
-    '<path d="M12 2.8C7.3 2.8 3.7 6.4 3.7 11.1c0 6.3 8.3 16.1 8.3 16.1s8.3-9.8 8.3-16.1C20.3 6.4 16.7 2.8 12 2.8Z"/>' +
-    '<circle cx="12" cy="11" r="3.4"/></svg>';
+s = s || 13;
+return '<svg width="' + s + '" height="' + Math.round(s * 1.25) + '" viewBox="0 0 24 30" fill="none" stroke="#3f3a32" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:6px">' +
+'<path d="M12 2.8C7.3 2.8 3.7 6.4 3.7 11.1c0 6.3 8.3 16.1 8.3 16.1s8.3-9.8 8.3-16.1C20.3 6.4 16.7 2.8 12 2.8Z"/>' +
+'<circle cx="12" cy="11" r="3.4"/></svg>';
 }
 function locMsg(t) { var el = $("locMsg"); if (el) el.textContent = t || ""; }
 function hideLocPanel() { var p = $("locPanel"); if (p) p.hidden = true; syncSticky(); }
 function setLocation(loc) {
-  state.loc = resolveLoc({ name: loc.name, lat: loc.lat, lon: loc.lon });
-  try { localStorage.setItem("ff_loc", JSON.stringify({ name: state.loc.name, lat: state.loc.lat, lon: state.loc.lon })); } catch (e) {}
-  if (!state.loc.home) saveRecent(state.loc);
-  hideLocPanel();
-  boot();
+state.loc = resolveLoc({ name: loc.name, lat: loc.lat, lon: loc.lon });
+try { localStorage.setItem("ff_loc", JSON.stringify({ name: state.loc.name, lat: state.loc.lat, lon: state.loc.lon })); } catch (e) {}
+if (!state.loc.home) saveRecent(state.loc);
+hideLocPanel();
+boot();
 }
 function useMyLocation() {
-  var S = STR[state.lang];
-  locMsg(S.locating);
-  if (!navigator.geolocation) { locMsg(S.geoUnsupported); return; }
-  navigator.geolocation.getCurrentPosition(function(pos) {
-    var acc = pos.coords.accuracy || 1e9;
-    if (acc > 2000) { // rough network/IP fix, not real GPS — don't save a wrong spot
-      locMsg(S.geoRough.replace("{mi}", Math.max(1, Math.round(acc / 1609))));
-      return;
-    }
-    var lat = pos.coords.latitude, lon = pos.coords.longitude;
-    fetchJSON("https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=" + lat + "&longitude=" + lon + "&localityLanguage=en")
-      .then(function(j) {
-        var place = j.locality || j.city || "";
-        var st = (j.principalSubdivisionCode || "").split("-").pop();
-        setLocation({ name: place ? place + (st ? ", " + st : "") : S.currentLoc, lat: lat, lon: lon });
-      }).catch(function() { setLocation({ name: S.currentLoc, lat: lat, lon: lon }); });
-  }, function() { locMsg(S.geoDenied); }, { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 });
+var S = STR[state.lang];
+locMsg(S.locating);
+if (!navigator.geolocation) { locMsg(S.geoUnsupported); return; }
+navigator.geolocation.getCurrentPosition(function(pos) {
+var acc = pos.coords.accuracy || 1e9;
+if (acc > 2000) { // rough network/IP fix, not real GPS — don't save a wrong spot
+locMsg(S.geoRough.replace("{mi}", Math.max(1, Math.round(acc / 1609))));
+return;
+}
+var lat = pos.coords.latitude, lon = pos.coords.longitude;
+fetchJSON("https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=" + lat + "&longitude=" + lon + "&localityLanguage=en")
+.then(function(j) {
+var place = j.locality || j.city || "";
+var st = (j.principalSubdivisionCode || "").split("-").pop();
+setLocation({ name: place ? place + (st ? ", " + st : "") : S.currentLoc, lat: lat, lon: lon });
+}).catch(function() { setLocation({ name: S.currentLoc, lat: lat, lon: lon }); });
+}, function() { locMsg(S.geoDenied); }, { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 });
+}
+/* Accept typed coordinates: "26.76, -80.11", "26.76 -80.11", "26.76N 80.11W" */
+function parseCoords(q) {
+var t = String(q || "").trim();
+if (!t) return null;
+t = t.toUpperCase().replace(/[\u00B0\u00BA]/g, "").replace(/,/g, " ").replace(/\s+/g, " ").trim();
+var merged = [], pending = null;
+t.split(" ").forEach(function(p) {
+if (/^[NSEW]$/.test(p)) { // lone hemisphere: suffix of previous number, else prefix of next
+var prev = merged[merged.length - 1];
+if (prev && /^-?\d+(?:\.\d+)?$/.test(prev)) merged[merged.length - 1] = prev + p;
+else pending = p;
+return;
+}
+if (pending) { p = pending + p; pending = null; }
+merged.push(p);
+});
+var latH = null, lonH = null, nums = [];
+merged.forEach(function(p) {
+var m = p.match(/^([NS])?(-?\d+(?:\.\d+)?)([NS])?$/);
+if (m) { var h = m[1] || m[3]; if (h === "N" || h === "S") latH = h; nums.push(parseFloat(m[2])); return; }
+m = p.match(/^([EW])?(-?\d+(?:\.\d+)?)([EW])?$/);
+if (m) { var h2 = m[1] || m[3]; if (h2 === "E" || h2 === "W") lonH = h2; nums.push(parseFloat(m[2])); return; }
+});
+if (nums.length !== 2) return null;
+var lat = nums[0], lon = nums[1];
+if (latH === "S") lat = -Math.abs(lat); else if (latH === "N") lat = Math.abs(lat);
+if (lonH === "W") lon = -Math.abs(lon); else if (lonH === "E") lon = Math.abs(lon);
+if (lat < -90 || lat > 90 || lon < -180 || lon > 180) return null;
+return { lat: lat, lon: lon };
+}
+function setLocationFromCoords(lat, lon) {
+var S = STR[state.lang];
+var fallback = lat.toFixed(4) + ", " + lon.toFixed(4);
+locMsg(S.locating);
+fetchJSON("https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=" + lat + "&longitude=" + lon + "&localityLanguage=" + state.lang)
+.then(function(j) {
+var place = j.locality || j.city || "";
+var st = (j.principalSubdivisionCode || "").split("-").pop();
+setLocation({ name: place ? place + (st ? ", " + st : "") : fallback, lat: lat, lon: lon });
+}).catch(function() { setLocation({ name: fallback, lat: lat, lon: lon }); });
 }
 var locSearchTimer = null;
 function doSearch(q) {
-  var S = STR[state.lang], box = $("locResults");
-  if (!q || q.length < 2) { box.innerHTML = ""; return; }
-  fetchJSON("https://geocoding-api.open-meteo.com/v1/search?name=" + encodeURIComponent(q) + "&count=6&language=" + state.lang + "&format=json")
-    .then(function(j) {
-      var res = (j && j.results) || [], html = "";
-      res.forEach(function(r, i) {
-        var label = r.name + (r.admin1 ? ", " + r.admin1 : "") + (r.country_code && r.country_code !== "US" ? " " + r.country_code : "");
-        html += '<button data-gi="' + i + '">' + escHTML(label) + "</button>";
-      });
-      if (!res.length) html = '<div class="locmsg">' + escHTML(S.noResults) + "</div>";
-      box.innerHTML = html;
-      var btns = box.querySelectorAll("[data-gi]");
-      for (var i = 0; i < btns.length; i++) (function(b) {
-        b.addEventListener("click", function() {
-          var r = res[+b.getAttribute("data-gi")];
-          if (r) setLocation({ name: r.name + (r.admin1 ? ", " + r.admin1 : ""), lat: r.latitude, lon: r.longitude });
-        });
-      })(btns[i]);
-    }).catch(function() { box.innerHTML = ""; });
+var S = STR[state.lang], box = $("locResults");
+if (!q || q.length < 2) { box.innerHTML = ""; return; }
+var cc = parseCoords(q);
+if (cc) {
+var label = cc.lat.toFixed(4) + ", " + cc.lon.toFixed(4);
+box.innerHTML = '<button data-coords="1">' + escHTML(label) + "</button>";
+box.querySelector("[data-coords]").addEventListener("click", function() {
+setLocationFromCoords(cc.lat, cc.lon);
+});
+return;
+}
+fetchJSON("https://geocoding-api.open-meteo.com/v1/search?name=" + encodeURIComponent(q) + "&count=6&language=" + state.lang + "&format=json")
+.then(function(j) {
+var res = (j && j.results) || [], html = "";
+res.forEach(function(r, i) {
+var label = r.name + (r.admin1 ? ", " + r.admin1 : "") + (r.country_code && r.country_code !== "US" ? " " + r.country_code : "");
+html += '<button data-gi="' + i + '">' + escHTML(label) + "</button>";
+});
+if (!res.length) html = '<div class="locmsg">' + escHTML(S.noResults) + "</div>";
+box.innerHTML = html;
+var btns = box.querySelectorAll("[data-gi]");
+for (var i = 0; i < btns.length; i++) (function(b) {
+b.addEventListener("click", function() {
+var r = res[+b.getAttribute("data-gi")];
+if (r) setLocation({ name: r.name + (r.admin1 ? ", " + r.admin1 : ""), lat: r.latitude, lon: r.longitude });
+});
+})(btns[i]);
+}).catch(function() { box.innerHTML = ""; });
 }
 function renderRecents() {
-  var r = getRecents(), el = $("locRecents"), html = "";
-  r.forEach(function(x, i) { html += '<button class="locchip" data-ri="' + i + '">' + escHTML(x.name) + "</button>"; });
-  el.innerHTML = html;
-  var chips = el.querySelectorAll("[data-ri]");
-  for (var i = 0; i < chips.length; i++) (function(b) {
-    b.addEventListener("click", function() {
-      var x = getRecents()[+b.getAttribute("data-ri")];
-      if (x) setLocation(x);
-    });
-  })(chips[i]);
+var r = getRecents(), el = $("locRecents"), html = "";
+r.forEach(function(x, i) { html += '<button class="locchip" data-ri="' + i + '">' + escHTML(x.name) + "</button>"; });
+el.innerHTML = html;
+var chips = el.querySelectorAll("[data-ri]");
+for (var i = 0; i < chips.length; i++) (function(b) {
+b.addEventListener("click", function() {
+var x = getRecents()[+b.getAttribute("data-ri")];
+if (x) setLocation(x);
+});
+})(chips[i]);
 }
 function wireLocUI() {
-  var S = STR[state.lang];
-  $("locSearch").placeholder = S.searchPh;
-  $("locGPS").innerHTML = pinSVG(12) + escHTML(S.useMyLoc);
-  var _ls = lastShore();
-  $("locHome").textContent = (_ls && _ls.name) ? "\u2302 " + _ls.name : S.homeBtn;
-  renderRecents();
+var S = STR[state.lang];
+$("locSearch").placeholder = S.searchPh;
+$("locGPS").innerHTML = pinSVG(12) + escHTML(S.useMyLoc);
+var _ls = lastShore();
+$("locHome").textContent = (_ls && _ls.name) ? "\u2302 " + _ls.name : S.homeBtn;
+renderRecents();
 }
 
 /* ================= i18n ================= */
 var STR = {
-  en: {
-    loading: "Checking lookdown conditions…",
-    rating: "LOOKDOWN BITE RATING", today: "TODAY",
-    pickDay: "Pick a day", best: "★ BEST", bestWeek: "BEST DAY THIS WEEK", goDay: "GO DAY",
-    goFish: "BEST TIME TO FISH", inFish: function(d) { return "in " + d; }, nowFish: "NOW", gotAway: "The one that got away! 🎣", wind: "WIND", water: "WATER", cond: "CONDITION", rain: "RAIN", moon: "MOON", sunrise: "SUNRISE", sunset: "SUNSET", catch: "Catch",
-    searchPh: "Search a beach or town…", useMyLoc: "Use my location", homeBtn: "⌂ Jupiter Inlet",
-    locating: "Locating…", geoDenied: "Location unavailable — check permission", geoUnsupported: "Geolocation not supported",
-    currentLoc: "Current location", checkRegs: "Check local fishing regulations", noResults: "No places found",
-    geoRough: "GPS fix is rough (\u00b1{mi} mi) \u2014 try again in the open",
-    chgLoc: "Change location", radar: "RADAR", wind: "WIND", live: "LIVE",
-    moonTitle: "🌙 Major / Minor bite times", major: "MAJOR", minor: "MINOR", now: "NOW",
-    tide: "Tide", high: "High", low: "Low", refresh: "Refresh", back: "‹ Home",
-    rules: "<b>Lookdown</b> — no size/bag limit",
-    seasonYear: "OPEN · year-round", todayWord: "Today",
-    retry: "Try again", loadFail: "Could not load live data. Check your connection.",
-    great: "Great", good: "Good", fair: "Fair", poor: "Poor",
-    updated: function(d, t) { return "Updated " + d + " at " + t; },
-    dur: function(h, m) { return h > 0 ? h + "h " + m + "m" : m + "m"; },
-    nextMajor: function(d) { return "Next Major in " + d; },
-    nextMinor: function(d) { return "Next Minor in " + d; },
-    majorNow: "Major bite happening now", minorNow: "Minor bite happening now",
-    nextHigh: function(d) { return "High tide in " + d; },
-    nextLow: function(d) { return "Low tide in " + d; },
-    tideNote: "Tide data unavailable right now.", moonNote: "Moon bite times unavailable right now.", freshMsg: "Looks like freshwater \u2014 we only do saltwater fish.", inlandMsg: "Out of the lookdown zone! They hang around piers \u2014 not couches.", askLast: "Would you like to go to your last location?",
-    catchT0: "Skunked! The lookdown win today. 🎣",
-    catchT1: "Nice haul — dinner's on! 🐟",
-    catchT2: "Lookdown master! 🏆",
-    catchT3: "Unreal — are you running a charter?! 😄",
-    fullIn: function(d) { return "Full in " + d + "d"; },
-    fullTonight: "Full tonight 🌕",
-    hourly: "Hour by hour", thHour: "Hour", thScore: "Bite", thSkyWind: "Sky · Wind",
-    thRain: "Rain", thAirWtr: "Air/Wtr", biteHint: "Tinted rows fall inside a bite window.",
-    days: ["SUN","MON","TUE","WED","THU","FRI","SAT"],
-    months: ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
-    condName: {
-      0:"Clear", 1:"Mostly clear", 2:"Partly cloudy", 3:"Overcast",
-      45:"Fog", 48:"Fog", 51:"Drizzle", 53:"Drizzle", 55:"Drizzle",
-      56:"Freezing drizzle", 57:"Freezing drizzle", 61:"Light rain", 63:"Rain",
-      65:"Heavy rain", 66:"Freezing rain", 67:"Freezing rain", 71:"Snow",
-      73:"Snow", 75:"Snow", 77:"Snow", 80:"Showers", 81:"Showers", 82:"Showers",
-      85:"Snow showers", 86:"Snow showers", 95:"Thunderstorm", 96:"Storm", 99:"Storm"
-    },
-  },
-  vi: {
-    loading: "Đang kiểm tra điều kiện câu cá…",
-    rating: "ĐIỂM CẮN CÂU LOOKDOWN", today: "HÔM NAY",
-    pickDay: "Chọn ngày", best: "★ ĐẸP NHẤT", bestWeek: "NGÀY ĐẸP NHẤT TUẦN", goDay: "ĐI NGAY",
-    goFish: "GIỜ CÂU TỐT NHẤT", inFish: function(d) { return "sau " + d; }, nowFish: "BÂY GIỜ", gotAway: "Cá chạy mất tiêu rồi! 🎣", wind: "GIÓ", water: "NƯỚC", cond: "THỜI TIẾT", rain: "MƯA", moon: "TRĂNG", sunrise: "BÌNH MINH", sunset: "HOÀNG HÔN", catch: "Cá câu được",
-    searchPh: "Tìm bãi biển hoặc thị trấn…", useMyLoc: "Vị trí của tôi", homeBtn: "⌂ Jupiter Inlet",
-    locating: "Đang định vị…", geoDenied: "Không lấy được vị trí — kiểm tra quyền", geoUnsupported: "Thiết bị không hỗ trợ định vị",
-    currentLoc: "Vị trí hiện tại", checkRegs: "Kiểm tra quy định câu cá địa phương", noResults: "Không tìm thấy địa điểm",
-    geoRough: "Định vị chưa chính xác (\u00b1{mi} dặm) — thử lại ở nơi thoáng",
-    chgLoc: "Đổi địa điểm", radar: "RADAR", wind: "GIÓ", live: "TRỰC TIẾP",
-    moonTitle: "🌙 Giờ cá cắn câu chính / phụ", major: "CHÍNH", minor: "PHỤ", now: "NGAY BÂY GIỜ",
-    tide: "Thủy triều", high: "Nước lên", low: "Nước xuống", refresh: "Làm mới", back: "‹ Trang chủ",
-    rules: "<b>Cá lookdown</b> — không giới hạn",
-    seasonYear: "MỞ · quanh năm", todayWord: "Hôm nay",
-    retry: "Thử lại", loadFail: "Không tải được dữ liệu. Kiểm tra kết nối mạng.",
-    great: "Tuyệt vời", good: "Tốt", fair: "Trung bình", poor: "Tệ",
-    updated: function(d, t) { return "Cập nhật " + d + " lúc " + t; },
-    dur: function(h, m) { return h > 0 ? h + " giờ " + m + " phút" : m + " phút"; },
-    nextMajor: function(d) { return "Cá cắn mạnh sau " + d; },
-    nextMinor: function(d) { return "Cá cắn nhẹ sau " + d; },
-    majorNow: "Đang cắn mạnh ngay bây giờ", minorNow: "Đang cắn nhẹ ngay bây giờ",
-    nextHigh: function(d) { return "Nước lên sau " + d; },
-    nextLow: function(d) { return "Nước xuống sau " + d; },
-    tideNote: "Hiện chưa có dữ liệu thủy triều.", moonNote: "Hiện chưa có giờ cá cắn theo mặt trăng.", freshMsg: "Có vẻ là nước ngọt \u2014 chúng tôi chỉ câu cá nước mặn.", inlandMsg: "Ra khỏi vùng lookdown rồi! Chúng tụ tập quanh cầu cảng \u2014 chứ không phải ghế sofa.", askLast: "Bạn có muốn về lại điểm câu gần nhất không?",
-    catchT0: "Móm rồi! Hôm nay cá thắng rồi. 🎣",
-    catchT1: "Khá đấy — có cá ăn rồi! 🐟",
-    catchT2: "Cao thủ săn cá! 🏆",
-    catchT3: "Đỉnh quá — mở tàu câu luôn đi! 😄",
-    fullIn: function(d) { return "Trăng tròn sau " + d + "d"; },
-    fullTonight: "Trăng tròn tối nay 🌕",
-    hourly: "Từng giờ trong ngày", thHour: "Giờ", thScore: "Điểm cắn", thSkyWind: "Trời · Gió",
-    thRain: "Mưa", thAirWtr: "KK/Nước", biteHint: "Hàng tô màu nằm trong giờ cá cắn.",
-    days: ["CN","T2","T3","T4","T5","T6","T7"],
-    months: ["Th1","Th2","Th3","Th4","Th5","Th6","Th7","Th8","Th9","Th10","Th11","Th12"],
-    condName: {
-      0:"Trời quang", 1:"Ít mây", 2:"Mây rải rác", 3:"Nhiều mây",
-      45:"Sương mù", 48:"Sương mù", 51:"Mưa phùn", 53:"Mưa phùn", 55:"Mưa phùn",
-      56:"Mưa phùn", 57:"Mưa phùn", 61:"Mưa nhẹ", 63:"Mưa",
-      65:"Mưa to", 66:"Mưa đá", 67:"Mưa đá", 71:"Tuyết",
-      73:"Tuyết", 75:"Tuyết", 77:"Tuyết", 80:"Mưa rào", 81:"Mưa rào", 82:"Mưa rào",
-      85:"Mưa tuyết", 86:"Mưa tuyết", 95:"Dông", 96:"Dông", 99:"Dông"
-    },
-  }
+en: {
+loading: "Checking lookdown conditions…",
+rating: "LOOKDOWN BITE RATING", today: "TODAY",
+pickDay: "Pick a day", best: "★ BEST", bestWeek: "BEST DAY THIS WEEK", goDay: "GO DAY",
+goFish: "BEST TIME TO FISH", inFish: function(d) { return "in " + d; }, nowFish: "NOW", gotAway: "The one that got away! 🎣", wind: "WIND", water: "WATER", cond: "CONDITION", rain: "RAIN", moon: "MOON", sunrise: "SUNRISE", sunset: "SUNSET", catch: "Catch",
+searchPh: "Enter a beach, an inlet, or coordinates…", useMyLoc: "Use my location", homeBtn: "⌂ Jupiter Inlet",
+locating: "Locating…", geoDenied: "Location unavailable — check permission", geoUnsupported: "Geolocation not supported",
+currentLoc: "Current location", checkRegs: "Check local fishing regulations", noResults: "No places found",
+geoRough: "GPS fix is rough (\u00b1{mi} mi) \u2014 try again in the open",
+chgLoc: "Change location", radar: "RADAR", wind: "WIND", live: "LIVE",
+moonTitle: "🌙 Major / Minor bite times", major: "MAJOR", minor: "MINOR", now: "NOW",
+tide: "Tide", high: "High", low: "Low", refresh: "Refresh", back: "‹ Home",
+rules: "<b>Lookdown</b> — no size/bag limit",
+seasonYear: "OPEN · year-round", todayWord: "Today",
+retry: "Try again", loadFail: "Could not load live data. Check your connection.",
+great: "Great", good: "Good", fair: "Fair", poor: "Poor",
+updated: function(d, t) { return "Updated " + d + " at " + t; },
+dur: function(h, m) { return h > 0 ? h + "h " + m + "m" : m + "m"; },
+nextMajor: function(d) { return "Next Major in " + d; },
+nextMinor: function(d) { return "Next Minor in " + d; },
+majorNow: "Major bite happening now", minorNow: "Minor bite happening now",
+nextHigh: function(d) { return "High tide in " + d; },
+nextLow: function(d) { return "Low tide in " + d; },
+tideNote: "Tide data unavailable right now.", moonNote: "Moon bite times unavailable right now.", freshMsg: "Looks like freshwater \u2014 we only do saltwater fish.", inlandMsg: "Out of the lookdown zone! They hang around piers \u2014 not couches.", askLast: "Would you like to go to your last location?",
+catchT0: "Skunked! The lookdown win today. 🎣",
+catchT1: "Nice haul — dinner's on! 🐟",
+catchT2: "Lookdown master! 🏆",
+catchT3: "Unreal — are you running a charter?! 😄",
+fullIn: function(d) { return "Full in " + d + "d"; },
+fullTonight: "Full tonight 🌕",
+hourly: "Hour by hour", thHour: "Hour", thScore: "Bite", thSkyWind: "Sky · Wind",
+thRain: "Rain", thAirWtr: "Air/Wtr", biteHint: "Tinted rows fall inside a bite window.",
+days: ["SUN","MON","TUE","WED","THU","FRI","SAT"],
+months: ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
+condName: {
+0:"Clear", 1:"Mostly clear", 2:"Partly cloudy", 3:"Overcast",
+45:"Fog", 48:"Fog", 51:"Drizzle", 53:"Drizzle", 55:"Drizzle",
+56:"Freezing drizzle", 57:"Freezing drizzle", 61:"Light rain", 63:"Rain",
+65:"Heavy rain", 66:"Freezing rain", 67:"Freezing rain", 71:"Snow",
+73:"Snow", 75:"Snow", 77:"Snow", 80:"Showers", 81:"Showers", 82:"Showers",
+85:"Snow showers", 86:"Snow showers", 95:"Thunderstorm", 96:"Storm", 99:"Storm"
+},
+},
+vi: {
+loading: "Đang kiểm tra điều kiện câu cá…",
+rating: "ĐIỂM CẮN CÂU LOOKDOWN", today: "HÔM NAY",
+pickDay: "Chọn ngày", best: "★ ĐẸP NHẤT", bestWeek: "NGÀY ĐẸP NHẤT TUẦN", goDay: "ĐI NGAY",
+goFish: "GIỜ CÂU TỐT NHẤT", inFish: function(d) { return "sau " + d; }, nowFish: "BÂY GIỜ", gotAway: "Cá chạy mất tiêu rồi! 🎣", wind: "GIÓ", water: "NƯỚC", cond: "THỜI TIẾT", rain: "MƯA", moon: "TRĂNG", sunrise: "BÌNH MINH", sunset: "HOÀNG HÔN", catch: "Cá câu được",
+searchPh: "Nhập bãi biển, cửa lạch hoặc tọa độ…", useMyLoc: "Vị trí của tôi", homeBtn: "⌂ Jupiter Inlet",
+locating: "Đang định vị…", geoDenied: "Không lấy được vị trí — kiểm tra quyền", geoUnsupported: "Thiết bị không hỗ trợ định vị",
+currentLoc: "Vị trí hiện tại", checkRegs: "Kiểm tra quy định câu cá địa phương", noResults: "Không tìm thấy địa điểm",
+geoRough: "Định vị chưa chính xác (\u00b1{mi} dặm) — thử lại ở nơi thoáng",
+chgLoc: "Đổi địa điểm", radar: "RADAR", wind: "GIÓ", live: "TRỰC TIẾP",
+moonTitle: "🌙 Giờ cá cắn câu chính / phụ", major: "CHÍNH", minor: "PHỤ", now: "NGAY BÂY GIỜ",
+tide: "Thủy triều", high: "Nước lên", low: "Nước xuống", refresh: "Làm mới", back: "‹ Trang chủ",
+rules: "<b>Cá lookdown</b> — không giới hạn",
+seasonYear: "MỞ · quanh năm", todayWord: "Hôm nay",
+retry: "Thử lại", loadFail: "Không tải được dữ liệu. Kiểm tra kết nối mạng.",
+great: "Tuyệt vời", good: "Tốt", fair: "Trung bình", poor: "Tệ",
+updated: function(d, t) { return "Cập nhật " + d + " lúc " + t; },
+dur: function(h, m) { return h > 0 ? h + " giờ " + m + " phút" : m + " phút"; },
+nextMajor: function(d) { return "Cá cắn mạnh sau " + d; },
+nextMinor: function(d) { return "Cá cắn nhẹ sau " + d; },
+majorNow: "Đang cắn mạnh ngay bây giờ", minorNow: "Đang cắn nhẹ ngay bây giờ",
+nextHigh: function(d) { return "Nước lên sau " + d; },
+nextLow: function(d) { return "Nước xuống sau " + d; },
+tideNote: "Hiện chưa có dữ liệu thủy triều.", moonNote: "Hiện chưa có giờ cá cắn theo mặt trăng.", freshMsg: "Có vẻ là nước ngọt \u2014 chúng tôi chỉ câu cá nước mặn.", inlandMsg: "Ra khỏi vùng lookdown rồi! Chúng tụ tập quanh cầu cảng \u2014 chứ không phải ghế sofa.", askLast: "Bạn có muốn về lại điểm câu gần nhất không?",
+catchT0: "Móm rồi! Hôm nay cá thắng rồi. 🎣",
+catchT1: "Khá đấy — có cá ăn rồi! 🐟",
+catchT2: "Cao thủ săn cá! 🏆",
+catchT3: "Đỉnh quá — mở tàu câu luôn đi! 😄",
+fullIn: function(d) { return "Trăng tròn sau " + d + "d"; },
+fullTonight: "Trăng tròn tối nay 🌕",
+hourly: "Từng giờ trong ngày", thHour: "Giờ", thScore: "Điểm cắn", thSkyWind: "Trời · Gió",
+thRain: "Mưa", thAirWtr: "KK/Nước", biteHint: "Hàng tô màu nằm trong giờ cá cắn.",
+days: ["CN","T2","T3","T4","T5","T6","T7"],
+months: ["Th1","Th2","Th3","Th4","Th5","Th6","Th7","Th8","Th9","Th10","Th11","Th12"],
+condName: {
+0:"Trời quang", 1:"Ít mây", 2:"Mây rải rác", 3:"Nhiều mây",
+45:"Sương mù", 48:"Sương mù", 51:"Mưa phùn", 53:"Mưa phùn", 55:"Mưa phùn",
+56:"Mưa phùn", 57:"Mưa phùn", 61:"Mưa nhẹ", 63:"Mưa",
+65:"Mưa to", 66:"Mưa đá", 67:"Mưa đá", 71:"Tuyết",
+73:"Tuyết", 75:"Tuyết", 77:"Tuyết", 80:"Mưa rào", 81:"Mưa rào", 82:"Mưa rào",
+85:"Mưa tuyết", 86:"Mưa tuyết", 95:"Dông", 96:"Dông", 99:"Dông"
+},
+}
 };
 
 /* ================= helpers ================= */
 function $(id) { return document.getElementById(id); }
 function pad(n) { return (n < 10 ? "0" : "") + n; }
 function compass(deg) {
-  var dirs = ["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSW","SW","WSW","W","WNW","NW","NNW"];
-  return dirs[Math.round(deg / 22.5) % 16];
+var dirs = ["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSW","SW","WSW","W","WNW","NW","NNW"];
+return dirs[Math.round(deg / 22.5) % 16];
 }
 function tstr(d, lang) { // 12h in both languages, e.g. "7:35p"
-  var h = d.getHours(), ap = h >= 12 ? "p" : "a";
-  h = h % 12; if (h === 0) h = 12;
-  return h + ":" + pad(d.getMinutes()) + ap;
+var h = d.getHours(), ap = h >= 12 ? "p" : "a";
+h = h % 12; if (h === 0) h = 12;
+return h + ":" + pad(d.getMinutes()) + ap;
 }
 function trange(a, b, lang) { return tstr(a, lang) + "–" + tstr(b, lang); }
 function clockStr(lang) { // 12h in both languages, e.g. "2:26 PM"
-  var d = new Date();
-  var h = d.getHours(), ap = h >= 12 ? "PM" : "AM";
-  h = h % 12; if (h === 0) h = 12;
-  return h + ":" + pad(d.getMinutes()) + " " + ap;
+var d = new Date();
+var h = d.getHours(), ap = h >= 12 ? "PM" : "AM";
+h = h % 12; if (h === 0) h = 12;
+return h + ":" + pad(d.getMinutes()) + " " + ap;
 }
 function fullDateStr(date, lang) { // EN: "Fri, Oct 9, 2026" · VI: "T6, 9 Th10 2026"
-  var S = STR[lang];
-  if (lang === "vi") {
-    return S.days[date.getDay()] + ", " + date.getDate() + " " + S.months[date.getMonth()] + " " + date.getFullYear();
-  }
-  var dn = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][date.getDay()];
-  return dn + ", " + S.months[date.getMonth()] + " " + date.getDate() + ", " + date.getFullYear();
+var S = STR[lang];
+if (lang === "vi") {
+return S.days[date.getDay()] + ", " + date.getDate() + " " + S.months[date.getMonth()] + " " + date.getFullYear();
+}
+var dn = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][date.getDay()];
+return dn + ", " + S.months[date.getMonth()] + " " + date.getDate() + ", " + date.getFullYear();
 }
 function ratingColor(s) { return s >= 60 ? "#1d9e6c" : (s >= 40 ? "#d9a441" : "#c0392b"); }
 function ratingWord(s, lang) {
-  var S = STR[lang];
-  return s >= 80 ? S.great : s >= 60 ? S.good : s >= 40 ? S.fair : S.poor;
+var S = STR[lang];
+return s >= 80 ? S.great : s >= 60 ? S.good : s >= 40 ? S.fair : S.poor;
 }
 function moonPhaseInfo(deg) {
-  // deg: MET Norway moonphase — 0=new, 90=first quarter, 180=full, 270=last quarter
-  var p = ((((deg % 360) + 360) % 360) / 360);
-  var th = 2 * Math.PI * p;
-  var illum = (1 - Math.cos(th)) / 2;
-  var dFull = Math.round((((180 - deg) % 360) + 360) % 360 / 360 * 29.53058867);
-  return { illum: illum, daysToFull: dFull };
+// deg: MET Norway moonphase — 0=new, 90=first quarter, 180=full, 270=last quarter
+var p = ((((deg % 360) + 360) % 360) / 360);
+var th = 2 * Math.PI * p;
+var illum = (1 - Math.cos(th)) / 2;
+var dFull = Math.round((((180 - deg) % 360) + 360) % 360 / 360 * 29.53058867);
+return { illum: illum, daysToFull: dFull };
 }
 function catchKey(date) { return "pf_catch_" + ymdDash(date); }
 function getCatch(date) {
-  try {
-    var v = parseInt(localStorage.getItem(catchKey(date)) || "0", 10);
-    return (isNaN(v) || v < 0) ? 0 : v;
-  } catch (e) { return 0; }
+try {
+var v = parseInt(localStorage.getItem(catchKey(date)) || "0", 10);
+return (isNaN(v) || v < 0) ? 0 : v;
+} catch (e) { return 0; }
 }
 function setCatch(date, n) {
-  try { localStorage.setItem(catchKey(date), String(Math.max(0, n))); } catch (e) {}
+try { localStorage.setItem(catchKey(date), String(Math.max(0, n))); } catch (e) {}
 }
 function catchMsg(n, lang) {
-  var S = STR[lang];
-  if (n <= 0) return S.catchT0;
-  if (n <= 5) return S.catchT1;
-  if (n <= 12) return S.catchT2;
-  return S.catchT3;
+var S = STR[lang];
+if (n <= 0) return S.catchT0;
+if (n <= 5) return S.catchT1;
+if (n <= 12) return S.catchT2;
+return S.catchT3;
 }
 function catchRowHTML(date) {
-  var S = STR[state.lang];
-  var n = getCatch(date);
-  return '<div class="catchrow"><span class="ck">' + S.catch + ':</span>' +
-    '<button class="cbtn" id="catchMinus">−</button>' +
-    '<span class="cnum" id="catchNum">' + n + '</span>' +
-    '<button class="cbtn" id="catchPlus">+</button>' +
-    '<span class="cmsg" id="catchMsg">' + catchMsg(n, state.lang) + "</span></div>";
+var S = STR[state.lang];
+var n = getCatch(date);
+return '<div class="catchrow"><span class="ck">' + S.catch + ':</span>' +
+'<button class="cbtn" id="catchMinus">−</button>' +
+'<span class="cnum" id="catchNum">' + n + '</span>' +
+'<button class="cbtn" id="catchPlus">+</button>' +
+'<span class="cmsg" id="catchMsg">' + catchMsg(n, state.lang) + "</span></div>";
 }
 function bumpCatch(dateMs, d) {
-  var date = new Date(dateMs), n = Math.max(0, getCatch(date) + d);
-  setCatch(date, n);
-  var cn = $("catchNum"); if (cn) cn.textContent = n;
-  var cm = $("catchMsg"); if (cm) cm.textContent = catchMsg(n, state.lang);
+var date = new Date(dateMs), n = Math.max(0, getCatch(date) + d);
+setCatch(date, n);
+var cn = $("catchNum"); if (cn) cn.textContent = n;
+var cm = $("catchMsg"); if (cm) cm.textContent = catchMsg(n, state.lang);
 }
 function durText(ms, lang) {
-  if (ms < 0) ms = 0;
-  var m = Math.round(ms / 60000), h = Math.floor(m / 60);
-  return STR[lang].dur(h, m % 60);
+if (ms < 0) ms = 0;
+var m = Math.round(ms / 60000), h = Math.floor(m / 60);
+return STR[lang].dur(h, m % 60);
 }
 function hx2rgb(h){h=h.replace("#","");if(h.length===3){h=h[0]+h[0]+h[1]+h[1]+h[2]+h[2];}return [parseInt(h.substr(0,2),16),parseInt(h.substr(2,2),16),parseInt(h.substr(4,2),16)];}
 function rgb2hx(r,g,b){function c(x){x=Math.max(0,Math.min(255,Math.round(x)));var s=x.toString(16);return s.length<2?"0"+s:s;}return "#"+c(r)+c(g)+c(b);}
@@ -653,81 +703,81 @@ function shade(hex,p){var c=hx2rgb(hex);if(p>=0){return rgb2hx(c[0]+(255-c[0])*p
 function mixc(h1,h2,p){var a=hx2rgb(h1),b=hx2rgb(h2);return rgb2hx(a[0]+(b[0]-a[0])*p/100,a[1]+(b[1]-a[1])*p/100,a[2]+(b[2]-a[2])*p/100);}
 var LOOK_URI = "data:image/png;base64,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";
 function fishSVG(color, size, maxW) {
-  // species silhouette, tinted by the rating color (CSS mask).
-  var ratio = 1.348, h = size, w = Math.round(h * ratio);
-  if (maxW && w > maxW) { w = maxW; h = Math.round(w / ratio); }
-  var st = "display:inline-block;width:" + w + "px;height:" + h + "px;background:" + color + ";" +
-    "-webkit-mask-image:url(" + LOOK_URI + ");-webkit-mask-repeat:no-repeat;" +
-    "-webkit-mask-position:center;-webkit-mask-size:contain;" +
-    "mask-image:url(" + LOOK_URI + ");mask-repeat:no-repeat;" +
-    "mask-position:center;mask-size:contain;vertical-align:-4px;";
-  return '<span style="' + st + '"></span>';
+// species silhouette, tinted by the rating color (CSS mask).
+var ratio = 1.348, h = size, w = Math.round(h * ratio);
+if (maxW && w > maxW) { w = maxW; h = Math.round(w / ratio); }
+var st = "display:inline-block;width:" + w + "px;height:" + h + "px;background:" + color + ";" +
+"-webkit-mask-image:url(" + LOOK_URI + ");-webkit-mask-repeat:no-repeat;" +
+"-webkit-mask-position:center;-webkit-mask-size:contain;" +
+"mask-image:url(" + LOOK_URI + ");mask-repeat:no-repeat;" +
+"mask-position:center;mask-size:contain;vertical-align:-4px;";
+return '<span style="' + st + '"></span>';
 }
 /* Original line-art crescent moon with three sparkle stars (Tien's reference style).
-   Clean strokes in deep teal to match the warm-sand/deep-green theme. */
+Clean strokes in deep teal to match the warm-sand/deep-green theme. */
 function moonSVG(em) {
-  var s = em || 1.15, st = "#0f766e", sw = 2.2;
-  function spark(cx, cy, r) {
-    var k = +(r * 0.18).toFixed(2);
-    return '<path d="M' + cx + ' ' + (cy - r) +
-      ' Q' + (cx + k) + ' ' + (cy - k) + ' ' + (cx + r) + ' ' + cy +
-      ' Q' + (cx + k) + ' ' + (cy + k) + ' ' + cx + ' ' + (cy + r) +
-      ' Q' + (cx - k) + ' ' + (cy + k) + ' ' + (cx - r) + ' ' + cy +
-      ' Q' + (cx - k) + ' ' + (cy - k) + ' ' + cx + ' ' + (cy - r) + ' Z"/>';
-  }
-  return '<svg width="' + s + 'em" height="' + s + 'em" viewBox="0 0 32 32" ' +
-    'style="vertical-align:-0.18em" fill="none" stroke="' + st + '" stroke-width="' + sw + '" ' +
-    'stroke-linecap="round" stroke-linejoin="round">' +
-    '<path d="M13.7 6 A10 10 0 1 0 22.1 20.1 A8.2 8.2 0 0 1 13.7 6 Z"/>' +
-    spark(24, 6.5, 3.1) + spark(18, 12.5, 2.3) + spark(25, 14, 1.9) +
-    '</svg>';
+var s = em || 1.15, st = "#0f766e", sw = 2.2;
+function spark(cx, cy, r) {
+var k = +(r * 0.18).toFixed(2);
+return '<path d="M' + cx + ' ' + (cy - r) +
+' Q' + (cx + k) + ' ' + (cy - k) + ' ' + (cx + r) + ' ' + cy +
+' Q' + (cx + k) + ' ' + (cy + k) + ' ' + cx + ' ' + (cy + r) +
+' Q' + (cx - k) + ' ' + (cy + k) + ' ' + (cx - r) + ' ' + cy +
+' Q' + (cx - k) + ' ' + (cy - k) + ' ' + cx + ' ' + (cy - r) + ' Z"/>';
+}
+return '<svg width="' + s + 'em" height="' + s + 'em" viewBox="0 0 32 32" ' +
+'style="vertical-align:-0.18em" fill="none" stroke="' + st + '" stroke-width="' + sw + '" ' +
+'stroke-linecap="round" stroke-linejoin="round">' +
+'<path d="M13.7 6 A10 10 0 1 0 22.1 20.1 A8.2 8.2 0 0 1 13.7 6 Z"/>' +
+spark(24, 6.5, 3.1) + spark(18, 12.5, 2.3) + spark(25, 14, 1.9) +
+'</svg>';
 }
 /* Dynamic moon-phase icon (~30px): dark disc + accurately-shaped lit portion,
-   drawn from the MET Norway moonphase angle (0=new, 90=first quarter,
-   180=full, 270=last quarter). The terminator is a half-ellipse with
-   semi-minor axis r*|cos(phase)|; waxing lights the right side, waning the left.
-   Lit: warm pale yellow; dark: deep slate — reads on the warm-sand theme. */
+drawn from the MET Norway moonphase angle (0=new, 90=first quarter,
+180=full, 270=last quarter). The terminator is a half-ellipse with
+semi-minor axis r*|cos(phase)|; waxing lights the right side, waning the left.
+Lit: warm pale yellow; dark: deep slate — reads on the warm-sand theme. */
 function moonPhaseSVG(deg, em) {
-  var th = ((((deg % 360) + 360) % 360) * Math.PI) / 180;
-  var r = 14, cx = 16, cy = 16;
-  var c = Math.cos(th);
-  if (Math.abs(c) < 1e-9) c = 0; // snap float noise at quarter points
-  var waxing = th <= Math.PI;
-  var rx = Math.abs(r * c).toFixed(2);
-  var outerSweep = waxing ? 1 : 0;
-  var termSweep = (c < 0) ? 1 : 0;
-  var s = em || 1.3;
-  var d = "M" + cx + " " + (cy - r) +
-    " A" + r + " " + r + " 0 0 " + outerSweep + " " + cx + " " + (cy + r) +
-    " A" + rx + " " + r + " 0 0 " + termSweep + " " + cx + " " + (cy - r) + " Z";
-  return '<svg width="' + s + 'em" height="' + s + 'em" viewBox="0 0 32 32" ' +
-    'style="vertical-align:-0.18em">' +
-    '<circle cx="16" cy="16" r="14" fill="#1f3a3a"/>' +
-    '<path d="' + d + '" fill="#f5e6b8"/>' +
-    '<circle cx="16" cy="16" r="13.2" fill="none" stroke="#0f766e" stroke-width="1.6"/>' +
-    '</svg>';
+var th = ((((deg % 360) + 360) % 360) * Math.PI) / 180;
+var r = 14, cx = 16, cy = 16;
+var c = Math.cos(th);
+if (Math.abs(c) < 1e-9) c = 0; // snap float noise at quarter points
+var waxing = th <= Math.PI;
+var rx = Math.abs(r * c).toFixed(2);
+var outerSweep = waxing ? 1 : 0;
+var termSweep = (c < 0) ? 1 : 0;
+var s = em || 1.3;
+var d = "M" + cx + " " + (cy - r) +
+" A" + r + " " + r + " 0 0 " + outerSweep + " " + cx + " " + (cy + r) +
+" A" + rx + " " + r + " 0 0 " + termSweep + " " + cx + " " + (cy - r) + " Z";
+return '<svg width="' + s + 'em" height="' + s + 'em" viewBox="0 0 32 32" ' +
+'style="vertical-align:-0.18em">' +
+'<circle cx="16" cy="16" r="14" fill="#1f3a3a"/>' +
+'<path d="' + d + '" fill="#f5e6b8"/>' +
+'<circle cx="16" cy="16" r="13.2" fill="none" stroke="#0f766e" stroke-width="1.6"/>' +
+'</svg>';
 }
 /* ============ Original line-art weather icons (drawn for this app) ============
-   One consistent style: 32x32 grid, deep teal #0f766e strokes, round caps/joins.
-   Sized ~1em for inline use; simple shapes stay crisp at 16px.
-   Night keeps Tien's crescent-moon-with-sparkles for clear skies. */
+One consistent style: 32x32 grid, deep teal #0f766e strokes, round caps/joins.
+Sized ~1em for inline use; simple shapes stay crisp at 16px.
+Night keeps Tien's crescent-moon-with-sparkles for clear skies. */
 var WXST = "#0f766e", WXSW = 2.2;
 function _wsvg(inner, em) {
-  var s = em || 1.15;
-  return '<svg width="' + s + 'em" height="' + s + 'em" viewBox="0 0 32 32" ' +
-    'style="vertical-align:-0.18em" fill="none" stroke="' + WXST + '" stroke-width="' + WXSW + '" ' +
-    'stroke-linecap="round" stroke-linejoin="round">' + inner + '</svg>';
+var s = em || 1.15;
+return '<svg width="' + s + 'em" height="' + s + 'em" viewBox="0 0 32 32" ' +
+'style="vertical-align:-0.18em" fill="none" stroke="' + WXST + '" stroke-width="' + WXSW + '" ' +
+'stroke-linecap="round" stroke-linejoin="round">' + inner + '</svg>';
 }
 function _wsun(cx, cy, r) {
-  var g = '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '"/>';
-  for (var i = 0; i < 8; i++) {
-    var a = i * Math.PI / 4;
-    g += '<line x1="' + (cx + (r + 2.2) * Math.cos(a)).toFixed(1) +
-         '" y1="' + (cy + (r + 2.2) * Math.sin(a)).toFixed(1) +
-         '" x2="' + (cx + (r + 4.6) * Math.cos(a)).toFixed(1) +
-         '" y2="' + (cy + (r + 4.6) * Math.sin(a)).toFixed(1) + '"/>';
-  }
-  return g;
+var g = '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '"/>';
+for (var i = 0; i < 8; i++) {
+var a = i * Math.PI / 4;
+g += '<line x1="' + (cx + (r + 2.2) * Math.cos(a)).toFixed(1) +
+'" y1="' + (cy + (r + 2.2) * Math.sin(a)).toFixed(1) +
+'" x2="' + (cx + (r + 4.6) * Math.cos(a)).toFixed(1) +
+'" y2="' + (cy + (r + 4.6) * Math.sin(a)).toFixed(1) + '"/>';
+}
+return g;
 }
 /* Cloud body: bottom line, right bump, big top arc, left bump. Spans x~5..26, y~11..25. */
 function _wcloudP() { return '<path d="M10 25 h12 a4 4 0 0 0 0-8 a6 6 0 0 0-11.6-1.6 A4.5 4.5 0 0 0 10 25 Z"/>'; }
@@ -735,596 +785,596 @@ function _wcloud(dy) { return '<g transform="translate(0 ' + (dy || 0) + ')">' +
 function _wcloudSm() { return '<g transform="translate(6.5 7) scale(0.68)">' + _wcloudP() + '</g>'; }
 /* Small crescent for night combos (this app's own crescent geometry). */
 function _wcresSm() {
-  return '<g transform="translate(-1.5 -2.5) scale(0.6)">' +
-    '<path d="M13.7 6 A10 10 0 1 0 22.1 20.1 A8.2 8.2 0 0 1 13.7 6 Z"/></g>';
+return '<g transform="translate(-1.5 -2.5) scale(0.6)">' +
+'<path d="M13.7 6 A10 10 0 1 0 22.1 20.1 A8.2 8.2 0 0 1 13.7 6 Z"/></g>';
 }
 function _wrain(xs, y) {
-  var g = '';
-  for (var i = 0; i < xs.length; i++) {
-    var x = xs[i];
-    g += '<line x1="' + x + '" y1="' + y + '" x2="' + (x - 1.6).toFixed(1) + '" y2="' + (y + 4.2).toFixed(1) + '"/>';
-  }
-  return g;
+var g = '';
+for (var i = 0; i < xs.length; i++) {
+var x = xs[i];
+g += '<line x1="' + x + '" y1="' + y + '" x2="' + (x - 1.6).toFixed(1) + '" y2="' + (y + 4.2).toFixed(1) + '"/>';
+}
+return g;
 }
 function _wdriz(y) {
-  var g = '', xs = [12, 16.5, 21];
-  for (var i = 0; i < 3; i++)
-    g += '<circle cx="' + xs[i] + '" cy="' + (y + (i % 2)) + '" r="1.15" fill="' + WXST + '" stroke="none"/>';
-  return g;
+var g = '', xs = [12, 16.5, 21];
+for (var i = 0; i < 3; i++)
+g += '<circle cx="' + xs[i] + '" cy="' + (y + (i % 2)) + '" r="1.15" fill="' + WXST + '" stroke="none"/>';
+return g;
 }
 function _wsnow(y) {
-  var g = '', xs = [11.5, 16.5, 21.5];
-  for (var i = 0; i < 3; i++) {
-    var x = xs[i];
-    g += '<path d="M' + x + ' ' + (y - 2.2) + 'V' + (y + 2.2) +
-      'M' + (x - 1.9).toFixed(1) + ' ' + (y - 1.1) + 'L' + (x + 1.9).toFixed(1) + ' ' + (y + 1.1) +
-      'M' + (x - 1.9).toFixed(1) + ' ' + (y + 1.1) + 'L' + (x + 1.9).toFixed(1) + ' ' + (y - 1.1) + '"/>';
-  }
-  return g;
+var g = '', xs = [11.5, 16.5, 21.5];
+for (var i = 0; i < 3; i++) {
+var x = xs[i];
+g += '<path d="M' + x + ' ' + (y - 2.2) + 'V' + (y + 2.2) +
+'M' + (x - 1.9).toFixed(1) + ' ' + (y - 1.1) + 'L' + (x + 1.9).toFixed(1) + ' ' + (y + 1.1) +
+'M' + (x - 1.9).toFixed(1) + ' ' + (y + 1.1) + 'L' + (x + 1.9).toFixed(1) + ' ' + (y - 1.1) + '"/>';
+}
+return g;
 }
 function _wbolt() {
-  return '<path d="M18 23 L13 29 H16 L14.5 31.5 L20 26 H17.2 Z" fill="' + WXST + '" stroke="none"/>';
+return '<path d="M18 23 L13 29 H16 L14.5 31.5 L20 26 H17.2 Z" fill="' + WXST + '" stroke="none"/>';
 }
 function _wfog(y) {
-  return '<line x1="9" y1="' + y + '" x2="23" y2="' + y + '"/>' +
-         '<line x1="11.5" y1="' + (y + 3) + '" x2="20.5" y2="' + (y + 3) + '"/>';
+return '<line x1="9" y1="' + y + '" x2="23" y2="' + y + '"/>' +
+'<line x1="11.5" y1="' + (y + 3) + '" x2="20.5" y2="' + (y + 3) + '"/>';
 }
 /* Stat-tile label icons: original line-art in the same style (replaces emoji). */
 function _lblWind() {
-  return _wsvg('<path d="M4 10 h12 a2.8 2.8 0 1 0-2.8-2.8"/>' +
-    '<line x1="4" y1="16" x2="24" y2="16"/>' +
-    '<path d="M4 22 h12 a2.8 2.8 0 1 1-2.8 2.8"/>', 1.05);
+return _wsvg('<path d="M4 10 h12 a2.8 2.8 0 1 0-2.8-2.8"/>' +
+'<line x1="4" y1="16" x2="24" y2="16"/>' +
+'<path d="M4 22 h12 a2.8 2.8 0 1 1-2.8 2.8"/>', 1.05);
 }
 function _lblWater() {
-  return _wsvg('<path d="M16 5 C16 5 9 14 9 19 a7 7 0 0 0 14 0 C23 14 16 5 16 5 Z"/>', 1.05);
+return _wsvg('<path d="M16 5 C16 5 9 14 9 19 a7 7 0 0 0 14 0 C23 14 16 5 16 5 Z"/>', 1.05);
 }
 function _lblRain() {
-  return _wsvg(_wcloudSm() + _wrain([12, 16.5, 21], 25.5), 1.05);
+return _wsvg(_wcloudSm() + _wrain([12, 16.5, 21], 25.5), 1.05);
 }
 /* Condition icon for a weather code + is_day flag (same interface as before). */
 function condIcon(code, isDay) {
-  var night = (isDay === 0), inner = "";
-  var RC = _wcloud(-2);                              /* cloud shifted up, room for precip */
-  var sky = night ? _wcresSm() : _wsun(10, 9, 3.5);   /* small sky body for combos */
-  switch (code) {
-    case 0: return night ? moonSVG(1.15) : _wsvg(_wsun(16, 13, 5.5));
-    case 1: inner = (night ? _wcresSm() : _wsun(10.5, 9.5, 3.8)) + _wcloudSm(); break;
-    case 2: inner = sky + _wcloud(0); break;
-    case 3: inner = _wcloud(0); break;
-    case 45: case 48: inner = RC + _wfog(26); break;
-    case 51: case 53: case 55:
-    case 56: case 57: inner = RC + _wdriz(26.5); break;
-    case 61: inner = RC + _wrain([13.5, 18.5], 24.5); break;
-    case 63: case 66: case 67: inner = RC + _wrain([11.5, 16.5, 21.5], 24.5); break;
-    case 65: inner = RC + _wrain([9.5, 14, 18.5, 23], 24.5); break;
-    case 71: case 73: case 75: case 77: inner = RC + _wsnow(27); break;
-    case 80: case 81: case 82: inner = sky + RC + _wrain([13.5, 18.5], 24.5); break;
-    case 85: case 86: inner = sky + RC + _wsnow(27); break;
-    case 95: inner = RC + _wbolt(); break;
-    case 96: case 99: inner = RC + _wbolt() + _wrain([9.5, 22.5], 24.5); break;
-    default: inner = sky + _wcloud(0);
-  }
-  return _wsvg(inner);
+var night = (isDay === 0), inner = "";
+var RC = _wcloud(-2);                              /* cloud shifted up, room for precip */
+var sky = night ? _wcresSm() : _wsun(10, 9, 3.5);   /* small sky body for combos */
+switch (code) {
+case 0: return night ? moonSVG(1.15) : _wsvg(_wsun(16, 13, 5.5));
+case 1: inner = (night ? _wcresSm() : _wsun(10.5, 9.5, 3.8)) + _wcloudSm(); break;
+case 2: inner = sky + _wcloud(0); break;
+case 3: inner = _wcloud(0); break;
+case 45: case 48: inner = RC + _wfog(26); break;
+case 51: case 53: case 55:
+case 56: case 57: inner = RC + _wdriz(26.5); break;
+case 61: inner = RC + _wrain([13.5, 18.5], 24.5); break;
+case 63: case 66: case 67: inner = RC + _wrain([11.5, 16.5, 21.5], 24.5); break;
+case 65: inner = RC + _wrain([9.5, 14, 18.5, 23], 24.5); break;
+case 71: case 73: case 75: case 77: inner = RC + _wsnow(27); break;
+case 80: case 81: case 82: inner = sky + RC + _wrain([13.5, 18.5], 24.5); break;
+case 85: case 86: inner = sky + RC + _wsnow(27); break;
+case 95: inner = RC + _wbolt(); break;
+case 96: case 99: inner = RC + _wbolt() + _wrain([9.5, 22.5], 24.5); break;
+default: inner = sky + _wcloud(0);
+}
+return _wsvg(inner);
 }
 /* ================= state ================= */
 var state = {
-  lang: localStorage.getItem("pf_lang") || "en",
-  ready: false, sel: 0, days: [], moon: [], tides: [], moonPhase: {},
-  loc: getSavedLoc(),
-  updatedAt: null, isOcean: true, isShore: true
+lang: localStorage.getItem("pf_lang") || "en",
+ready: false, sel: 0, days: [], moon: [], tides: [], moonPhase: {},
+loc: getSavedLoc(),
+updatedAt: null, isOcean: true, isShore: true
 };
 
 /* ================= data loading ================= */
 function fetchJSON(url) {
-  return fetch(url).then(function(r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); });
+return fetch(url).then(function(r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); });
 }
 function ymd(d) { return d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()); }
 function ymdDash(d) { return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()); }
 
 function loadWeather(lat, lon) {
-  var u = "https://api.open-meteo.com/v1/forecast?latitude=" + lat + "&longitude=" + lon +
-    "&hourly=temperature_2m,precipitation_probability,precipitation,windspeed_10m,winddirection_10m,wind_gusts_10m,weather_code,is_day,pressure_msl" +
-    "&daily=temperature_2m_max,temperature_2m_min,weather_code,precipitation_probability_max,sunrise,sunset" +
-    "&timezone=auto&forecast_days=7&temperature_unit=fahrenheit&windspeed_unit=mph";
-  return fetchJSON(u);
+var u = "https://api.open-meteo.com/v1/forecast?latitude=" + lat + "&longitude=" + lon +
+"&hourly=temperature_2m,precipitation_probability,precipitation,windspeed_10m,winddirection_10m,wind_gusts_10m,weather_code,is_day,pressure_msl" +
+"&daily=temperature_2m_max,temperature_2m_min,weather_code,precipitation_probability_max,sunrise,sunset" +
+"&timezone=auto&forecast_days=7&temperature_unit=fahrenheit&windspeed_unit=mph";
+return fetchJSON(u);
 }
 function loadMarine(lat, lon) {
-  var u = "https://marine-api.open-meteo.com/v1/marine?latitude=" + lat + "&longitude=" + lon +
-    "&hourly=wave_height,sea_surface_temperature,swell_wave_period&timezone=auto&forecast_days=7&temperature_unit=fahrenheit";
-  return fetchJSON(u);
+var u = "https://marine-api.open-meteo.com/v1/marine?latitude=" + lat + "&longitude=" + lon +
+"&hourly=wave_height,sea_surface_temperature,swell_wave_period&timezone=auto&forecast_days=7&temperature_unit=fahrenheit";
+return fetchJSON(u);
 }
 function loadTides(station, fromD, toD) {
-  var u = "https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?begin_date=" + ymd(fromD) +
-    "&end_date=" + ymd(toD) + "&station=" + station +
-    "&product=predictions&datum=MLLW&time_zone=lst_ldt&units=english&interval=hilo&format=json&application=lookdown-forecast";
-  return fetchJSON(u).then(function(j) {
-    var out = [];
-    (j.predictions || []).forEach(function(p) {
-      // "2026-10-09 15:21" local station time
-      var m = /^(\d+)-(\d+)-(\d+) (\d+):(\d+)$/.exec(p.t);
-      if (!m) return;
-      out.push({ t: new Date(+m[1], +m[2] - 1, +m[3], +m[4], +m[5]).getTime(), type: p.type, v: parseFloat(p.v) });
-    });
-    out.sort(function(a, b) { return a.t - b.t; });
-    return out;
-  });
+var u = "https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?begin_date=" + ymd(fromD) +
+"&end_date=" + ymd(toD) + "&station=" + station +
+"&product=predictions&datum=MLLW&time_zone=lst_ldt&units=english&interval=hilo&format=json&application=lookdown-forecast";
+return fetchJSON(u).then(function(j) {
+var out = [];
+(j.predictions || []).forEach(function(p) {
+// "2026-10-09 15:21" local station time
+var m = /^(\d+)-(\d+)-(\d+) (\d+):(\d+)$/.exec(p.t);
+if (!m) return;
+out.push({ t: new Date(+m[1], +m[2] - 1, +m[3], +m[4], +m[5]).getTime(), type: p.type, v: parseFloat(p.v) });
+});
+out.sort(function(a, b) { return a.t - b.t; });
+return out;
+});
 }
 function loadMoonDay(lat, lon, date) {
-  // MET Norway sunrise API — the same moon source the Muse app uses.
-  // high_moon/low_moon -> Major (+/-1h); moonrise/moonset -> Minor (+/-30min).
-  // Times requested in UTC (+00:00) so daylight-saving can't shift them.
-  var u = "https://api.met.no/weatherapi/sunrise/3.0/moon?lat=" + lat + "&lon=" + lon +
-    "&date=" + ymdDash(date) + "&offset=" + encodeURIComponent("+00:00");
-  return fetchJSON(u).then(function(j) {
-    var p = (j && j.properties) || {}, wins = [];
-    // moonphase: phase angle in degrees (0=new, 90=first quarter, 180=full, 270=last quarter)
-    try {
-      state.moonPhase = state.moonPhase || {};
-      if (p.moonphase != null && !isNaN(+p.moonphase)) state.moonPhase[ymdDash(date)] = +p.moonphase;
-    } catch (e) {}
-    function T(ev) { return ev && ev.time ? new Date(ev.time).getTime() : null; }
-    [["high_moon"], ["low_moon"]].forEach(function(cfg) {
-      var t = T(p[cfg[0]]);
-      if (t != null && !isNaN(t)) wins.push({ type: "major", start: t - 3600000, end: t + 3600000, center: t });
-    });
-    [["moonrise"], ["moonset"]].forEach(function(cfg) {
-      var t = T(p[cfg[0]]);
-      if (t != null && !isNaN(t)) wins.push({ type: "minor", start: t - 1800000, end: t + 1800000, center: t });
-    });
-    return wins;
-  }).catch(function() { return []; });
+// MET Norway sunrise API — the same moon source the Muse app uses.
+// high_moon/low_moon -> Major (+/-1h); moonrise/moonset -> Minor (+/-30min).
+// Times requested in UTC (+00:00) so daylight-saving can't shift them.
+var u = "https://api.met.no/weatherapi/sunrise/3.0/moon?lat=" + lat + "&lon=" + lon +
+"&date=" + ymdDash(date) + "&offset=" + encodeURIComponent("+00:00");
+return fetchJSON(u).then(function(j) {
+var p = (j && j.properties) || {}, wins = [];
+// moonphase: phase angle in degrees (0=new, 90=first quarter, 180=full, 270=last quarter)
+try {
+state.moonPhase = state.moonPhase || {};
+if (p.moonphase != null && !isNaN(+p.moonphase)) state.moonPhase[ymdDash(date)] = +p.moonphase;
+} catch (e) {}
+function T(ev) { return ev && ev.time ? new Date(ev.time).getTime() : null; }
+[["high_moon"], ["low_moon"]].forEach(function(cfg) {
+var t = T(p[cfg[0]]);
+if (t != null && !isNaN(t)) wins.push({ type: "major", start: t - 3600000, end: t + 3600000, center: t });
+});
+[["moonrise"], ["moonset"]].forEach(function(cfg) {
+var t = T(p[cfg[0]]);
+if (t != null && !isNaN(t)) wins.push({ type: "minor", start: t - 1800000, end: t + 1800000, center: t });
+});
+return wins;
+}).catch(function() { return []; });
 }
 function atHourly(hourly, isoIdx, key) { return hourly[key][isoIdx]; }
 function hourlyIndex(hourly, ms) {
-  // hourly.time entries "2026-10-09T14:00" local
-  var best = 0, bd = 1e15;
-  for (var i = 0; i < hourly.time.length; i++) {
-    var t = new Date(hourly.time[i]).getTime();
-    var d = Math.abs(t - ms);
-    if (d < bd) { bd = d; best = i; }
-  }
-  return best;
+// hourly.time entries "2026-10-09T14:00" local
+var best = 0, bd = 1e15;
+for (var i = 0; i < hourly.time.length; i++) {
+var t = new Date(hourly.time[i]).getTime();
+var d = Math.abs(t - ms);
+if (d < bd) { bd = d; best = i; }
+}
+return best;
 }
 function tideAt(ms) {
-  // Cosine interpolation between hilo events: tides rise/fall fastest
-  // mid-tide and flatten at highs/lows, so the chart renders as a smooth
-  // natural curve instead of angular straight segments.
-  var T = state.tides;
-  if (!T.length) return 0;
-  if (ms <= T[0].t) return T[0].v;
-  for (var i = 0; i < T.length - 1; i++) {
-    if (ms >= T[i].t && ms <= T[i + 1].t) {
-      var f = (ms - T[i].t) / (T[i + 1].t - T[i].t);
-      var s = (1 - Math.cos(Math.PI * f)) / 2;
-      return T[i].v + s * (T[i + 1].v - T[i].v);
-    }
-  }
-  return T[T.length - 1].v;
+// Cosine interpolation between hilo events: tides rise/fall fastest
+// mid-tide and flatten at highs/lows, so the chart renders as a smooth
+// natural curve instead of angular straight segments.
+var T = state.tides;
+if (!T.length) return 0;
+if (ms <= T[0].t) return T[0].v;
+for (var i = 0; i < T.length - 1; i++) {
+if (ms >= T[i].t && ms <= T[i + 1].t) {
+var f = (ms - T[i].t) / (T[i + 1].t - T[i].t);
+var s = (1 - Math.cos(Math.PI * f)) / 2;
+return T[i].v + s * (T[i + 1].v - T[i].v);
+}
+}
+return T[T.length - 1].v;
 }
 /* ---- scoring (mirrors the Muse app's server/src/actions.ts) ----
-   Hourly score starts at 100 and subtracts penalties, clamped 0-100.
-   Tide adjustment is applied per hour afterwards, clamped to [-6, +14].
-   Moon boost applies ONLY to per-window bite ratings, never to day scores. */
+Hourly score starts at 100 and subtracts penalties, clamped 0-100.
+Tide adjustment is applied per hour afterwards, clamped to [-6, +14].
+Moon boost applies ONLY to per-window bite ratings, never to day scores. */
 function hourScore(wi, mi) {
-  var wx = state.wx.hourly, mar = state.mar.hourly, s = 100;
-  var wsp = wx.windspeed_10m[wi];
-  if (wsp < 4) s -= 4;
-  else if (wsp <= 15) s -= 0;
-  else if (wsp <= 20) s -= 12;
-  else if (wsp <= 25) s -= 26;
-  else s -= 46;
-  var gust = wx.wind_gusts_10m ? wx.wind_gusts_10m[wi] : 0;
-  if (gust > wsp + 12) s -= 8;
-  if (gust > 30) s -= 18;
-  var rp = wx.precipitation_probability[wi];
-  if (rp >= 80) s -= 45; else if (rp >= 60) s -= 30; else if (rp >= 40) s -= 20; else if (rp >= 20) s -= 10;
-  var mm = wx.precipitation ? wx.precipitation[wi] : 0;
-  if (mm >= 2.5) s -= 30; else if (mm >= 0.5) s -= 15; else if (mm > 0) s -= 5;
-  var wt = mar.sea_surface_temperature[mi];
-  if (wt != null && !isNaN(wt)) {
-    if (wt >= 72 && wt <= 84) s -= 0;
-    else if ((wt >= 68 && wt < 72) || (wt > 84 && wt <= 88)) s -= 10;
-    else if ((wt >= 65 && wt < 68) || (wt > 88 && wt <= 90)) s -= 18;
-    else s -= 28;
-  }
-  var wv = mar.wave_height[mi] * 3.28084; // ft
-  if (!isNaN(wv)) {
-    // Lookdown are inshore structure fish — surf height barely matters.
-    if (wv <= 4) s -= 0;
-    else if (wv <= 5) s -= 10;
-    else if (wv <= 6) s -= 20;
-    else s -= 32;
-  }
-  // Lookdown feed hardest at night around dock and bridge lights (angler consensus).
-  var isDayH = (wx.is_day && wx.is_day[wi] != null) ? wx.is_day[wi] : 1;
-  if (isDayH === 0) s += 8;
-  return Math.max(0, Math.min(100, Math.round(s)));
+var wx = state.wx.hourly, mar = state.mar.hourly, s = 100;
+var wsp = wx.windspeed_10m[wi];
+if (wsp < 4) s -= 4;
+else if (wsp <= 15) s -= 0;
+else if (wsp <= 20) s -= 12;
+else if (wsp <= 25) s -= 26;
+else s -= 46;
+var gust = wx.wind_gusts_10m ? wx.wind_gusts_10m[wi] : 0;
+if (gust > wsp + 12) s -= 8;
+if (gust > 30) s -= 18;
+var rp = wx.precipitation_probability[wi];
+if (rp >= 80) s -= 45; else if (rp >= 60) s -= 30; else if (rp >= 40) s -= 20; else if (rp >= 20) s -= 10;
+var mm = wx.precipitation ? wx.precipitation[wi] : 0;
+if (mm >= 2.5) s -= 30; else if (mm >= 0.5) s -= 15; else if (mm > 0) s -= 5;
+var wt = mar.sea_surface_temperature[mi];
+if (wt != null && !isNaN(wt)) {
+if (wt >= 72 && wt <= 84) s -= 0;
+else if ((wt >= 68 && wt < 72) || (wt > 84 && wt <= 88)) s -= 10;
+else if ((wt >= 65 && wt < 68) || (wt > 88 && wt <= 90)) s -= 18;
+else s -= 28;
+}
+var wv = mar.wave_height[mi] * 3.28084; // ft
+if (!isNaN(wv)) {
+// Lookdown are inshore structure fish — surf height barely matters.
+if (wv <= 4) s -= 0;
+else if (wv <= 5) s -= 10;
+else if (wv <= 6) s -= 20;
+else s -= 32;
+}
+// Lookdown feed hardest at night around dock and bridge lights (angler consensus).
+var isDayH = (wx.is_day && wx.is_day[wi] != null) ? wx.is_day[wi] : 1;
+if (isDayH === 0) s += 8;
+return Math.max(0, Math.min(100, Math.round(s)));
 }
 function tideAdj(ms) {
-  // Tien's jetty experience: lookdown bite from high tide through the outgoing.
-  // +8 when the next event is a Low (ebb), +2 when it's a High.
-  // -8 within 0.5h of an event (slack), +2 within 1h, +6 within 3h (mid-tide flow).
-  var T = state.tides;
-  if (!T.length) return 0;
-  var next = null, nearest = 1e15, i, d;
-  for (i = 0; i < T.length; i++) {
-    d = Math.abs(T[i].t - ms);
-    if (d < nearest) nearest = d;
-    if (T[i].t > ms && !next) next = T[i];
-  }
-  var a = next ? (next.type === "L" ? 8 : 2) : 0;
-  if (nearest <= 1800000) a -= 8; else if (nearest <= 3600000) a += 2; else if (nearest <= 10800000) a += 6;
-  return Math.max(-6, Math.min(14, a));
+// Tien's jetty experience: lookdown bite from high tide through the outgoing.
+// +8 when the next event is a Low (ebb), +2 when it's a High.
+// -8 within 0.5h of an event (slack), +2 within 1h, +6 within 3h (mid-tide flow).
+var T = state.tides;
+if (!T.length) return 0;
+var next = null, nearest = 1e15, i, d;
+for (i = 0; i < T.length; i++) {
+d = Math.abs(T[i].t - ms);
+if (d < nearest) nearest = d;
+if (T[i].t > ms && !next) next = T[i];
+}
+var a = next ? (next.type === "L" ? 8 : 2) : 0;
+if (nearest <= 1800000) a -= 8; else if (nearest <= 3600000) a += 2; else if (nearest <= 10800000) a += 6;
+return Math.max(-6, Math.min(14, a));
 }
 function pressureAdj(wi) {
-  // Falling pressure ahead of a front often turns the feed on; rapid swings shut it down.
-  var p = state.wx.hourly.pressure_msl;
-  if (!p || p[wi] == null || wi < 3 || p[wi - 3] == null) return 0;
-  var dp = p[wi] - p[wi - 3]; // hPa per 3h
-  if (dp < -3) return -6;
-  if (dp < -0.5) return 4;
-  if (dp <= 0.5) return 0;
-  if (dp <= 3) return -2;
-  return -6;
+// Falling pressure ahead of a front often turns the feed on; rapid swings shut it down.
+var p = state.wx.hourly.pressure_msl;
+if (!p || p[wi] == null || wi < 3 || p[wi - 3] == null) return 0;
+var dp = p[wi] - p[wi - 3]; // hPa per 3h
+if (dp < -3) return -6;
+if (dp < -0.5) return 4;
+if (dp <= 0.5) return 0;
+if (dp <= 3) return -2;
+return -6;
 }
 function swellAdj(mi) {
-  // Long-period swell = clean, organized water; short chop = washing machine.
-  var sp = state.mar.hourly.swell_wave_period ? state.mar.hourly.swell_wave_period[mi] : null;
-  if (sp == null || isNaN(sp)) return 0;
-  if (sp >= 9) return 3;
-  if (sp >= 6) return 0;
-  if (sp >= 4) return -4;
-  return -8;
+// Long-period swell = clean, organized water; short chop = washing machine.
+var sp = state.mar.hourly.swell_wave_period ? state.mar.hourly.swell_wave_period[mi] : null;
+if (sp == null || isNaN(sp)) return 0;
+if (sp >= 9) return 3;
+if (sp >= 6) return 0;
+if (sp >= 4) return -4;
+return -8;
 }
 function adjHourScore(wi, mi, ms) {
-  return hourScore(wi, mi) + tideAdj(ms) + pressureAdj(wi) + swellAdj(mi);
+return hourScore(wi, mi) + tideAdj(ms) + pressureAdj(wi) + swellAdj(mi);
 }
 function windowMoonBoost(startMs, endMs) {
-  // (any Major overlap ? 10 : any Minor overlap ? 5 : 0) + (High tide event in window ? 7 : 0)
-  var b = 0, minor = false, i;
-  for (i = 0; i < state.moon.length; i++) {
-    var w = state.moon[i];
-    if (w.end >= startMs && w.start <= endMs) {
-      if (w.type === "major") { b = 10; break; }
-      minor = true;
-    }
-  }
-  if (b === 0 && minor) b = 5;
-  for (i = 0; i < state.tides.length; i++) {
-    var e = state.tides[i];
-    if (e.type === "H" && e.t >= startMs && e.t <= endMs) { b += 7; break; }
-  }
-  return b;
+// (any Major overlap ? 10 : any Minor overlap ? 5 : 0) + (High tide event in window ? 7 : 0)
+var b = 0, minor = false, i;
+for (i = 0; i < state.moon.length; i++) {
+var w = state.moon[i];
+if (w.end >= startMs && w.start <= endMs) {
+if (w.type === "major") { b = 10; break; }
+minor = true;
+}
+}
+if (b === 0 && minor) b = 5;
+for (i = 0; i < state.tides.length; i++) {
+var e = state.tides[i];
+if (e.type === "H" && e.t >= startMs && e.t <= endMs) { b += 7; break; }
+}
+return b;
 }
 function buildDays(wx, mar) {
-  var days = [];
-  var now = new Date();
-  for (var d = 0; d < 7; d++) {
-    var date = new Date(now.getFullYear(), now.getMonth(), now.getDate() + d);
-    // tide-adjusted hourly scores for this date (spot-local hours)
-    var hs = [];
-    for (var i = 0; i < wx.hourly.time.length; i++) {
-      var dt = new Date(wx.hourly.time[i]);
-      if (dt.getFullYear() === date.getFullYear() && dt.getMonth() === date.getMonth() &&
-          dt.getDate() === date.getDate()) {
-        var mi = hourlyIndex(mar.hourly, dt.getTime());
-        hs.push({ t: dt.getTime(), s: adjHourScore(i, mi, dt.getTime()) });
-      }
-    }
-    // day score = rounded mean of the 06:00-22:00 pool (else all hours) — no moon boost
-    var pool = hs.filter(function(h) { var hh = new Date(h.t).getHours(); return hh >= 6 && hh <= 22; });
-    if (!pool.length) pool = hs;
-    var dayScore = 0;
-    if (pool.length) {
-      var sum = 0;
-      pool.forEach(function(h) { sum += h.s; });
-      dayScore = Math.max(0, Math.min(100, Math.round(sum / pool.length)));
-    }
-    // bite windows: local maxima of hourly scores (>=40, >=2h apart, top 4), +/-1h each
-    var peaks = [];
-    for (var k = 1; k < hs.length - 1; k++) {
-      if (hs[k].s >= hs[k-1].s && hs[k].s >= hs[k+1].s && hs[k].s >= 40) {
-        var ok = true;
-        for (var q = 0; q < peaks.length; q++) {
-          if (Math.abs(peaks[q].t - hs[k].t) < 7200000) {
-            ok = false;
-            if (hs[k].s > peaks[q].s) peaks[q] = hs[k];
-          }
-        }
-        if (ok) peaks.push(hs[k]);
-      }
-    }
-    peaks.sort(function(a, b) { return b.s - a.s; });
-    peaks = peaks.slice(0, 4);
-    var windows = peaks.map(function(p) {
-      var st = p.t - 3600000, en = p.t + 3600000, wsum = 0, n = 0;
-      hs.forEach(function(h) { if (h.t >= st && h.t <= en) { wsum += h.s; n++; } });
-      var sc = n ? wsum / n : p.s;
-      sc = Math.min(100, Math.round(sc + windowMoonBoost(st, en)));
-      return { start: new Date(st), end: new Date(en), score: sc };
-    });
-    windows.sort(function(a, b) { return a.start - b.start; });
-    var best = null;
-    windows.forEach(function(w) { if (!best || w.score > best.score) best = w; });
-    // weather tiles at best-window peak (or noon)
-    var refT = best ? best.start.getTime() + 3600000 : date.getTime() + 43200000;
-    var wi = hourlyIndex(wx.hourly, refT), mi2 = hourlyIndex(mar.hourly, refT);
-    var wv = mar.hourly.wave_height[mi2] * 3.28084;
-    days.push({
-      date: date, score: dayScore, windows: windows, best: best,
-      wind: Math.round(wx.hourly.windspeed_10m[wi]),
-      windDir: compass(wx.hourly.winddirection_10m[wi]),
-      gust: (wx.hourly.wind_gusts_10m && wi >= 0 && wx.hourly.wind_gusts_10m[wi] != null) ? Math.round(wx.hourly.wind_gusts_10m[wi]) : null,
-      water: (function(w){ return (w == null || isNaN(w)) ? null : Math.round(w * 10) / 10; })(mar.hourly.sea_surface_temperature[mi2]),
-      waveFt: Math.round(wv * 10) / 10,
-      condCode: wx.hourly.weather_code[wi],
-      condDay: (wx.hourly.is_day && wx.hourly.is_day[wi] != null) ? wx.hourly.is_day[wi] : 1,
-      rain: wx.daily.precipitation_probability_max[d],
-      sunrise: (wx.daily.sunrise && wx.daily.sunrise[d]) ? new Date(wx.daily.sunrise[d]) : null,
-      sunset: (wx.daily.sunset && wx.daily.sunset[d]) ? new Date(wx.daily.sunset[d]) : null
-    });
-  }
-  return days;
+var days = [];
+var now = new Date();
+for (var d = 0; d < 7; d++) {
+var date = new Date(now.getFullYear(), now.getMonth(), now.getDate() + d);
+// tide-adjusted hourly scores for this date (spot-local hours)
+var hs = [];
+for (var i = 0; i < wx.hourly.time.length; i++) {
+var dt = new Date(wx.hourly.time[i]);
+if (dt.getFullYear() === date.getFullYear() && dt.getMonth() === date.getMonth() &&
+dt.getDate() === date.getDate()) {
+var mi = hourlyIndex(mar.hourly, dt.getTime());
+hs.push({ t: dt.getTime(), s: adjHourScore(i, mi, dt.getTime()) });
+}
+}
+// day score = rounded mean of the 06:00-22:00 pool (else all hours) — no moon boost
+var pool = hs.filter(function(h) { var hh = new Date(h.t).getHours(); return hh >= 6 && hh <= 22; });
+if (!pool.length) pool = hs;
+var dayScore = 0;
+if (pool.length) {
+var sum = 0;
+pool.forEach(function(h) { sum += h.s; });
+dayScore = Math.max(0, Math.min(100, Math.round(sum / pool.length)));
+}
+// bite windows: local maxima of hourly scores (>=40, >=2h apart, top 4), +/-1h each
+var peaks = [];
+for (var k = 1; k < hs.length - 1; k++) {
+if (hs[k].s >= hs[k-1].s && hs[k].s >= hs[k+1].s && hs[k].s >= 40) {
+var ok = true;
+for (var q = 0; q < peaks.length; q++) {
+if (Math.abs(peaks[q].t - hs[k].t) < 7200000) {
+ok = false;
+if (hs[k].s > peaks[q].s) peaks[q] = hs[k];
+}
+}
+if (ok) peaks.push(hs[k]);
+}
+}
+peaks.sort(function(a, b) { return b.s - a.s; });
+peaks = peaks.slice(0, 4);
+var windows = peaks.map(function(p) {
+var st = p.t - 3600000, en = p.t + 3600000, wsum = 0, n = 0;
+hs.forEach(function(h) { if (h.t >= st && h.t <= en) { wsum += h.s; n++; } });
+var sc = n ? wsum / n : p.s;
+sc = Math.min(100, Math.round(sc + windowMoonBoost(st, en)));
+return { start: new Date(st), end: new Date(en), score: sc };
+});
+windows.sort(function(a, b) { return a.start - b.start; });
+var best = null;
+windows.forEach(function(w) { if (!best || w.score > best.score) best = w; });
+// weather tiles at best-window peak (or noon)
+var refT = best ? best.start.getTime() + 3600000 : date.getTime() + 43200000;
+var wi = hourlyIndex(wx.hourly, refT), mi2 = hourlyIndex(mar.hourly, refT);
+var wv = mar.hourly.wave_height[mi2] * 3.28084;
+days.push({
+date: date, score: dayScore, windows: windows, best: best,
+wind: Math.round(wx.hourly.windspeed_10m[wi]),
+windDir: compass(wx.hourly.winddirection_10m[wi]),
+gust: (wx.hourly.wind_gusts_10m && wi >= 0 && wx.hourly.wind_gusts_10m[wi] != null) ? Math.round(wx.hourly.wind_gusts_10m[wi]) : null,
+water: (function(w){ return (w == null || isNaN(w)) ? null : Math.round(w * 10) / 10; })(mar.hourly.sea_surface_temperature[mi2]),
+waveFt: Math.round(wv * 10) / 10,
+condCode: wx.hourly.weather_code[wi],
+condDay: (wx.hourly.is_day && wx.hourly.is_day[wi] != null) ? wx.hourly.is_day[wi] : 1,
+rain: wx.daily.precipitation_probability_max[d],
+sunrise: (wx.daily.sunrise && wx.daily.sunrise[d]) ? new Date(wx.daily.sunrise[d]) : null,
+sunset: (wx.daily.sunset && wx.daily.sunset[d]) ? new Date(wx.daily.sunset[d]) : null
+});
+}
+return days;
 }
 /* ================= render ================= */
 function moonScore(w) {
-  // App's solunarRatingForWindow: tide-adjusted hourly score at the window + 10 (Major) / 5 (Minor), capped at 100.
-  if (w._score == null) {
-    try {
-      var wi = hourlyIndex(state.wx.hourly, w.center), mi = hourlyIndex(state.mar.hourly, w.center);
-      w._score = Math.min(100, Math.round(adjHourScore(wi, mi, w.center) + (w.type === "major" ? 10 : 5)));
-    } catch (e) { w._score = 0; }
-  }
-  return w._score || 0;
+// App's solunarRatingForWindow: tide-adjusted hourly score at the window + 10 (Major) / 5 (Minor), capped at 100.
+if (w._score == null) {
+try {
+var wi = hourlyIndex(state.wx.hourly, w.center), mi = hourlyIndex(state.mar.hourly, w.center);
+w._score = Math.min(100, Math.round(adjHourScore(wi, mi, w.center) + (w.type === "major" ? 10 : 5)));
+} catch (e) { w._score = 0; }
+}
+return w._score || 0;
 }
 function moonRowsHTML(day) {
-  var S = STR[state.lang], now = Date.now();
-  var d0 = day.date.getTime(), d1 = d0 + 86400000;
-  var isToday = now >= d0 && now < d1;
-  var rows = state.moon.filter(function(w) {
-    return w.end > d0 && w.start < d1 && (!isToday || w.end > now);
-  });
-  rows.sort(function(a, b) { return a.start - b.start; });
-  if (!rows.length) return "";
-  var html = "";
-  rows.forEach(function(w) {
-    var sc = moonScore(w), c = ratingColor(sc);
-    var active = now >= w.start && now <= w.end;
-    html += '<div class="mrow' + (active ? " now" : "") + '">' +
-      '<span class="mbadge ' + w.type + '">' + (w.type === "major" ? S.major : S.minor) + "</span>" +
-      '<span class="mt">' + trange(new Date(w.start), new Date(w.end), state.lang) + "</span>" +
-      '<span style="display:inline-flex;align-items:center;gap:6px;margin-left:4px;">' +
-        fishSVG(c, 22, 42) + '<span class="mt" style="color:' + c + '">' + sc + "</span></span>" +
-      (active ? '<span class="nowpill">' + S.now + "</span>" : "") +
-      "</div>";
-  });
-  return html;
+var S = STR[state.lang], now = Date.now();
+var d0 = day.date.getTime(), d1 = d0 + 86400000;
+var isToday = now >= d0 && now < d1;
+var rows = state.moon.filter(function(w) {
+return w.end > d0 && w.start < d1 && (!isToday || w.end > now);
+});
+rows.sort(function(a, b) { return a.start - b.start; });
+if (!rows.length) return "";
+var html = "";
+rows.forEach(function(w) {
+var sc = moonScore(w), c = ratingColor(sc);
+var active = now >= w.start && now <= w.end;
+html += '<div class="mrow' + (active ? " now" : "") + '">' +
+'<span class="mbadge ' + w.type + '">' + (w.type === "major" ? S.major : S.minor) + "</span>" +
+'<span class="mt">' + trange(new Date(w.start), new Date(w.end), state.lang) + "</span>" +
+'<span style="display:inline-flex;align-items:center;gap:6px;margin-left:4px;">' +
+fishSVG(c, 22, 42) + '<span class="mt" style="color:' + c + '">' + sc + "</span></span>" +
+(active ? '<span class="nowpill">' + S.now + "</span>" : "") +
+"</div>";
+});
+return html;
 }
 function moonCountdownHTML() {
-  var S = STR[state.lang], now = Date.now();
-  function next(type) {
-    var best = null;
-    state.moon.forEach(function(w) {
-      if (w.type !== type || w.end <= now) return;
-      if (!best || w.start < best.start) best = w;
-    });
-    return best;
-  }
-  var parts = [];
-  [["major", S.nextMajor, S.majorNow], ["minor", S.nextMinor, S.minorNow]].forEach(function(cfg) {
-    var w = next(cfg[0]);
-    if (!w) return;
-    parts.push(now >= w.start ? cfg[2] : cfg[1](durText(w.start - now, state.lang)));
-  });
-  return parts.join(" · ");
+var S = STR[state.lang], now = Date.now();
+function next(type) {
+var best = null;
+state.moon.forEach(function(w) {
+if (w.type !== type || w.end <= now) return;
+if (!best || w.start < best.start) best = w;
+});
+return best;
+}
+var parts = [];
+[["major", S.nextMajor, S.majorNow], ["minor", S.nextMinor, S.minorNow]].forEach(function(cfg) {
+var w = next(cfg[0]);
+if (!w) return;
+parts.push(now >= w.start ? cfg[2] : cfg[1](durText(w.start - now, state.lang)));
+});
+return parts.join(" · ");
 }
 function tideCountdownHTML() {
-  var S = STR[state.lang], now = Date.now();
-  var nh = null, nl = null;
-  state.tides.forEach(function(e) {
-    if (e.t <= now) return;
-    if (e.type === "H" && !nh) nh = e;
-    if (e.type === "L" && !nl) nl = e;
-  });
-  var parts = [];
-  if (nh) parts.push(S.nextHigh(durText(nh.t - now, state.lang)));
-  if (nl) parts.push(S.nextLow(durText(nl.t - now, state.lang)));
-  return parts.join(" · ");
+var S = STR[state.lang], now = Date.now();
+var nh = null, nl = null;
+state.tides.forEach(function(e) {
+if (e.t <= now) return;
+if (e.type === "H" && !nh) nh = e;
+if (e.type === "L" && !nl) nl = e;
+});
+var parts = [];
+if (nh) parts.push(S.nextHigh(durText(nh.t - now, state.lang)));
+if (nl) parts.push(S.nextLow(durText(nl.t - now, state.lang)));
+return parts.join(" · ");
 }
 function tideSVG(day) {
-  var W = 360, H = 176, pL = 8, pR = 8, pT = 56, pB = 22;
-  var d0 = day.date.getTime(), d1 = d0 + 86400000;
-  var pts = [];
-  for (var t = d0; t <= d1; t += 900000) pts.push([t, tideAt(t)]);
-  var vs = pts.map(function(p) { return p[1]; });
-  var mn = Math.min.apply(null, vs), mx = Math.max.apply(null, vs);
-  if (mx - mn < 0.3) { mx += 0.15; mn -= 0.15; }
-  function X(t) { return pL + (t - d0) / 86400000 * (W - pL - pR); }
-  function Y(v) { return pT + (1 - (v - mn) / (mx - mn)) * (H - pT - pB); }
-  // Catmull-Rom -> cubic Bezier for a smooth tide curve
-  function smoothPath() {
-    var d = "M" + X(pts[0][0]).toFixed(1) + "," + Y(pts[0][1]).toFixed(1);
-    for (var i = 0; i < pts.length - 1; i++) {
-      var p0 = pts[Math.max(0, i - 1)], p1 = pts[i],
-          p2 = pts[i + 1], p3 = pts[Math.min(pts.length - 1, i + 2)];
-      var c1x = X(p1[0]) + (X(p2[0]) - X(p0[0])) / 6,
-          c1y = Y(p1[1]) + (Y(p2[1]) - Y(p0[1])) / 6;
-      var c2x = X(p2[0]) - (X(p3[0]) - X(p1[0])) / 6,
-          c2y = Y(p2[1]) - (Y(p3[1]) - Y(p1[1])) / 6;
-      d += "C" + c1x.toFixed(1) + "," + c1y.toFixed(1) + " " +
-           c2x.toFixed(1) + "," + c2y.toFixed(1) + " " +
-           X(p2[0]).toFixed(1) + "," + Y(p2[1]).toFixed(1);
-    }
-    return d;
-  }
-  var line = smoothPath();
-  var svg = '<svg class="tidechart" viewBox="0 0 ' + W + " " + H + '">';
-  svg += '<defs><linearGradient id="tideg" x1="0" y1="0" x2="0" y2="1">' +
-    '<stop offset="0" stop-color="#14b8a6" stop-opacity=".30"/>' +
-    '<stop offset=".6" stop-color="#14b8a6" stop-opacity=".10"/>' +
-    '<stop offset="1" stop-color="#14b8a6" stop-opacity=".03"/>' +
-    "</linearGradient></defs>";
-  // soft panel backdrop so the chart sits gently on the warm-sand theme
-  svg += '<rect x="0" y="0" width="' + W + '" height="' + H + '" rx="14" fill="#f8f2e3"/>';
-  // shade bite windows
-  (day.windows || []).forEach(function(w, i) {
-    var isBest = day.best && w.start.getTime() === day.best.start.getTime();
-    svg += '<rect x="' + X(w.start.getTime()).toFixed(1) + '" y="' + (pT - 4) + '" width="' +
-      (X(w.end.getTime()) - X(w.start.getTime())).toFixed(1) + '" height="' + (H - pT - pB + 8) +
-      '" fill="' + (isBest ? "rgba(20,184,166,.20)" : "rgba(20,184,166,.09)") + '" rx="6"/>';
-  });
-  svg += '<path d="' + line + " L" + X(d1).toFixed(1) + "," + (H - pB) + " L" + X(d0).toFixed(1) + "," + (H - pB) +
-    ' Z" fill="url(#tideg)" stroke="none"/>';
-  svg += '<path d="' + line + '" fill="none" stroke="#14b8a6" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"/>';
-  // high / low dots
-  state.tides.forEach(function(e) {
-    if (e.t < d0 || e.t > d1) return;
-    svg += '<circle cx="' + X(e.t).toFixed(1) + '" cy="' + Y(e.v).toFixed(1) +
-      '" r="4.5" fill="#fff" stroke="#0f766e" stroke-width="2"/>';
-  });
-  // now line
-  var now = Date.now();
-  state.tideScale = null;
-  if (now >= d0 && now <= d1) {
-    svg += '<line x1="' + X(now).toFixed(1) + '" y1="' + (pT - 6) + '" x2="' + X(now).toFixed(1) + '" y2="' + (H - pB) +
-      '" stroke="#d9a441" stroke-width="1.75" stroke-dasharray="5,4" stroke-linecap="round"/>';
-    // remember the chart scale so the live fish marker can be repositioned as time passes
-    state.tideScale = { d0: d0, mn: mn, mx: mx, W: W, H: H, pL: pL, pR: pR, pT: pT, pB: pB };
-  }
-  // best-bite marker
-  if (day.best) {
-    var bt = day.best.start.getTime() + 3600000, bv = tideAt(bt);
-    svg += '<circle cx="' + X(bt).toFixed(1) + '" cy="' + (Y(bv) - 13).toFixed(1) +
-      '" r="9.5" fill="#fff" stroke="#bc5a1e" stroke-width="2"/>';
-    svg += '<text x="' + X(bt).toFixed(1) + '" y="' + (Y(bv) - 9.5).toFixed(1) +
-      '" text-anchor="middle" font-size="10">🎣</text>';
-  }
-  // Major bite markers: small rating-colored fish on the curve at each Major window's midpoint
-  var fcol = ratingColor(day.score);
-  var pmk = 0;
-  state.moon.forEach(function(w) {
-    if (w.type !== "major") return;
-    if (w.end < d0 || w.start > d1) return;
-    var mid = (w.start + w.end) / 2;
-    var mx = X(mid), my = Y(tideAt(mid));
-    if (now >= w.start && now <= w.end) {
-      svg += '<circle cx="' + mx.toFixed(1) + '" cy="' + my.toFixed(1) + '" r="15" fill="none" stroke="' + fcol +
-        '" stroke-width="2" opacity="0.55"/>';
-    }
-    var iw = 27, ih = 14, mkid = "pompm" + (pmk++);
-    var mxx = (mx - iw / 2).toFixed(1), myy = (my - ih / 2).toFixed(1);
-    svg += '<mask id="' + mkid + '" maskUnits="userSpaceOnUse" x="' + mxx + '" y="' + myy + '" width="' + iw + '" height="' + ih + '">' +
-      '<image href="' + LOOK_URI + '" x="' + mxx + '" y="' + myy + '" width="' + iw + '" height="' + ih + '"/></mask>' +
-      '<rect x="' + mxx + '" y="' + myy + '" width="' + iw + '" height="' + ih + '" fill="' + fcol + '" mask="url(#' + mkid + ')"/>';
-  });
-  // live fishing-rod marker riding the tide curve at the current time.
-  // Cartoon rod inspired by Tien's reference photo: brown tapered blank angled
-  // up-right, dark grip, spinning reel, 3 line guides, line hanging from the tip
-  // to a pink bobber + hook. Rating number above in rating color, live time below it.
-  if (state.tideScale) {
-    var fxx = X(now), fyy = Y(tideAt(now));
-    svg += '<g id="tiderod" transform="translate(' + fxx.toFixed(1) + ',' + fyy.toFixed(1) + ')">' +
-      '<text x="0" y="-34" text-anchor="middle" font-size="13" font-weight="700" fill="' + fcol + '">' + day.score + '</text>' +
-      '<text id="rodtim" x="0" y="-21" text-anchor="middle" font-size="9.5" font-weight="700" fill="#8a7a5f">' + clockStr(state.lang) + '</text>' +
-      '<g transform="scale(0.7)">' +
-      '<path d="M-17.5,17.5 L-9.5,9.5" stroke="#161616" stroke-width="8.6" stroke-linecap="round"/>' +
-      '<path d="M-17.5,17.5 L-9.5,9.5" stroke="#7c4f30" stroke-width="6.2" stroke-linecap="round"/>' +
-      '<polygon points="-11.2,14.8 -14.8,11.2 14.2,-15.8 15.8,-14.2" fill="#b07a52" stroke="#161616" stroke-width="1.4" stroke-linejoin="round"/>' +
-      '<path d="M-4.5,7.6 L-5.4,5.8" stroke="#161616" stroke-width="1.6"/>' +
-      '<circle cx="-4.5" cy="12" r="4.6" fill="#e9f2ff" stroke="#161616" stroke-width="1.6"/>' +
-      '<circle cx="-4.5" cy="12" r="2" fill="#1f2937"/>' +
-      '<path d="M-0.6,14.2 L2.8,16.2" stroke="#161616" stroke-width="1.6" stroke-linecap="round"/><circle cx="3.4" cy="16.5" r="1.5" fill="#1f2937"/>' +
-      '<circle cx="-1.8" cy="1.8" r="1.7" fill="#fffdf7" stroke="#161616" stroke-width="1.3"/>' +
-      '<circle cx="4.4" cy="-4.4" r="1.7" fill="#fffdf7" stroke="#161616" stroke-width="1.3"/>' +
-      '<circle cx="10.5" cy="-10.5" r="1.7" fill="#fffdf7" stroke="#161616" stroke-width="1.3"/>' +
-      '<path d="M-4.5,7.4 L-1.8,1.8 L4.4,-4.4 L10.5,-10.5 L15,-15 C16.5,-9 12,-2.5 3.5,-0.5" stroke="#161616" stroke-width="1.1" fill="none" stroke-linecap="round"/>' +
-      '<circle cx="5.5" cy="-1.1" r="2" fill="#f472a0" stroke="#161616" stroke-width="1"/>' +
-      '<path d="M3.5,-0.5 L3.5,3.5 Q3.5,6 1,6 Q-1,6 -1,4" stroke="#161616" stroke-width="1.4" fill="none" stroke-linecap="round"/></g></g>';
-  }
-  // x labels — 12h style in both languages
-  var S = STR[state.lang];
-  [["12a", 0], ["6a", 6], ["12p", 12], ["6p", 18]].forEach(function(l) {
-    var lab = l[0];
-    svg += '<text x="' + X(d0 + l[1] * 3600000).toFixed(1) + '" y="' + (H - 7) +
-      '" text-anchor="middle" font-size="9" fill="#a89a7c">' + lab + "</text>";
-  });
-  svg += '<text x="' + (W - pR) + '" y="' + (pT - 6) + '" text-anchor="end" font-size="9" fill="#a89a7c">ft</text>';
-  return svg + "</svg>";
+var W = 360, H = 176, pL = 8, pR = 8, pT = 56, pB = 22;
+var d0 = day.date.getTime(), d1 = d0 + 86400000;
+var pts = [];
+for (var t = d0; t <= d1; t += 900000) pts.push([t, tideAt(t)]);
+var vs = pts.map(function(p) { return p[1]; });
+var mn = Math.min.apply(null, vs), mx = Math.max.apply(null, vs);
+if (mx - mn < 0.3) { mx += 0.15; mn -= 0.15; }
+function X(t) { return pL + (t - d0) / 86400000 * (W - pL - pR); }
+function Y(v) { return pT + (1 - (v - mn) / (mx - mn)) * (H - pT - pB); }
+// Catmull-Rom -> cubic Bezier for a smooth tide curve
+function smoothPath() {
+var d = "M" + X(pts[0][0]).toFixed(1) + "," + Y(pts[0][1]).toFixed(1);
+for (var i = 0; i < pts.length - 1; i++) {
+var p0 = pts[Math.max(0, i - 1)], p1 = pts[i],
+p2 = pts[i + 1], p3 = pts[Math.min(pts.length - 1, i + 2)];
+var c1x = X(p1[0]) + (X(p2[0]) - X(p0[0])) / 6,
+c1y = Y(p1[1]) + (Y(p2[1]) - Y(p0[1])) / 6;
+var c2x = X(p2[0]) - (X(p3[0]) - X(p1[0])) / 6,
+c2y = Y(p2[1]) - (Y(p3[1]) - Y(p1[1])) / 6;
+d += "C" + c1x.toFixed(1) + "," + c1y.toFixed(1) + " " +
+c2x.toFixed(1) + "," + c2y.toFixed(1) + " " +
+X(p2[0]).toFixed(1) + "," + Y(p2[1]).toFixed(1);
+}
+return d;
+}
+var line = smoothPath();
+var svg = '<svg class="tidechart" viewBox="0 0 ' + W + " " + H + '">';
+svg += '<defs><linearGradient id="tideg" x1="0" y1="0" x2="0" y2="1">' +
+'<stop offset="0" stop-color="#14b8a6" stop-opacity=".30"/>' +
+'<stop offset=".6" stop-color="#14b8a6" stop-opacity=".10"/>' +
+'<stop offset="1" stop-color="#14b8a6" stop-opacity=".03"/>' +
+"</linearGradient></defs>";
+// soft panel backdrop so the chart sits gently on the warm-sand theme
+svg += '<rect x="0" y="0" width="' + W + '" height="' + H + '" rx="14" fill="#f8f2e3"/>';
+// shade bite windows
+(day.windows || []).forEach(function(w, i) {
+var isBest = day.best && w.start.getTime() === day.best.start.getTime();
+svg += '<rect x="' + X(w.start.getTime()).toFixed(1) + '" y="' + (pT - 4) + '" width="' +
+(X(w.end.getTime()) - X(w.start.getTime())).toFixed(1) + '" height="' + (H - pT - pB + 8) +
+'" fill="' + (isBest ? "rgba(20,184,166,.20)" : "rgba(20,184,166,.09)") + '" rx="6"/>';
+});
+svg += '<path d="' + line + " L" + X(d1).toFixed(1) + "," + (H - pB) + " L" + X(d0).toFixed(1) + "," + (H - pB) +
+' Z" fill="url(#tideg)" stroke="none"/>';
+svg += '<path d="' + line + '" fill="none" stroke="#14b8a6" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"/>';
+// high / low dots
+state.tides.forEach(function(e) {
+if (e.t < d0 || e.t > d1) return;
+svg += '<circle cx="' + X(e.t).toFixed(1) + '" cy="' + Y(e.v).toFixed(1) +
+'" r="4.5" fill="#fff" stroke="#0f766e" stroke-width="2"/>';
+});
+// now line
+var now = Date.now();
+state.tideScale = null;
+if (now >= d0 && now <= d1) {
+svg += '<line x1="' + X(now).toFixed(1) + '" y1="' + (pT - 6) + '" x2="' + X(now).toFixed(1) + '" y2="' + (H - pB) +
+'" stroke="#d9a441" stroke-width="1.75" stroke-dasharray="5,4" stroke-linecap="round"/>';
+// remember the chart scale so the live fish marker can be repositioned as time passes
+state.tideScale = { d0: d0, mn: mn, mx: mx, W: W, H: H, pL: pL, pR: pR, pT: pT, pB: pB };
+}
+// best-bite marker
+if (day.best) {
+var bt = day.best.start.getTime() + 3600000, bv = tideAt(bt);
+svg += '<circle cx="' + X(bt).toFixed(1) + '" cy="' + (Y(bv) - 13).toFixed(1) +
+'" r="9.5" fill="#fff" stroke="#bc5a1e" stroke-width="2"/>';
+svg += '<text x="' + X(bt).toFixed(1) + '" y="' + (Y(bv) - 9.5).toFixed(1) +
+'" text-anchor="middle" font-size="10">🎣</text>';
+}
+// Major bite markers: small rating-colored fish on the curve at each Major window's midpoint
+var fcol = ratingColor(day.score);
+var pmk = 0;
+state.moon.forEach(function(w) {
+if (w.type !== "major") return;
+if (w.end < d0 || w.start > d1) return;
+var mid = (w.start + w.end) / 2;
+var mx = X(mid), my = Y(tideAt(mid));
+if (now >= w.start && now <= w.end) {
+svg += '<circle cx="' + mx.toFixed(1) + '" cy="' + my.toFixed(1) + '" r="15" fill="none" stroke="' + fcol +
+'" stroke-width="2" opacity="0.55"/>';
+}
+var iw = 27, ih = 14, mkid = "pompm" + (pmk++);
+var mxx = (mx - iw / 2).toFixed(1), myy = (my - ih / 2).toFixed(1);
+svg += '<mask id="' + mkid + '" maskUnits="userSpaceOnUse" x="' + mxx + '" y="' + myy + '" width="' + iw + '" height="' + ih + '">' +
+'<image href="' + LOOK_URI + '" x="' + mxx + '" y="' + myy + '" width="' + iw + '" height="' + ih + '"/></mask>' +
+'<rect x="' + mxx + '" y="' + myy + '" width="' + iw + '" height="' + ih + '" fill="' + fcol + '" mask="url(#' + mkid + ')"/>';
+});
+// live fishing-rod marker riding the tide curve at the current time.
+// Cartoon rod inspired by Tien's reference photo: brown tapered blank angled
+// up-right, dark grip, spinning reel, 3 line guides, line hanging from the tip
+// to a pink bobber + hook. Rating number above in rating color, live time below it.
+if (state.tideScale) {
+var fxx = X(now), fyy = Y(tideAt(now));
+svg += '<g id="tiderod" transform="translate(' + fxx.toFixed(1) + ',' + fyy.toFixed(1) + ')">' +
+'<text x="0" y="-34" text-anchor="middle" font-size="13" font-weight="700" fill="' + fcol + '">' + day.score + '</text>' +
+'<text id="rodtim" x="0" y="-21" text-anchor="middle" font-size="9.5" font-weight="700" fill="#8a7a5f">' + clockStr(state.lang) + '</text>' +
+'<g transform="scale(0.7)">' +
+'<path d="M-17.5,17.5 L-9.5,9.5" stroke="#161616" stroke-width="8.6" stroke-linecap="round"/>' +
+'<path d="M-17.5,17.5 L-9.5,9.5" stroke="#7c4f30" stroke-width="6.2" stroke-linecap="round"/>' +
+'<polygon points="-11.2,14.8 -14.8,11.2 14.2,-15.8 15.8,-14.2" fill="#b07a52" stroke="#161616" stroke-width="1.4" stroke-linejoin="round"/>' +
+'<path d="M-4.5,7.6 L-5.4,5.8" stroke="#161616" stroke-width="1.6"/>' +
+'<circle cx="-4.5" cy="12" r="4.6" fill="#e9f2ff" stroke="#161616" stroke-width="1.6"/>' +
+'<circle cx="-4.5" cy="12" r="2" fill="#1f2937"/>' +
+'<path d="M-0.6,14.2 L2.8,16.2" stroke="#161616" stroke-width="1.6" stroke-linecap="round"/><circle cx="3.4" cy="16.5" r="1.5" fill="#1f2937"/>' +
+'<circle cx="-1.8" cy="1.8" r="1.7" fill="#fffdf7" stroke="#161616" stroke-width="1.3"/>' +
+'<circle cx="4.4" cy="-4.4" r="1.7" fill="#fffdf7" stroke="#161616" stroke-width="1.3"/>' +
+'<circle cx="10.5" cy="-10.5" r="1.7" fill="#fffdf7" stroke="#161616" stroke-width="1.3"/>' +
+'<path d="M-4.5,7.4 L-1.8,1.8 L4.4,-4.4 L10.5,-10.5 L15,-15 C16.5,-9 12,-2.5 3.5,-0.5" stroke="#161616" stroke-width="1.1" fill="none" stroke-linecap="round"/>' +
+'<circle cx="5.5" cy="-1.1" r="2" fill="#f472a0" stroke="#161616" stroke-width="1"/>' +
+'<path d="M3.5,-0.5 L3.5,3.5 Q3.5,6 1,6 Q-1,6 -1,4" stroke="#161616" stroke-width="1.4" fill="none" stroke-linecap="round"/></g></g>';
+}
+// x labels — 12h style in both languages
+var S = STR[state.lang];
+[["12a", 0], ["6a", 6], ["12p", 12], ["6p", 18]].forEach(function(l) {
+var lab = l[0];
+svg += '<text x="' + X(d0 + l[1] * 3600000).toFixed(1) + '" y="' + (H - 7) +
+'" text-anchor="middle" font-size="9" fill="#a89a7c">' + lab + "</text>";
+});
+svg += '<text x="' + (W - pR) + '" y="' + (pT - 6) + '" text-anchor="end" font-size="9" fill="#a89a7c">ft</text>';
+return svg + "</svg>";
 }
 function tideChipsHTML(day) {
-  var S = STR[state.lang];
-  var d0 = day.date.getTime(), d1 = d0 + 86400000;
-  var html = "";
-  state.tides.forEach(function(e) {
-    if (e.t < d0 || e.t > d1) return;
-    var hi = e.type === "H";
-    html += '<span class="tchip' + (hi ? " hi" : "") + '">' + (hi ? "▲" : "▼") + " " +
-      (hi ? S.high : S.low) + " " + tstr(new Date(e.t), state.lang) + " · " + e.v.toFixed(1) + " ft</span>";
-  });
-  return html;
+var S = STR[state.lang];
+var d0 = day.date.getTime(), d1 = d0 + 86400000;
+var html = "";
+state.tides.forEach(function(e) {
+if (e.t < d0 || e.t > d1) return;
+var hi = e.type === "H";
+html += '<span class="tchip' + (hi ? " hi" : "") + '">' + (hi ? "▲" : "▼") + " " +
+(hi ? S.high : S.low) + " " + tstr(new Date(e.t), state.lang) + " · " + e.v.toFixed(1) + " ft</span>";
+});
+return html;
 }
 function hourLabel(d) { // 12h in both languages, e.g. "2 PM" — never 24h/military
-  var h = d.getHours(), ap = h >= 12 ? "PM" : "AM";
-  h = h % 12; if (h === 0) h = 12;
-  return h + " " + ap;
+var h = d.getHours(), ap = h >= 12 ? "PM" : "AM";
+h = h % 12; if (h === 0) h = 12;
+return h + " " + ap;
 }
 function hourlyHTML(day) {
-  var S = STR[state.lang];
-  var wx = state.wx.hourly, mar = state.mar.hourly;
-  var rows = "";
-  for (var i = 0; i < wx.time.length; i++) {
-    var dt = new Date(wx.time[i]);
-    if (dt.getFullYear() !== day.date.getFullYear() || dt.getMonth() !== day.date.getMonth() ||
-        dt.getDate() !== day.date.getDate()) continue;
-    var ms = dt.getTime();
-    var mi = hourlyIndex(mar, ms);
-    var sc = Math.max(0, Math.min(100, Math.round(adjHourScore(i, mi, ms))));
-    var c = ratingColor(sc);
-    var code = wx.weather_code[i];
-    var isDay = (wx.is_day && wx.is_day[i] != null) ? wx.is_day[i] : 1;
-    var wsp = Math.round(wx.windspeed_10m[i]);
-    var wdir = compass(wx.winddirection_10m[i]);
-    var gst = (wx.wind_gusts_10m && wx.wind_gusts_10m[i] != null) ? Math.round(wx.wind_gusts_10m[i]) : null;
-    var sky = condIcon(code, isDay) + " " + wsp + (gst != null ? " | " + gst : "") + " " + wdir;
-    var rp = wx.precipitation_probability[i];
-    var air = Math.round(wx.temperature_2m[i]);
-    var wtr = mar.sea_surface_temperature[mi];
-    var wtrS = (wtr == null || isNaN(wtr)) ? "—" : (Math.round(wtr * 10) / 10) + "°";
-    var inbite = false;
-    (day.windows || []).forEach(function(w) {
-      if (ms >= w.start.getTime() && ms < w.end.getTime()) inbite = true;
-    });
-    rows += '<tr class="hrow' + (inbite ? " inbite" : "") + '" data-ms="' + ms + '">' +
-      '<td class="hhour">' + hourLabel(dt) + "</td>" +
-      '<td class="hscore">' + fishSVG(c, 13, 26) + ' <span style="color:' + c + '">' + sc + "</span></td>" +
-      "<td class=\"hskyw\">" + sky + "</td>" +
-      "<td class=\"hrain\">" + rp + "%</td>" +
-      "<td class=\"htemp\">" + air + "°/" + wtrS + "</td></tr>";
-  }
-  if (!rows) return "";
-  return '<div class="card"><div class="hsec"><div class="hh2">🕐 ' + S.hourly + "</div>" +
-    '<div class="hwrap"><table class="htable"><tr><th class="hhour">' + S.thHour + '</th><th class="hscore">' + S.thScore + '</th><th class="hskyw">' +
-    S.thSkyWind + '</th><th class="hrain">' + S.thRain + '</th><th class="htemp">' + S.thAirWtr + "</th></tr>" +
-    rows + '</table></div><p class="hint">' + S.biteHint + "</p></div></div>";
+var S = STR[state.lang];
+var wx = state.wx.hourly, mar = state.mar.hourly;
+var rows = "";
+for (var i = 0; i < wx.time.length; i++) {
+var dt = new Date(wx.time[i]);
+if (dt.getFullYear() !== day.date.getFullYear() || dt.getMonth() !== day.date.getMonth() ||
+dt.getDate() !== day.date.getDate()) continue;
+var ms = dt.getTime();
+var mi = hourlyIndex(mar, ms);
+var sc = Math.max(0, Math.min(100, Math.round(adjHourScore(i, mi, ms))));
+var c = ratingColor(sc);
+var code = wx.weather_code[i];
+var isDay = (wx.is_day && wx.is_day[i] != null) ? wx.is_day[i] : 1;
+var wsp = Math.round(wx.windspeed_10m[i]);
+var wdir = compass(wx.winddirection_10m[i]);
+var gst = (wx.wind_gusts_10m && wx.wind_gusts_10m[i] != null) ? Math.round(wx.wind_gusts_10m[i]) : null;
+var sky = condIcon(code, isDay) + " " + wsp + (gst != null ? " | " + gst : "") + " " + wdir;
+var rp = wx.precipitation_probability[i];
+var air = Math.round(wx.temperature_2m[i]);
+var wtr = mar.sea_surface_temperature[mi];
+var wtrS = (wtr == null || isNaN(wtr)) ? "—" : (Math.round(wtr * 10) / 10) + "°";
+var inbite = false;
+(day.windows || []).forEach(function(w) {
+if (ms >= w.start.getTime() && ms < w.end.getTime()) inbite = true;
+});
+rows += '<tr class="hrow' + (inbite ? " inbite" : "") + '" data-ms="' + ms + '">' +
+'<td class="hhour">' + hourLabel(dt) + "</td>" +
+'<td class="hscore">' + fishSVG(c, 13, 26) + ' <span style="color:' + c + '">' + sc + "</span></td>" +
+"<td class=\"hskyw\">" + sky + "</td>" +
+"<td class=\"hrain\">" + rp + "%</td>" +
+"<td class=\"htemp\">" + air + "°/" + wtrS + "</td></tr>";
+}
+if (!rows) return "";
+return '<div class="card"><div class="hsec"><div class="hh2">🕐 ' + S.hourly + "</div>" +
+'<div class="hwrap"><table class="htable"><tr><th class="hhour">' + S.thHour + '</th><th class="hscore">' + S.thScore + '</th><th class="hskyw">' +
+S.thSkyWind + '</th><th class="hrain">' + S.thRain + '</th><th class="htemp">' + S.thAirWtr + "</th></tr>" +
+rows + '</table></div><p class="hint">' + S.biteHint + "</p></div></div>";
 }
 function seasonPillHTML() {
-  // Lookdown have no closed season in Florida state waters.
-  return '<span class="season open">' + STR[state.lang].seasonYear + "</span>";
+// Lookdown have no closed season in Florida state waters.
+return '<span class="season open">' + STR[state.lang].seasonYear + "</span>";
 }
 function renderHeader() {
-  var S = STR[state.lang], L = state.loc;
-  $("locName").innerHTML = pinSVG(13) + escHTML(L.name);
-  var d = new Date();
-  var ds = state.lang === "vi"
-    ? d.getDate() + " " + S.months[d.getMonth()]
-    : S.months[d.getMonth()] + " " + d.getDate();
-  $("updLine").textContent = state.updatedAt ? S.updated(ds, clockStr(state.lang)) : "";
-  $("langBtn").innerHTML = state.lang === "en" ? "<b>EN</b> | VI" : "EN | <b>VI</b>";
-  $("refBtn").textContent = S.refresh;
-  $("backBtn").textContent = S.back;
-  $("locGPS2").textContent = S.currentLoc;
-  $("locChange").textContent = S.chgLoc;
-  $("rules").innerHTML = state.loc.home ? S.rules + " " + seasonPillHTML() : '<span class="regsn">' + S.checkRegs + "</span>";
+var S = STR[state.lang], L = state.loc;
+$("locName").innerHTML = pinSVG(13) + escHTML(L.name);
+var d = new Date();
+var ds = state.lang === "vi"
+? d.getDate() + " " + S.months[d.getMonth()]
+: S.months[d.getMonth()] + " " + d.getDate();
+$("updLine").textContent = state.updatedAt ? S.updated(ds, clockStr(state.lang)) : "";
+$("langBtn").innerHTML = state.lang === "en" ? "<b>EN</b> | VI" : "EN | <b>VI</b>";
+$("refBtn").textContent = S.refresh;
+$("backBtn").textContent = S.back;
+$("locGPS2").textContent = S.currentLoc;
+$("locChange").textContent = S.chgLoc;
+$("rules").innerHTML = state.loc.home ? S.rules + " " + seasonPillHTML() : '<span class="regsn">' + S.checkRegs + "</span>";
 }
 
 /* ================= live map: radar (RainViewer) + wind particles (Open-Meteo) ================= */
@@ -1336,491 +1386,491 @@ function radarTileURL(fr) { return "https://tilecache.rainviewer.com" + fr.path 
 function stopWind() { if (windRAF) { cancelAnimationFrame(windRAF); windRAF = null; } }
 
 function loadWindGrid() {
-  var key = state.loc.lat.toFixed(2) + "," + state.loc.lon.toFixed(2);
-  if (windGridCache.key === key && windGridCache.grid) {
-    windGrid = windGridCache.grid;
-    if (mapMode === "wind") startWind();
-    return;
-  }
-  var N = 5, lats = [], lons = [];
-  for (var i = 0; i < N; i++) for (var j = 0; j < N; j++) {
-    lats.push((state.loc.lat - 1.2 + i * 0.6).toFixed(2));
-    lons.push((state.loc.lon - 1.6 + j * 0.8).toFixed(2));
-  }
-  fetchJSON("https://api.open-meteo.com/v1/forecast?latitude=" + lats.join(",") + "&longitude=" + lons.join(",") +
-    "&current=wind_speed_10m,wind_direction_10m&wind_speed_unit=mph&forecast_days=1").then(function(d) {
-    var arr = Array.isArray(d) ? d : [d], v = [];
-    for (var k = 0; k < arr.length && k < N * N; k++) {
-      var cur = arr[k].current || {}, sp = +cur.wind_speed_10m || 0, dr = +cur.wind_direction_10m || 0;
-      var r = dr * Math.PI / 180;
-      v.push([-sp * Math.sin(r), -sp * Math.cos(r)]);
-    }
-    if (v.length === N * N) {
-      windGrid = { n: N, lat0: state.loc.lat - 1.2, lon0: state.loc.lon - 1.6, dlat: 0.6, dlon: 0.8, v: v };
-      windGridCache = { key: key, grid: windGrid };
-      if (mapMode === "wind") startWind();
-    }
-  }).catch(function() {});
+var key = state.loc.lat.toFixed(2) + "," + state.loc.lon.toFixed(2);
+if (windGridCache.key === key && windGridCache.grid) {
+windGrid = windGridCache.grid;
+if (mapMode === "wind") startWind();
+return;
+}
+var N = 5, lats = [], lons = [];
+for (var i = 0; i < N; i++) for (var j = 0; j < N; j++) {
+lats.push((state.loc.lat - 1.2 + i * 0.6).toFixed(2));
+lons.push((state.loc.lon - 1.6 + j * 0.8).toFixed(2));
+}
+fetchJSON("https://api.open-meteo.com/v1/forecast?latitude=" + lats.join(",") + "&longitude=" + lons.join(",") +
+"&current=wind_speed_10m,wind_direction_10m&wind_speed_unit=mph&forecast_days=1").then(function(d) {
+var arr = Array.isArray(d) ? d : [d], v = [];
+for (var k = 0; k < arr.length && k < N * N; k++) {
+var cur = arr[k].current || {}, sp = +cur.wind_speed_10m || 0, dr = +cur.wind_direction_10m || 0;
+var r = dr * Math.PI / 180;
+v.push([-sp * Math.sin(r), -sp * Math.cos(r)]);
+}
+if (v.length === N * N) {
+windGrid = { n: N, lat0: state.loc.lat - 1.2, lon0: state.loc.lon - 1.6, dlat: 0.6, dlon: 0.8, v: v };
+windGridCache = { key: key, grid: windGrid };
+if (mapMode === "wind") startWind();
+}
+}).catch(function() {});
 }
 function windFoot() {
-  var ft = $("radarFoot");
-  if (ft && mapMode === "wind" && state.days.length) {
-    var d = state.days[state.sel];
-    ft.textContent = STR[state.lang].wind + " \u00b7 " + d.wind + " mph " + d.windDir;
-  }
+var ft = $("radarFoot");
+if (ft && mapMode === "wind" && state.days.length) {
+var d = state.days[state.sel];
+ft.textContent = STR[state.lang].wind + " \u00b7 " + d.wind + " mph " + d.windDir;
+}
 }
 
 function startWind() {
-  stopWind();
-  if (!windCanvas || !radarMap || !windGrid) return;
-  var map = radarMap, cv = windCanvas, G = windGrid, N = G.n;
-  var dpr = Math.min(window.devicePixelRatio || 1, 2);
-  var W = cv.clientWidth || 300, H = cv.clientHeight || 230;
-  cv.width = W * dpr; cv.height = H * dpr;
-  var ctx = cv.getContext("2d");
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  if (!windResizeBound) { windResizeBound = true; window.addEventListener("resize", function() { if (mapMode === "wind" && windCanvas) startWind(); }); }
-  function vecAt(lat, lon) {
-    var fx = (lon - G.lon0) / G.dlon, fy = (lat - G.lat0) / G.dlat;
-    if (fx < 0) fx = 0; if (fy < 0) fy = 0;
-    if (fx > N - 1.001) fx = N - 1.001; if (fy > N - 1.001) fy = N - 1.001;
-    var ix = Math.floor(fx), iy = Math.floor(fy), ax = fx - ix, ay = fy - iy, g = G.v, i00 = iy * N + ix;
-    var w00 = (1 - ax) * (1 - ay), w10 = ax * (1 - ay), w01 = (1 - ax) * ay, w11 = ax * ay;
-    return [g[i00][0] * w00 + g[i00 + 1][0] * w10 + g[i00 + N][0] * w01 + g[i00 + N + 1][0] * w11,
-            g[i00][1] * w00 + g[i00 + 1][1] * w10 + g[i00 + N][1] * w01 + g[i00 + N + 1][1] * w11];
-  }
-  var P = [], COUNT = 150;
-  function spawn(p) {
-    var b = map.getBounds();
-    p.lat = b.getSouth() + Math.random() * (b.getNorth() - b.getSouth());
-    p.lon = b.getWest() + Math.random() * (b.getEast() - b.getWest());
-    p.plat = p.lat; p.plon = p.lon; p.age = 0; p.max = 80 + Math.random() * 160;
-    return p;
-  }
-  for (var i = 0; i < COUNT; i++) P.push(spawn({}));
-  var lastT = performance.now(), K = 2.1;
-  ctx.lineCap = "round";
-  function frame(now) {
-    if (mapMode !== "wind") return;
-    windRAF = requestAnimationFrame(frame);
-    var dt = Math.min(0.05, (now - lastT) / 1000); lastT = now;
-    var c = map.getCenter(), p0 = map.latLngToContainerPoint([c.lat, c.lng]);
-    var pxL = Math.abs(map.latLngToContainerPoint([c.lat, c.lng + 0.1]).x - p0.x) / 0.1 || 1;
-    var pxA = Math.abs(map.latLngToContainerPoint([c.lat + 0.1, c.lng]).y - p0.y) / 0.1 || 1;
-    ctx.clearRect(0, 0, W, H);
-    var b = map.getBounds(), bs = b.getSouth(), bn = b.getNorth(), bw = b.getWest(), be = b.getEast();
-    for (var i = 0; i < P.length; i++) {
-      var p = P[i];
-      p.age++;
-      var vv = vecAt(p.lat, p.lon), sp = Math.sqrt(vv[0] * vv[0] + vv[1] * vv[1]);
-      if (sp < 0.5 || p.age > p.max || p.lat < bs || p.lat > bn || p.lon < bw || p.lon > be) { spawn(p); continue; }
-      var step = sp * K * dt, ux = vv[0] / sp, uy = vv[1] / sp;
-      p.lat += uy * step / pxA; p.lon += ux * step / pxL;
-      var q = map.latLngToContainerPoint([p.lat, p.lon]);
-      var dx = ux * pxL, dy = -uy * pxA, dl = Math.sqrt(dx * dx + dy * dy) || 1;
-      var nx = dx / dl, ny = dy / dl;
-      var AL = 11 + sp * 0.12, HS = 4.5;
-      var hx = q.x, hy = q.y;
-      var tx = hx - nx * AL, ty = hy - ny * AL;
-      var bx = hx - nx * HS, by = hy - ny * HS;
-      var pxn = -ny, pyn = nx;
-      var fade = Math.min(1, p.age / 25) * Math.min(1, (p.max - p.age) / 25);
-      var a = (0.55 + Math.min(0.4, sp / 50)) * fade;
-      for (var pass = 0; pass < 2; pass++) {
-        var halo = pass === 0;
-        ctx.strokeStyle = halo ? "rgba(255,255,255," + (a * 0.85).toFixed(3) + ")" : "rgba(143,149,155," + a.toFixed(3) + ")";
-        ctx.fillStyle = ctx.strokeStyle;
-        ctx.lineWidth = halo ? 3.6 : 1.6;
-        ctx.beginPath(); ctx.moveTo(tx, ty); ctx.lineTo(bx, by); ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(hx, hy);
-        ctx.lineTo(bx + pxn * HS * 0.62, by + pyn * HS * 0.62);
-        ctx.lineTo(bx - pxn * HS * 0.62, by - pyn * HS * 0.62);
-        ctx.closePath(); ctx.fill();
-      }
-    }
-  }
-  windRAF = requestAnimationFrame(frame);
+stopWind();
+if (!windCanvas || !radarMap || !windGrid) return;
+var map = radarMap, cv = windCanvas, G = windGrid, N = G.n;
+var dpr = Math.min(window.devicePixelRatio || 1, 2);
+var W = cv.clientWidth || 300, H = cv.clientHeight || 230;
+cv.width = W * dpr; cv.height = H * dpr;
+var ctx = cv.getContext("2d");
+ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+if (!windResizeBound) { windResizeBound = true; window.addEventListener("resize", function() { if (mapMode === "wind" && windCanvas) startWind(); }); }
+function vecAt(lat, lon) {
+var fx = (lon - G.lon0) / G.dlon, fy = (lat - G.lat0) / G.dlat;
+if (fx < 0) fx = 0; if (fy < 0) fy = 0;
+if (fx > N - 1.001) fx = N - 1.001; if (fy > N - 1.001) fy = N - 1.001;
+var ix = Math.floor(fx), iy = Math.floor(fy), ax = fx - ix, ay = fy - iy, g = G.v, i00 = iy * N + ix;
+var w00 = (1 - ax) * (1 - ay), w10 = ax * (1 - ay), w01 = (1 - ax) * ay, w11 = ax * ay;
+return [g[i00][0] * w00 + g[i00 + 1][0] * w10 + g[i00 + N][0] * w01 + g[i00 + N + 1][0] * w11,
+g[i00][1] * w00 + g[i00 + 1][1] * w10 + g[i00 + N][1] * w01 + g[i00 + N + 1][1] * w11];
+}
+var P = [], COUNT = 150;
+function spawn(p) {
+var b = map.getBounds();
+p.lat = b.getSouth() + Math.random() * (b.getNorth() - b.getSouth());
+p.lon = b.getWest() + Math.random() * (b.getEast() - b.getWest());
+p.plat = p.lat; p.plon = p.lon; p.age = 0; p.max = 80 + Math.random() * 160;
+return p;
+}
+for (var i = 0; i < COUNT; i++) P.push(spawn({}));
+var lastT = performance.now(), K = 2.1;
+ctx.lineCap = "round";
+function frame(now) {
+if (mapMode !== "wind") return;
+windRAF = requestAnimationFrame(frame);
+var dt = Math.min(0.05, (now - lastT) / 1000); lastT = now;
+var c = map.getCenter(), p0 = map.latLngToContainerPoint([c.lat, c.lng]);
+var pxL = Math.abs(map.latLngToContainerPoint([c.lat, c.lng + 0.1]).x - p0.x) / 0.1 || 1;
+var pxA = Math.abs(map.latLngToContainerPoint([c.lat + 0.1, c.lng]).y - p0.y) / 0.1 || 1;
+ctx.clearRect(0, 0, W, H);
+var b = map.getBounds(), bs = b.getSouth(), bn = b.getNorth(), bw = b.getWest(), be = b.getEast();
+for (var i = 0; i < P.length; i++) {
+var p = P[i];
+p.age++;
+var vv = vecAt(p.lat, p.lon), sp = Math.sqrt(vv[0] * vv[0] + vv[1] * vv[1]);
+if (sp < 0.5 || p.age > p.max || p.lat < bs || p.lat > bn || p.lon < bw || p.lon > be) { spawn(p); continue; }
+var step = sp * K * dt, ux = vv[0] / sp, uy = vv[1] / sp;
+p.lat += uy * step / pxA; p.lon += ux * step / pxL;
+var q = map.latLngToContainerPoint([p.lat, p.lon]);
+var dx = ux * pxL, dy = -uy * pxA, dl = Math.sqrt(dx * dx + dy * dy) || 1;
+var nx = dx / dl, ny = dy / dl;
+var AL = 11 + sp * 0.12, HS = 4.5;
+var hx = q.x, hy = q.y;
+var tx = hx - nx * AL, ty = hy - ny * AL;
+var bx = hx - nx * HS, by = hy - ny * HS;
+var pxn = -ny, pyn = nx;
+var fade = Math.min(1, p.age / 25) * Math.min(1, (p.max - p.age) / 25);
+var a = (0.55 + Math.min(0.4, sp / 50)) * fade;
+for (var pass = 0; pass < 2; pass++) {
+var halo = pass === 0;
+ctx.strokeStyle = halo ? "rgba(255,255,255," + (a * 0.85).toFixed(3) + ")" : "rgba(143,149,155," + a.toFixed(3) + ")";
+ctx.fillStyle = ctx.strokeStyle;
+ctx.lineWidth = halo ? 3.6 : 1.6;
+ctx.beginPath(); ctx.moveTo(tx, ty); ctx.lineTo(bx, by); ctx.stroke();
+ctx.beginPath();
+ctx.moveTo(hx, hy);
+ctx.lineTo(bx + pxn * HS * 0.62, by + pyn * HS * 0.62);
+ctx.lineTo(bx - pxn * HS * 0.62, by - pyn * HS * 0.62);
+ctx.closePath(); ctx.fill();
+}
+}
+}
+windRAF = requestAnimationFrame(frame);
 }
 
 function setMapMode(m) {
-  mapMode = m;
-  var wB = $("modeWind"), rB = $("modeRadar"), play = $("radarPlay");
-  if (wB) wB.className = m === "wind" ? "on" : "";
-  if (rB) rB.className = m === "radar" ? "on" : "";
-  if (windCanvas) windCanvas.style.display = m === "wind" ? "block" : "none";
-  if (play) { play.hidden = m !== "radar" || radarInCONUS; if (m !== "radar" && radarTimer) { clearInterval(radarTimer); radarTimer = null; play.textContent = "\u25b6"; } }
-  if (radarLayer) radarLayer.setOpacity(m === "radar" ? (radarInCONUS ? 0.75 : 0.65) : 0);
-  if (m === "radar") {
-    stopWind();
-    var ft = $("radarFoot");
-    if (radarInCONUS) {
-      if (ft) ft.textContent = STR[state.lang].radar + " \u00b7 " + STR[state.lang].live;
-    } else {
-      var fr = radarCache.frames;
-      if (ft) ft.textContent = fr.length ? STR[state.lang].radar + " \u00b7 " + frameTime(fr[fr.length - 1].time) : STR[state.lang].radar;
-    }
-  } else {
-    startWind(); windFoot();
-  }
+mapMode = m;
+var wB = $("modeWind"), rB = $("modeRadar"), play = $("radarPlay");
+if (wB) wB.className = m === "wind" ? "on" : "";
+if (rB) rB.className = m === "radar" ? "on" : "";
+if (windCanvas) windCanvas.style.display = m === "wind" ? "block" : "none";
+if (play) { play.hidden = m !== "radar" || radarInCONUS; if (m !== "radar" && radarTimer) { clearInterval(radarTimer); radarTimer = null; play.textContent = "\u25b6"; } }
+if (radarLayer) radarLayer.setOpacity(m === "radar" ? (radarInCONUS ? 0.75 : 0.65) : 0);
+if (m === "radar") {
+stopWind();
+var ft = $("radarFoot");
+if (radarInCONUS) {
+if (ft) ft.textContent = STR[state.lang].radar + " \u00b7 " + STR[state.lang].live;
+} else {
+var fr = radarCache.frames;
+if (ft) ft.textContent = fr.length ? STR[state.lang].radar + " \u00b7 " + frameTime(fr[fr.length - 1].time) : STR[state.lang].radar;
+}
+} else {
+startWind(); windFoot();
+}
 }
 
 function initRadar() {
-  if (radarTimer) { clearInterval(radarTimer); radarTimer = null; }
-  stopWind();
-  if (radarMap) { try { radarMap.remove(); } catch (e) {} radarMap = null; }
-  radarLayer = null; windCanvas = null;
-  var el = $("radarmap");
-  if (!el || typeof L === "undefined" || !state.days.length) return;
-  var day = state.days[state.sel], c = ratingColor(day.score);
-  var map = L.map("radarmap", { scrollWheelZoom: false, attributionControl: false, maxZoom: 14 });
-  radarMap = map;
-  map.setView([state.loc.lat, state.loc.lon], 8);
-  L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19, detectRetina: true }).addTo(map);
-  L.marker([state.loc.lat, state.loc.lon], {
-    icon: L.divIcon({ className: "scoremark",
-      html: '<div class="scoredot" style="background:' + c + '"></div>',
-      iconSize: [16, 16], iconAnchor: [8, 8] }),
-    interactive: false, keyboard: false
-  }).addTo(map);
-  windCanvas = document.createElement("canvas");
-  windCanvas.className = "windcv";
-  windCanvas.style.zIndex = 500;
-  el.appendChild(windCanvas);
-  var wB = $("modeWind"), rB = $("modeRadar");
-  if (wB) wB.onclick = function() { setMapMode("wind"); };
-  if (rB) rB.onclick = function() { setMapMode("radar"); };
-  var show = function(frames) {
-    if (!radarMap) return;
-    radarInCONUS = state.loc.lat > 15 && state.loc.lat < 52 && state.loc.lon > -135 && state.loc.lon < -55;
-    var btn = $("radarPlay"), attr = $("radarAttr");
-    if (radarInCONUS) {
-      radarLayer = L.tileLayer("https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/nexrad-n0q-900913/{z}/{x}/{y}.png",
-        { opacity: 0, zIndex: 10, maxNativeZoom: 11 }).addTo(radarMap);
-      if (btn) { btn.hidden = true; btn.onclick = null; }
-      if (attr) attr.textContent = "\u00a9 OpenStreetMap \u00b7 IEM NEXRAD";
-    } else {
-      if (!frames || !frames.length) return;
-      radarLayer = L.tileLayer(radarTileURL(frames[frames.length - 1]),
-        { opacity: 0, zIndex: 10, maxNativeZoom: 7 }).addTo(radarMap);
-      if (btn && frames.length > 1) {
-        var i = frames.length - 1;
-        btn.onclick = function() {
-          if (mapMode !== "radar") return;
-          if (radarTimer) { clearInterval(radarTimer); radarTimer = null; btn.textContent = "\u25b6"; return; }
-          btn.textContent = "\u23f8";
-          var ft = $("radarFoot");
-          radarTimer = setInterval(function() {
-            i = (i + 1) % frames.length;
-            try { radarLayer.setUrl(radarTileURL(frames[i])); } catch (e) {}
-            if (ft && mapMode === "radar") ft.textContent = STR[state.lang].radar + " \u00b7 " + frameTime(frames[i].time);
-          }, 800);
-        };
-      }
-      if (attr) attr.textContent = "\u00a9 OpenStreetMap \u00b7 RainViewer";
-    }
-    setMapMode(mapMode);
-  };
-  loadWindGrid();
-  setMapMode(mapMode);
-  if (state.loc.lat > 15 && state.loc.lat < 52 && state.loc.lon > -135 && state.loc.lon < -55) { show([]); return; }
-  var now = Date.now();
-  if (radarCache.frames.length && now - radarCache.at < 600000) { show(radarCache.frames); return; }
-  fetchJSON("https://api.rainviewer.com/public/weather-maps.json").then(function(j) {
-    var fr = ((j && j.radar && j.radar.past) || []).filter(function(f) { return f && f.path; }).map(function(f) { return { time: f.time, path: f.path }; });
-    radarCache = { at: Date.now(), frames: fr };
-    show(fr);
-  }).catch(function() {});
+if (radarTimer) { clearInterval(radarTimer); radarTimer = null; }
+stopWind();
+if (radarMap) { try { radarMap.remove(); } catch (e) {} radarMap = null; }
+radarLayer = null; windCanvas = null;
+var el = $("radarmap");
+if (!el || typeof L === "undefined" || !state.days.length) return;
+var day = state.days[state.sel], c = ratingColor(day.score);
+var map = L.map("radarmap", { scrollWheelZoom: false, attributionControl: false, maxZoom: 14 });
+radarMap = map;
+map.setView([state.loc.lat, state.loc.lon], 8);
+L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19, detectRetina: true }).addTo(map);
+L.marker([state.loc.lat, state.loc.lon], {
+icon: L.divIcon({ className: "scoremark",
+html: '<div class="scoredot" style="background:' + c + '"></div>',
+iconSize: [16, 16], iconAnchor: [8, 8] }),
+interactive: false, keyboard: false
+}).addTo(map);
+windCanvas = document.createElement("canvas");
+windCanvas.className = "windcv";
+windCanvas.style.zIndex = 500;
+el.appendChild(windCanvas);
+var wB = $("modeWind"), rB = $("modeRadar");
+if (wB) wB.onclick = function() { setMapMode("wind"); };
+if (rB) rB.onclick = function() { setMapMode("radar"); };
+var show = function(frames) {
+if (!radarMap) return;
+radarInCONUS = state.loc.lat > 15 && state.loc.lat < 52 && state.loc.lon > -135 && state.loc.lon < -55;
+var btn = $("radarPlay"), attr = $("radarAttr");
+if (radarInCONUS) {
+radarLayer = L.tileLayer("https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/nexrad-n0q-900913/{z}/{x}/{y}.png",
+{ opacity: 0, zIndex: 10, maxNativeZoom: 11 }).addTo(radarMap);
+if (btn) { btn.hidden = true; btn.onclick = null; }
+if (attr) attr.textContent = "\u00a9 OpenStreetMap \u00b7 IEM NEXRAD";
+} else {
+if (!frames || !frames.length) return;
+radarLayer = L.tileLayer(radarTileURL(frames[frames.length - 1]),
+{ opacity: 0, zIndex: 10, maxNativeZoom: 7 }).addTo(radarMap);
+if (btn && frames.length > 1) {
+var i = frames.length - 1;
+btn.onclick = function() {
+if (mapMode !== "radar") return;
+if (radarTimer) { clearInterval(radarTimer); radarTimer = null; btn.textContent = "\u25b6"; return; }
+btn.textContent = "\u23f8";
+var ft = $("radarFoot");
+radarTimer = setInterval(function() {
+i = (i + 1) % frames.length;
+try { radarLayer.setUrl(radarTileURL(frames[i])); } catch (e) {}
+if (ft && mapMode === "radar") ft.textContent = STR[state.lang].radar + " \u00b7 " + frameTime(frames[i].time);
+}, 800);
+};
+}
+if (attr) attr.textContent = "\u00a9 OpenStreetMap \u00b7 RainViewer";
+}
+setMapMode(mapMode);
+};
+loadWindGrid();
+setMapMode(mapMode);
+if (state.loc.lat > 15 && state.loc.lat < 52 && state.loc.lon > -135 && state.loc.lon < -55) { show([]); return; }
+var now = Date.now();
+if (radarCache.frames.length && now - radarCache.at < 600000) { show(radarCache.frames); return; }
+fetchJSON("https://api.rainviewer.com/public/weather-maps.json").then(function(j) {
+var fr = ((j && j.radar && j.radar.past) || []).filter(function(f) { return f && f.path; }).map(function(f) { return { time: f.time, path: f.path }; });
+radarCache = { at: Date.now(), frames: fr };
+show(fr);
+}).catch(function() {});
 }
 function lastShore() { try { return JSON.parse(localStorage.getItem("ff_last_shore")); } catch (e) { return null; } }
 function renderAll() {
-  var S = STR[state.lang];
-  renderHeader();
-  var app = $("app");
-  if (!state.ready || !state.days.length) return;
-  var d0 = state.days[0];
-  var dx = state.days[state.sel];
-  var c0 = ratingColor(dx.score);
-  function guardScreen(msg) {
-    var btn = "", ls = lastShore();
-    if (ls && ls.name && (ls.lat !== state.loc.lat || ls.lon !== state.loc.lon))
-      btn = '<div class="asklast">' + S.askLast + '</div><button class="shorebtn" id="backShore">' + escHTML(ls.name) + " \u2192</button>";
-    return '<div class="freshmsg"><div class="fmsg">' + msg + "</div>" + btn + "</div>";
-  }
-  function wireBackShore() {
-    var b = $("backShore");
-    if (b) b.onclick = function() { var ls = lastShore(); if (ls) setLocation(ls); };
-  }
-  if (!state.isOcean) { app.innerHTML = guardScreen(S.freshMsg); wireBackShore(); return; }
-  if (!state.isShore) { app.innerHTML = guardScreen(S.inlandMsg); wireBackShore(); return; }
-  var html = "";
-  // top rating card
-  html += '<div class="topcard" style="border-color:' + c0 + '">' +
-    '<div class="wm">' + fishSVG(c0, 110) + "</div>" +
-    '<div class="row"><div class="badge">' + fishSVG(c0, 40, 76) + "</div>" +
-    '<div><div class="lbl">' + S.rating + '</div>' +
-    '<div class="big">' + ratingWord(dx.score, state.lang).toUpperCase() +
-    ' <span class="sc" style="color:' + c0 + '">' + dx.score + '/100</span></div>' +
-    '<div class="ddate">' + fullDateStr(dx.date, state.lang) +
-    (state.sel === 0 ? ' · <span id="clock">' + clockStr(state.lang) + "</span>" : "") + "</div>" +
-    "</div></div>" +
-    "</div>";
-  // pick-a-day strip
-  var bestIdx = 0;
-  state.days.forEach(function(d, i) { if (d.score > state.days[bestIdx].score) bestIdx = i; });
-  html += '<div class="pick"><span class="ph">' + S.pickDay + "</span>" +
-    '<span class="pr">' + S.months[d0.date.getMonth()] + " " + d0.date.getDate() + " – " +
-    S.months[state.days[6].date.getMonth()] + " " + state.days[6].date.getDate() + "</span></div>";
-  html += '<div class="strip">';
-  state.days.forEach(function(d, i) {
-    var c = ratingColor(d.score);
-    var cls = "dpill" + (i === state.sel ? " sel" : "") + (i === bestIdx ? " best" : "");
-    var dw = i === 0 ? S.todayWord.toUpperCase() : S.days[d.date.getDay()];
-    html += '<div class="' + cls + '" data-day="' + i + '"' +
-      (i === state.sel ? ' style="background:' + c + '"' : "") + ">" +
-      (i === bestIdx ? '<span class="bestbadge">' + S.best + "</span>" : "") +
-      '<div class="dw">' + dw + '</div><div class="dn">' + d.date.getDate() + "</div>" +
-      '<div style="margin:2px 0">' + fishSVG(i === state.sel ? "#ffffff" : c, 22, 42) + "</div>" +
-      '<div class="dsc" style="color:' + (i === state.sel ? "#fff" : c) + '">' + d.score + "</div>" +
-      '<div class="dow2">' + ratingWord(d.score, state.lang) + "</div></div>";
-  });
-  html += "</div>";
-  // slim go-fish band: best window hours, vanishes once the window passes
-  var gfD = state.days[state.sel], gfW = gfD.best, gfNow = Date.now(), gfHTML = "";
-  if (gfW && gfW.end.getTime() > gfNow) {
-    var gfIn = "";
-    if (state.sel === 0) {
-      gfIn = gfW.start.getTime() > gfNow
-        ? '<span class="gf-in" id="gfIn" data-start="' + gfW.start.getTime() + '">' + S.inFish(durText(gfW.start.getTime() - gfNow, state.lang)) + "</span>"
-        : '<span class="gf-in">' + S.nowFish + "</span>";
-    }
-    gfHTML = '<div class="gofish" id="gofish" data-end="' + gfW.end.getTime() + '">' +
-      fishSVG("#b3541e", 20) + "<span><b>" + S.goFish + "</b> \u00b7 " + trange(gfW.start, gfW.end, state.lang) + "</span>" + gfIn + "</div>";
-  }
-  html += gfHTML;
-  // day card
-  var day = state.days[state.sel];
-  var dc = ratingColor(day.score);
-  html += '<div class="card" style="border-color:' + dc + '">';
-  var cn = condIcon(day.condCode, day.condDay) + " " + (S.condName[day.condCode] || S.condName[2]);
-  var mph = (state.moonPhase && state.moonPhase[ymdDash(day.date)] != null) ? state.moonPhase[ymdDash(day.date)] : null;
-  var moonTile;
-  if (mph == null) {
-    moonTile = '<div class="tile"><div class="k">' + S.moon + '</div><div class="v">—</div></div>';
-  } else {
-    var mp = moonPhaseInfo(mph);
-    var msub = mp.daysToFull === 0 ? S.fullTonight : S.fullIn(mp.daysToFull);
-    moonTile = '<div class="tile"><div class="k">' + S.moon + '</div><div class="v">' + moonPhaseSVG(mph, 1.3) + " " +
-      Math.round(mp.illum * 100) + '%</div><div class="msub">' + msub + "</div></div>";
-  }
-  var sunTile = '<div class="tile"><div class="sundrow">' +
-    '<div><div class="k">' + S.sunrise + '</div><div class="v">' + (day.sunrise ? tstr(day.sunrise, state.lang) : "—") + "</div></div>" +
-    '<div class="sundiv"></div>' +
-    '<div><div class="k">' + S.sunset + '</div><div class="v">' + (day.sunset ? tstr(day.sunset, state.lang) : "—") + "</div></div>" +
-    "</div></div>";
-  html += '<div class="tiles">' +
-    '<div class="tile"><div class="k">' + _lblWind() + ' ' + S.wind + '</div><div class="v">' + day.wind + (day.gust != null ? " | " + day.gust : "") + " " + day.windDir + "</div></div>" +
-    '<div class="tile"><div class="k">' + _lblWater() + ' ' + S.water + '</div><div class="v">' + (day.water == null ? "\u2014" : day.water.toFixed(1) + "\u00b0F") + "</div></div>" +
-    '<div class="tile"><div class="k">' + S.cond + '</div><div class="v">' + cn + "</div></div>" +
-    '<div class="tile"><div class="k">' + _lblRain() + ' ' + S.rain + '</div><div class="v">' + day.rain + "%</div></div>" +
-    moonTile + sunTile +
-    "</div>";
-  // live precipitation radar with the day's score pinned at the spot
-  html += '<div class="radarcap"><div class="radarmap" id="radarmap"></div>' +
-    '<div class="radarbar"><span class="seg"><button id="modeWind" class="on">' + S.wind + '</button><button id="modeRadar">' + S.radar + '</button></span>' +
-    '<span id="radarFoot" class="radarfoot"></span>' +
-    '<span class="radarattr" id="radarAttr">\u00a9 OpenStreetMap \u00b7 RainViewer</span>' +
-    '<button class="radarplay" id="radarPlay" hidden>\u25b6</button></div></div>';
-  // major/minor — past windows disappear; countdown keeps pointing at the next bite
-  var moonRows = moonRowsHTML(day);
-  var moonSec = "";
-  if (moonRows) {
-    moonSec = '<div class="moonsec"><div class="mh">' + S.moonTitle + "</div>" +
-      '<p class="cdline" id="moonCd">' + moonCountdownHTML() + "</p>" +
-      '<div id="moonRows">' + moonRows + "</div></div>";
-  } else if (state.moon.some(function(w) { return w.end > day.date.getTime() && w.start < day.date.getTime() + 86400000; })) {
-    moonSec = '<div class="moonsec"><div class="mh">' + S.moonTitle + "</div>" +
-      '<p class="cdline" id="moonCd">' + moonCountdownHTML() + "</p></div>";
-  } else {
-    moonSec = '<div class="moonsec"><div class="mh">' + S.moonTitle + "</div>" +
-      '<p class="cdline">' + S.moonNote + "</p></div>";
-  }
-  html += moonSec;
-  // tide
-  html += '<div class="tidesec"><div class="th">🌊 ' + S.tide + " · " +
-    (state.sel === 0 ? S.todayWord : S.days[day.date.getDay()] + " " + day.date.getDate()) + "</div>" +
-    (state.tides.length
-      ? '<p class="cdline" id="tideCd">' + tideCountdownHTML() + "</p>" +
-        tideSVG(day) + '<div class="tchips">' + tideChipsHTML(day) + "</div>"
-      : '<p class="cdline">' + S.tideNote + "</p>") + "</div>";
-  html += "</div>";
-  // hour-by-hour card for the selected day, after the tide chart
-  html += hourlyHTML(day);
-  app.innerHTML = html;
-  syncPastRows();
-  // wire buttons
-  var pills = app.querySelectorAll("[data-day]");
-  for (var i = 0; i < pills.length; i++) {
-    (function(el) {
-      el.addEventListener("click", function() { state.sel = +el.getAttribute("data-day"); renderAll(); });
-    })(pills[i]);
-  }
-  var cday = state.days[state.sel];
-  var cmn = $("catchMinus"), cpl = $("catchPlus");
-  if (cmn && cday) cmn.addEventListener("click", function() { bumpCatch(cday.date.getTime(), -1); });
-  if (cpl && cday) cpl.addEventListener("click", function() { bumpCatch(cday.date.getTime(), 1); });
-  initRadar();
+var S = STR[state.lang];
+renderHeader();
+var app = $("app");
+if (!state.ready || !state.days.length) return;
+var d0 = state.days[0];
+var dx = state.days[state.sel];
+var c0 = ratingColor(dx.score);
+function guardScreen(msg) {
+var btn = "", ls = lastShore();
+if (ls && ls.name && (ls.lat !== state.loc.lat || ls.lon !== state.loc.lon))
+btn = '<div class="asklast">' + S.askLast + '</div><button class="shorebtn" id="backShore">' + escHTML(ls.name) + " \u2192</button>";
+return '<div class="freshmsg"><div class="fmsg">' + msg + "</div>" + btn + "</div>";
+}
+function wireBackShore() {
+var b = $("backShore");
+if (b) b.onclick = function() { var ls = lastShore(); if (ls) setLocation(ls); };
+}
+if (!state.isOcean) { app.innerHTML = guardScreen(S.freshMsg); wireBackShore(); return; }
+if (!state.isShore) { app.innerHTML = guardScreen(S.inlandMsg); wireBackShore(); return; }
+var html = "";
+// top rating card
+html += '<div class="topcard" style="border-color:' + c0 + '">' +
+'<div class="wm">' + fishSVG(c0, 110) + "</div>" +
+'<div class="row"><div class="badge">' + fishSVG(c0, 40, 76) + "</div>" +
+'<div><div class="lbl">' + S.rating + '</div>' +
+'<div class="big">' + ratingWord(dx.score, state.lang).toUpperCase() +
+' <span class="sc" style="color:' + c0 + '">' + dx.score + '/100</span></div>' +
+'<div class="ddate">' + fullDateStr(dx.date, state.lang) +
+(state.sel === 0 ? ' · <span id="clock">' + clockStr(state.lang) + "</span>" : "") + "</div>" +
+"</div></div>" +
+"</div>";
+// pick-a-day strip
+var bestIdx = 0;
+state.days.forEach(function(d, i) { if (d.score > state.days[bestIdx].score) bestIdx = i; });
+html += '<div class="pick"><span class="ph">' + S.pickDay + "</span>" +
+'<span class="pr">' + S.months[d0.date.getMonth()] + " " + d0.date.getDate() + " – " +
+S.months[state.days[6].date.getMonth()] + " " + state.days[6].date.getDate() + "</span></div>";
+html += '<div class="strip">';
+state.days.forEach(function(d, i) {
+var c = ratingColor(d.score);
+var cls = "dpill" + (i === state.sel ? " sel" : "") + (i === bestIdx ? " best" : "");
+var dw = i === 0 ? S.todayWord.toUpperCase() : S.days[d.date.getDay()];
+html += '<div class="' + cls + '" data-day="' + i + '"' +
+(i === state.sel ? ' style="background:' + c + '"' : "") + ">" +
+(i === bestIdx ? '<span class="bestbadge">' + S.best + "</span>" : "") +
+'<div class="dw">' + dw + '</div><div class="dn">' + d.date.getDate() + "</div>" +
+'<div style="margin:2px 0">' + fishSVG(i === state.sel ? "#ffffff" : c, 22, 42) + "</div>" +
+'<div class="dsc" style="color:' + (i === state.sel ? "#fff" : c) + '">' + d.score + "</div>" +
+'<div class="dow2">' + ratingWord(d.score, state.lang) + "</div></div>";
+});
+html += "</div>";
+// slim go-fish band: best window hours, vanishes once the window passes
+var gfD = state.days[state.sel], gfW = gfD.best, gfNow = Date.now(), gfHTML = "";
+if (gfW && gfW.end.getTime() > gfNow) {
+var gfIn = "";
+if (state.sel === 0) {
+gfIn = gfW.start.getTime() > gfNow
+? '<span class="gf-in" id="gfIn" data-start="' + gfW.start.getTime() + '">' + S.inFish(durText(gfW.start.getTime() - gfNow, state.lang)) + "</span>"
+: '<span class="gf-in">' + S.nowFish + "</span>";
+}
+gfHTML = '<div class="gofish" id="gofish" data-end="' + gfW.end.getTime() + '">' +
+fishSVG("#b3541e", 20) + "<span><b>" + S.goFish + "</b> \u00b7 " + trange(gfW.start, gfW.end, state.lang) + "</span>" + gfIn + "</div>";
+}
+html += gfHTML;
+// day card
+var day = state.days[state.sel];
+var dc = ratingColor(day.score);
+html += '<div class="card" style="border-color:' + dc + '">';
+var cn = condIcon(day.condCode, day.condDay) + " " + (S.condName[day.condCode] || S.condName[2]);
+var mph = (state.moonPhase && state.moonPhase[ymdDash(day.date)] != null) ? state.moonPhase[ymdDash(day.date)] : null;
+var moonTile;
+if (mph == null) {
+moonTile = '<div class="tile"><div class="k">' + S.moon + '</div><div class="v">—</div></div>';
+} else {
+var mp = moonPhaseInfo(mph);
+var msub = mp.daysToFull === 0 ? S.fullTonight : S.fullIn(mp.daysToFull);
+moonTile = '<div class="tile"><div class="k">' + S.moon + '</div><div class="v">' + moonPhaseSVG(mph, 1.3) + " " +
+Math.round(mp.illum * 100) + '%</div><div class="msub">' + msub + "</div></div>";
+}
+var sunTile = '<div class="tile"><div class="sundrow">' +
+'<div><div class="k">' + S.sunrise + '</div><div class="v">' + (day.sunrise ? tstr(day.sunrise, state.lang) : "—") + "</div></div>" +
+'<div class="sundiv"></div>' +
+'<div><div class="k">' + S.sunset + '</div><div class="v">' + (day.sunset ? tstr(day.sunset, state.lang) : "—") + "</div></div>" +
+"</div></div>";
+html += '<div class="tiles">' +
+'<div class="tile"><div class="k">' + _lblWind() + ' ' + S.wind + '</div><div class="v">' + day.wind + (day.gust != null ? " | " + day.gust : "") + " " + day.windDir + "</div></div>" +
+'<div class="tile"><div class="k">' + _lblWater() + ' ' + S.water + '</div><div class="v">' + (day.water == null ? "\u2014" : day.water.toFixed(1) + "\u00b0F") + "</div></div>" +
+'<div class="tile"><div class="k">' + S.cond + '</div><div class="v">' + cn + "</div></div>" +
+'<div class="tile"><div class="k">' + _lblRain() + ' ' + S.rain + '</div><div class="v">' + day.rain + "%</div></div>" +
+moonTile + sunTile +
+"</div>";
+// live precipitation radar with the day's score pinned at the spot
+html += '<div class="radarcap"><div class="radarmap" id="radarmap"></div>' +
+'<div class="radarbar"><span class="seg"><button id="modeWind" class="on">' + S.wind + '</button><button id="modeRadar">' + S.radar + '</button></span>' +
+'<span id="radarFoot" class="radarfoot"></span>' +
+'<span class="radarattr" id="radarAttr">\u00a9 OpenStreetMap \u00b7 RainViewer</span>' +
+'<button class="radarplay" id="radarPlay" hidden>\u25b6</button></div></div>';
+// major/minor — past windows disappear; countdown keeps pointing at the next bite
+var moonRows = moonRowsHTML(day);
+var moonSec = "";
+if (moonRows) {
+moonSec = '<div class="moonsec"><div class="mh">' + S.moonTitle + "</div>" +
+'<p class="cdline" id="moonCd">' + moonCountdownHTML() + "</p>" +
+'<div id="moonRows">' + moonRows + "</div></div>";
+} else if (state.moon.some(function(w) { return w.end > day.date.getTime() && w.start < day.date.getTime() + 86400000; })) {
+moonSec = '<div class="moonsec"><div class="mh">' + S.moonTitle + "</div>" +
+'<p class="cdline" id="moonCd">' + moonCountdownHTML() + "</p></div>";
+} else {
+moonSec = '<div class="moonsec"><div class="mh">' + S.moonTitle + "</div>" +
+'<p class="cdline">' + S.moonNote + "</p></div>";
+}
+html += moonSec;
+// tide
+html += '<div class="tidesec"><div class="th">🌊 ' + S.tide + " · " +
+(state.sel === 0 ? S.todayWord : S.days[day.date.getDay()] + " " + day.date.getDate()) + "</div>" +
+(state.tides.length
+? '<p class="cdline" id="tideCd">' + tideCountdownHTML() + "</p>" +
+tideSVG(day) + '<div class="tchips">' + tideChipsHTML(day) + "</div>"
+: '<p class="cdline">' + S.tideNote + "</p>") + "</div>";
+html += "</div>";
+// hour-by-hour card for the selected day, after the tide chart
+html += hourlyHTML(day);
+app.innerHTML = html;
+syncPastRows();
+// wire buttons
+var pills = app.querySelectorAll("[data-day]");
+for (var i = 0; i < pills.length; i++) {
+(function(el) {
+el.addEventListener("click", function() { state.sel = +el.getAttribute("data-day"); renderAll(); });
+})(pills[i]);
+}
+var cday = state.days[state.sel];
+var cmn = $("catchMinus"), cpl = $("catchPlus");
+if (cmn && cday) cmn.addEventListener("click", function() { bumpCatch(cday.date.getTime(), -1); });
+if (cpl && cday) cpl.addEventListener("click", function() { bumpCatch(cday.date.getTime(), 1); });
+initRadar();
 }
 function syncPastRows() {
-  var nowMs = Date.now(), rows = document.querySelectorAll('.htable tr.hrow[data-ms]');
-  for (var i = 0; i < rows.length; i++) {
-    var ms = +rows[i].getAttribute('data-ms');
-    if (ms + 3600000 <= nowMs) rows[i].classList.add('past');
-    else rows[i].classList.remove('past');
-  }
+var nowMs = Date.now(), rows = document.querySelectorAll('.htable tr.hrow[data-ms]');
+for (var i = 0; i < rows.length; i++) {
+var ms = +rows[i].getAttribute('data-ms');
+if (ms + 3600000 <= nowMs) rows[i].classList.add('past');
+else rows[i].classList.remove('past');
+}
 }
 function tick() {
-  if (!state.ready) return;
-  var clk = $("clock");
-  if (clk) clk.textContent = clockStr(state.lang);
-  var mc = $("moonCd");
-  if (mc) mc.textContent = moonCountdownHTML();
-  var tc = $("tideCd");
-  if (tc) tc.textContent = tideCountdownHTML();
-  var mr = $("moonRows");
-  if (mr && state.days[state.sel]) {
-    var nr = moonRowsHTML(state.days[state.sel]);
-    if (nr) mr.innerHTML = nr; else mr.remove();
-  }
-  var gf = $("gofish");
-  if (gf) {
-    var gfn = Date.now(), gfe = +gf.getAttribute("data-end");
-    if (gfn >= gfe) { gf.remove(); }
-    else {
-      var gi = $("gfIn"), SS = STR[state.lang];
-      if (gi) gi.textContent = SS.inFish(durText(+gi.getAttribute("data-start") - gfn, state.lang));
-    }
-  }
-  renderHeader();
-  // if the phone's real clock has rolled past the rendered day (page left open
-  // across midnight), silently refetch so the rod, countdowns and scores match
-  // the real current day — never a stale or wrongly-placed marker
-  var nowMs = Date.now();
-  if (!state.loading && state.tideScale &&
-      (nowMs < state.tideScale.d0 || nowMs >= state.tideScale.d0 + 86400000)) {
-    startLoad();
-    return;
-  }
-  // move the live tide-chart rod every 30s so it rides the curve with the real time
-  syncPastRows();
-  if (++__tfN % 30 === 0) moveTideFish();
+if (!state.ready) return;
+var clk = $("clock");
+if (clk) clk.textContent = clockStr(state.lang);
+var mc = $("moonCd");
+if (mc) mc.textContent = moonCountdownHTML();
+var tc = $("tideCd");
+if (tc) tc.textContent = tideCountdownHTML();
+var mr = $("moonRows");
+if (mr && state.days[state.sel]) {
+var nr = moonRowsHTML(state.days[state.sel]);
+if (nr) mr.innerHTML = nr; else mr.remove();
+}
+var gf = $("gofish");
+if (gf) {
+var gfn = Date.now(), gfe = +gf.getAttribute("data-end");
+if (gfn >= gfe) { gf.remove(); }
+else {
+var gi = $("gfIn"), SS = STR[state.lang];
+if (gi) gi.textContent = SS.inFish(durText(+gi.getAttribute("data-start") - gfn, state.lang));
+}
+}
+renderHeader();
+// if the phone's real clock has rolled past the rendered day (page left open
+// across midnight), silently refetch so the rod, countdowns and scores match
+// the real current day — never a stale or wrongly-placed marker
+var nowMs = Date.now();
+if (!state.loading && state.tideScale &&
+(nowMs < state.tideScale.d0 || nowMs >= state.tideScale.d0 + 86400000)) {
+startLoad();
+return;
+}
+// move the live tide-chart rod every 30s so it rides the curve with the real time
+syncPastRows();
+if (++__tfN % 30 === 0) moveTideFish();
 }
 // repositions the #tiderod marker along the tide curve to the current time
 var __tfN = 0;
 function moveTideFish() {
-  var t = document.getElementById("tiderod"), sc = state.tideScale;
-  if (!t || !sc || !state.ready) return;
-  var now = Date.now(), d1 = sc.d0 + 86400000;
-  if (now < sc.d0 || now > d1) {
-    t.style.display = "none";
-    return;
-  }
-  t.style.display = "";
-  var fx = sc.pL + (now - sc.d0) / 86400000 * (sc.W - sc.pL - sc.pR);
-  var fy = sc.pT + (1 - (tideAt(now) - sc.mn) / (sc.mx - sc.mn)) * (sc.H - sc.pT - sc.pB);
-  t.setAttribute("transform", "translate(" + fx.toFixed(1) + "," + fy.toFixed(1) + ")");
-  var rt = document.getElementById("rodtim");
-  if (rt) rt.textContent = clockStr(state.lang);
+var t = document.getElementById("tiderod"), sc = state.tideScale;
+if (!t || !sc || !state.ready) return;
+var now = Date.now(), d1 = sc.d0 + 86400000;
+if (now < sc.d0 || now > d1) {
+t.style.display = "none";
+return;
+}
+t.style.display = "";
+var fx = sc.pL + (now - sc.d0) / 86400000 * (sc.W - sc.pL - sc.pR);
+var fy = sc.pT + (1 - (tideAt(now) - sc.mn) / (sc.mx - sc.mn)) * (sc.H - sc.pT - sc.pB);
+t.setAttribute("transform", "translate(" + fx.toFixed(1) + "," + fy.toFixed(1) + ")");
+var rt = document.getElementById("rodtim");
+if (rt) rt.textContent = clockStr(state.lang);
 }
 function showError() {
-  var S = STR[state.lang];
-  $("app").innerHTML = '<div class="err">' + S.loadFail +
-    '<br><button class="refresh" onclick="boot(true)">' + S.retry + "</button></div>";
+var S = STR[state.lang];
+$("app").innerHTML = '<div class="err">' + S.loadFail +
+'<br><button class="refresh" onclick="boot(true)">' + S.retry + "</button></div>";
 }
 function dedupeMoon(wins) {
-  wins.sort(function(a, b) { return a.start - b.start; });
-  var out = [];
-  wins.forEach(function(w) {
-    var last = out[out.length - 1];
-    if (last && last.type === w.type && w.start <= last.end + 600000) {
-      last.end = Math.max(last.end, w.end);
-    } else out.push(w);
-  });
-  return out;
+wins.sort(function(a, b) { return a.start - b.start; });
+var out = [];
+wins.forEach(function(w) {
+var last = out[out.length - 1];
+if (last && last.type === w.type && w.start <= last.end + 600000) {
+last.end = Math.max(last.end, w.end);
+} else out.push(w);
+});
+return out;
 }
 // Forecast for the selected location (Jupiter Inlet by default).
 function startLoad() {
-  var L = state.loc;
-  var lat = L.lat, lon = L.lon, station = L.station;
-  state.loading = true;
-  try { localStorage.setItem("ff_species", "lookdown"); } catch (e) {}
-  renderHeader();
-  var fromD = new Date(); fromD.setDate(fromD.getDate() - 1);
-  var toD = new Date(); toD.setDate(toD.getDate() + 7);
-  var moonPs = [];
-  for (var i = 0; i < 8; i++) {
-    var dt = new Date(); dt.setDate(dt.getDate() + i);
-    moonPs.push(loadMoonDay(lat, lon, dt));
-  }
-  // Each source is independent: weather+marine are essential, but tides and moon
-  // degrade gracefully (quiet note instead of a full-page error).
-  Promise.all([
-      loadWeather(lat, lon).catch(function(e) { return { _err: e }; }),
-      loadMarine(lat, lon).catch(function(e) { return { _err: e }; }),
-      (station ? loadTides(station, fromD, toD).catch(function() { return []; }) : Promise.resolve([])),
-      Promise.all(moonPs)
-    ])
-    .then(function(r) {
-      try {
-        if (r[0]._err || r[1]._err) { state.loading = false; showError(); return; }
-        var wx = r[0], mar = r[1];
-        state.wx = wx; state.mar = mar;
-        state.isOcean = mar.hourly.sea_surface_temperature.some(function(v) { return v != null && !isNaN(v); });
-        state.isShore = state.isOcean && (mar.hourly.wave_height || []).some(function(v) { return v != null && !isNaN(v); });
-        if (state.isShore) { try { localStorage.setItem("ff_last_shore", JSON.stringify({ name: state.loc.name, lat: state.loc.lat, lon: state.loc.lon })); } catch (e) {} }
-        state.tides = r[2];
-        var all = [];
-        r[3].forEach(function(arr) { arr.forEach(function(w) { all.push(w); }); });
-        state.moon = dedupeMoon(all);
-        state.days = buildDays(wx, mar);
-        state.sel = 0;
-        state.ready = true; state.loading = false;
-        state.updatedAt = new Date();
-        renderAll();
-      } catch (e) { state.loading = false; showError(); }
-    })
-    .catch(function() { state.loading = false; showError(); });
+var L = state.loc;
+var lat = L.lat, lon = L.lon, station = L.station;
+state.loading = true;
+try { localStorage.setItem("ff_species", "lookdown"); } catch (e) {}
+renderHeader();
+var fromD = new Date(); fromD.setDate(fromD.getDate() - 1);
+var toD = new Date(); toD.setDate(toD.getDate() + 7);
+var moonPs = [];
+for (var i = 0; i < 8; i++) {
+var dt = new Date(); dt.setDate(dt.getDate() + i);
+moonPs.push(loadMoonDay(lat, lon, dt));
+}
+// Each source is independent: weather+marine are essential, but tides and moon
+// degrade gracefully (quiet note instead of a full-page error).
+Promise.all([
+loadWeather(lat, lon).catch(function(e) { return { _err: e }; }),
+loadMarine(lat, lon).catch(function(e) { return { _err: e }; }),
+(station ? loadTides(station, fromD, toD).catch(function() { return []; }) : Promise.resolve([])),
+Promise.all(moonPs)
+])
+.then(function(r) {
+try {
+if (r[0]._err || r[1]._err) { state.loading = false; showError(); return; }
+var wx = r[0], mar = r[1];
+state.wx = wx; state.mar = mar;
+state.isOcean = mar.hourly.sea_surface_temperature.some(function(v) { return v != null && !isNaN(v); });
+state.isShore = state.isOcean && (mar.hourly.wave_height || []).some(function(v) { return v != null && !isNaN(v); });
+if (state.isShore) { try { localStorage.setItem("ff_last_shore", JSON.stringify({ name: state.loc.name, lat: state.loc.lat, lon: state.loc.lon })); } catch (e) {} }
+state.tides = r[2];
+var all = [];
+r[3].forEach(function(arr) { arr.forEach(function(w) { all.push(w); }); });
+state.moon = dedupeMoon(all);
+state.days = buildDays(wx, mar);
+state.sel = 0;
+state.ready = true; state.loading = false;
+state.updatedAt = new Date();
+renderAll();
+} catch (e) { state.loading = false; showError(); }
+})
+.catch(function() { state.loading = false; showError(); });
 }
 function boot() {
-  state.ready = false; state.sel = 0; state.days = []; state.moonPhase = {};
-  var S = STR[state.lang];
-  document.documentElement.lang = state.lang;
-  $("app").innerHTML = '<div class="loading">' + S.loading + "</div>";
-  renderHeader();
-  startLoad(); // selected location (Jupiter Inlet default)
+state.ready = false; state.sel = 0; state.days = []; state.moonPhase = {};
+var S = STR[state.lang];
+document.documentElement.lang = state.lang;
+$("app").innerHTML = '<div class="loading">' + S.loading + "</div>";
+renderHeader();
+startLoad(); // selected location (Jupiter Inlet default)
 }
 $("langBtn").addEventListener("click", function() {
-  state.lang = state.lang === "en" ? "vi" : "en";
-  localStorage.setItem("pf_lang", state.lang);
-  document.documentElement.lang = state.lang;
-  if (state.ready) renderAll(); else boot();
+state.lang = state.lang === "en" ? "vi" : "en";
+localStorage.setItem("pf_lang", state.lang);
+document.documentElement.lang = state.lang;
+if (state.ready) renderAll(); else boot();
 });
 $("refBtn").addEventListener("click", function() { boot(); });
 $("locName").addEventListener("click", function() {
-  var p = $("locPanel"); p.hidden = !p.hidden; syncSticky();
-  if (!p.hidden) { wireLocUI(); setTimeout(function() { $("locSearch").focus(); }, 60); }
+var p = $("locPanel"); p.hidden = !p.hidden; syncSticky();
+if (!p.hidden) { wireLocUI(); setTimeout(function() { $("locSearch").focus(); }, 60); }
 });
 $("locGPS").addEventListener("click", useMyLocation);
 $("locGPS2").addEventListener("click", function() { $("locPanel").hidden = false; syncSticky(); wireLocUI(); useMyLocation(); });
 $("locChange").addEventListener("click", function() {
-  var p = $("locPanel"); p.hidden = !p.hidden; syncSticky();
-  if (!p.hidden) { wireLocUI(); setTimeout(function() { $("locSearch").focus(); }, 60); }
+var p = $("locPanel"); p.hidden = !p.hidden; syncSticky();
+if (!p.hidden) { wireLocUI(); setTimeout(function() { $("locSearch").focus(); }, 60); }
 });
 $("locHome").addEventListener("click", function() { var _l = lastShore(); setLocation((_l && _l.name) ? _l : { name: PIN.name, lat: PIN.lat, lon: PIN.lon }); });
 $("locSearch").addEventListener("input", function(e) {
-  clearTimeout(locSearchTimer);
-  var q = e.target.value;
-  locSearchTimer = setTimeout(function() { doSearch(q); }, 350);
+clearTimeout(locSearchTimer);
+var q = e.target.value;
+locSearchTimer = setTimeout(function() { doSearch(q); }, 350);
 });
 boot();
 setInterval(tick, 1000);
