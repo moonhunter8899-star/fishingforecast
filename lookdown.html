@@ -921,7 +921,8 @@ function hourScore(wi, mi) {
   return Math.max(0, Math.min(100, Math.round(s)));
 }
 function tideAdj(ms) {
-  // Lookdown hunt around structure on moving water either way: +6 for any next event.
+  // Tien's jetty experience: lookdown bite from high tide through the outgoing.
+  // +8 when the next event is a Low (ebb), +2 when it's a High.
   // -8 within 0.5h of an event (slack), +2 within 1h, +6 within 3h (mid-tide flow).
   var T = state.tides;
   if (!T.length) return 0;
@@ -931,7 +932,7 @@ function tideAdj(ms) {
     if (d < nearest) nearest = d;
     if (T[i].t > ms && !next) next = T[i];
   }
-  var a = next ? 6 : 0;
+  var a = next ? (next.type === "L" ? 8 : 2) : 0;
   if (nearest <= 1800000) a -= 8; else if (nearest <= 3600000) a += 2; else if (nearest <= 10800000) a += 6;
   return Math.max(-6, Math.min(14, a));
 }
