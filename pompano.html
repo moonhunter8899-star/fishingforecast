@@ -1583,7 +1583,7 @@ function initRadar() {
   var day = state.days[state.sel], c = ratingColor(day.score);
   var map = L.map("radarmap", { scrollWheelZoom: false, attributionControl: false, maxZoom: 14 });
   radarMap = map;
-  map.setView([state.loc.lat, state.loc.lon], 8);
+  map.setView([state.loc.lat, state.loc.lon], 14);
   L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19, detectRetina: true }).addTo(map);
   L.marker([state.loc.lat, state.loc.lon], {
     icon: L.divIcon({ className: "scoremark",
