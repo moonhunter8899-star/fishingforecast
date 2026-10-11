@@ -903,9 +903,10 @@ function hourScore(wi, mi) {
   if (mm >= 2.5) s -= 30; else if (mm >= 0.5) s -= 15; else if (mm > 0) s -= 5;
   var wt = mar.sea_surface_temperature[mi];
   if (wt != null && !isNaN(wt)) {
-    if (wt >= 68 && wt <= 80) s -= 0;
-    else if ((wt >= 65 && wt < 68) || (wt > 80 && wt <= 84)) s -= 10;
-    else if ((wt >= 62 && wt < 65) || (wt > 84 && wt <= 88)) s -= 18;
+    // Angler consensus: prime ~68-75, fishable ~65-78, fade below ~65-68, picky above ~80.
+    if (wt >= 68 && wt <= 78) s -= 0;
+    else if ((wt >= 65 && wt < 68) || (wt > 78 && wt <= 82)) s -= 10;
+    else if ((wt >= 62 && wt < 65) || (wt > 82 && wt <= 86)) s -= 18;
     else s -= 28;
   }
   var wv = mar.wave_height[mi] * 3.28084; // ft
