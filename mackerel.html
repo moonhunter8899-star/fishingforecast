@@ -1271,9 +1271,6 @@ function hourLabel(d) { // 12h in both languages, e.g. "2 PM" — never 24h/mili
 }
 function hourlyHTML(day) {
   var S = STR[state.lang];
-  var _nd = new Date(), _dd = day.date;
-  var isToday = _dd.getFullYear() === _nd.getFullYear() && _dd.getMonth() === _nd.getMonth() && _dd.getDate() === _nd.getDate();
-  var nowMs0 = Date.now();
   var wx = state.wx.hourly, mar = state.mar.hourly;
   var rows = "";
   for (var i = 0; i < wx.time.length; i++) {
@@ -1298,8 +1295,7 @@ function hourlyHTML(day) {
     (day.windows || []).forEach(function(w) {
       if (ms >= w.start.getTime() && ms < w.end.getTime()) inbite = true;
     });
-        var pastCls = (isToday && ms + 3600000 <= nowMs0) ? " past" : "";
-    rows += '<tr class="hrow' + (inbite ? " inbite" : "") + pastCls + '" data-ms="' + ms + '">' +
+    rows += '<tr class="hrow' + (inbite ? " inbite" : "") + '" data-ms="' + ms + '">' +
       '<td class="hhour">' + hourLabel(dt) + "</td>" +
       '<td class="hscore">' + fishSVG(c, 13, 26) + ' <span style="color:' + c + '">' + sc + "</span></td>" +
       "<td class=\"hskyw\">" + sky + "</td>" +
@@ -1662,6 +1658,7 @@ function renderAll() {
   // hour-by-hour card for the selected day, after the tide chart
   html += hourlyHTML(day);
   app.innerHTML = html;
+  syncPastRows();
   // wire buttons
   var pills = app.querySelectorAll("[data-day]");
   for (var i = 0; i < pills.length; i++) {
@@ -1716,7 +1713,8 @@ function tick() {
     return;
   }
   // move the live tide-chart rod every 30s so it rides the curve with the real time
-  if (++__tfN % 30 === 0) { moveTideFish(); syncPastRows(); }
+  syncPastRows();
+  if (++__tfN % 30 === 0) moveTideFish();
 }
 // repositions the #tiderod marker along the tide curve to the current time
 var __tfN = 0;
