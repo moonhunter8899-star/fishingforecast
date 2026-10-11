@@ -213,6 +213,7 @@
   .htable td { padding: 6px; border-bottom: 1px solid #f0e7d2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .htable tr:last-child td { border-bottom: none; }
   .hrow.inbite td { background: rgba(29,158,108,.12); }
+  .htable tr.past { opacity: .45; }
   .hhour { font-family: "Fraunces", serif; font-weight: 800; }
   .hscore { font-weight: 800; }
   .hscore svg { vertical-align: -5px; }
@@ -1272,6 +1273,9 @@ function hourLabel(d) { // 12h in both languages, e.g. "2 PM" — never 24h/mili
 }
 function hourlyHTML(day) {
   var S = STR[state.lang];
+  var _nd = new Date(), _dd = day.date;
+  var isToday = _dd.getFullYear() === _nd.getFullYear() && _dd.getMonth() === _nd.getMonth() && _dd.getDate() === _nd.getDate();
+  var nowMs0 = Date.now();
   var wx = state.wx.hourly, mar = state.mar.hourly;
   var rows = "";
   for (var i = 0; i < wx.time.length; i++) {
@@ -1296,7 +1300,8 @@ function hourlyHTML(day) {
     (day.windows || []).forEach(function(w) {
       if (ms >= w.start.getTime() && ms < w.end.getTime()) inbite = true;
     });
-    rows += '<tr class="hrow' + (inbite ? " inbite" : "") + '">' +
+        var pastCls = (isToday && ms + 3600000 <= nowMs0) ? " past" : "";
+    rows += '<tr class="hrow' + (inbite ? " inbite" : "") + pastCls + '" data-ms="' + ms + '">' +
       '<td class="hhour">' + hourLabel(dt) + "</td>" +
       '<td class="hscore">' + snookSVG(c, 13) + ' <span style="color:' + c + '">' + sc + "</span></td>" +
       "<td class=\"hskyw\">" + sky + "</td>" +
@@ -1687,6 +1692,14 @@ function renderAll() {
   if (cpl && cday) cpl.addEventListener("click", function() { bumpCatch(cday.date.getTime(), 1); });
   initRadar();
 }
+function syncPastRows() {
+  var nowMs = Date.now(), rows = document.querySelectorAll('.htable tr.hrow[data-ms]');
+  for (var i = 0; i < rows.length; i++) {
+    var ms = +rows[i].getAttribute('data-ms');
+    if (ms + 3600000 <= nowMs) rows[i].classList.add('past');
+    else rows[i].classList.remove('past');
+  }
+}
 function tick() {
   if (!state.ready) return;
   var clk = $("clock");
@@ -1720,7 +1733,7 @@ function tick() {
     return;
   }
   // move the live tide-chart rod every 30s so it rides the curve with the real time
-  if (++__tfN % 30 === 0) moveTideFish();
+  if (++__tfN % 30 === 0) { moveTideFish(); syncPastRows(); }
 }
 // repositions the #tiderod marker along the tide curve to the current time
 var __tfN = 0;
