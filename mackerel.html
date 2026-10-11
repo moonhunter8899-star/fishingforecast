@@ -612,7 +612,7 @@ nextMinor: function(d) { return "Next Minor in " + d; },
 majorNow: "Major bite happening now", minorNow: "Minor bite happening now",
 nextHigh: function(d) { return "High tide in " + d; },
 nextLow: function(d) { return "Low tide in " + d; },
-tideNote: "Tide data unavailable right now.", moonNote: "Moon bite times unavailable right now.", freshMsg: "Looks like freshwater \u2014 we only do saltwater fish.", inlandMsg: "Out of the mackerel zone! They\u2019re running the beach \u2014 you\u2019re not.", askLast: "Would you like to go to your last location?",
+tideNote: "Tide data unavailable right now.", moonNote: "Moon bite times unavailable right now.", freshMsg: "Looks like freshwater \u2014 we only do saltwater fish.", inlandMsg: "Out of the mackerel zone! They\u2019re running the beach \u2014 you\u2019re not.", askLast: "Would you like to go to your last location?", onWaterAsk: "Dock, pier, or bridge?", onWater: "Fish here anyway",
 catchT0: "Skunked! The mackerel win today. 🎣",
 catchT1: "Nice haul — dinner's on! 🐟",
 catchT2: "Mackerel master! 🏆",
@@ -655,7 +655,7 @@ nextMinor: function(d) { return "Cá cắn nhẹ sau " + d; },
 majorNow: "Đang cắn mạnh ngay bây giờ", minorNow: "Đang cắn nhẹ ngay bây giờ",
 nextHigh: function(d) { return "Nước lên sau " + d; },
 nextLow: function(d) { return "Nước xuống sau " + d; },
-tideNote: "Hiện chưa có dữ liệu thủy triều.", moonNote: "Hiện chưa có giờ cá cắn theo mặt trăng.", freshMsg: "Có vẻ là nước ngọt \u2014 chúng tôi chỉ câu cá nước mặn.", inlandMsg: "Ra khỏi vùng cá thu rồi! Cá đang chạy ngoài bãi \u2014 còn bạn thì không.", askLast: "Bạn có muốn về lại điểm câu gần nhất không?",
+tideNote: "Hiện chưa có dữ liệu thủy triều.", moonNote: "Hiện chưa có giờ cá cắn theo mặt trăng.", freshMsg: "Có vẻ là nước ngọt \u2014 chúng tôi chỉ câu cá nước mặn.", inlandMsg: "Ra khỏi vùng cá thu rồi! Cá đang chạy ngoài bãi \u2014 còn bạn thì không.", askLast: "Bạn có muốn về lại điểm câu gần nhất không?", onWaterAsk: "Cầu tàu hay cầu cảng?", onWater: "Cứ câu ở đây",
 catchT0: "Móm rồi! Hôm nay cá thắng rồi. 🎣",
 catchT1: "Khá đấy — có cá ăn rồi! 🐟",
 catchT2: "Cao thủ săn cá! 🏆",
@@ -1641,6 +1641,18 @@ show(fr);
 }).catch(function() {});
 }
 function lastShore() { try { return JSON.parse(localStorage.getItem("ff_last_shore")); } catch (e) { return null; } }
+function waterKey(loc) { return loc.lat.toFixed(3) + "," + loc.lon.toFixed(3); }
+function hasWaterOverride(loc) {
+  try { return !!JSON.parse(localStorage.getItem("ff_water") || "{}")[waterKey(loc)]; }
+  catch (e) { return false; }
+}
+function saveWaterOverride(loc) {
+  try {
+    var o = JSON.parse(localStorage.getItem("ff_water") || "{}");
+    o[waterKey(loc)] = 1;
+    localStorage.setItem("ff_water", JSON.stringify(o));
+  } catch (e) {}
+}
 function renderAll() {
 var S = STR[state.lang];
 renderHeader();
@@ -1649,18 +1661,22 @@ if (!state.ready || !state.days.length) return;
 var d0 = state.days[0];
 var dx = state.days[state.sel];
 var c0 = ratingColor(dx.score);
-function guardScreen(msg) {
+function guardScreen(msg, allowOverride) {
 var btn = "", ls = lastShore();
 if (ls && ls.name && (ls.lat !== state.loc.lat || ls.lon !== state.loc.lon))
 btn = '<div class="asklast">' + S.askLast + '</div><button class="shorebtn" id="backShore">' + escHTML(ls.name) + " \u2192</button>";
+if (allowOverride)
+btn += '<div class="asklast">' + S.onWaterAsk + '</div><button class="shorebtn" id="waterBtn">' + escHTML(S.onWater) + " \u2192</button>";
 return '<div class="freshmsg"><div class="fmsg">' + msg + "</div>" + btn + "</div>";
 }
 function wireBackShore() {
 var b = $("backShore");
 if (b) b.onclick = function() { var ls = lastShore(); if (ls) setLocation(ls); };
+var w = $("waterBtn");
+if (w) w.onclick = function() { saveWaterOverride(state.loc); boot(); };
 }
 if (!state.isOcean) { app.innerHTML = guardScreen(S.freshMsg); wireBackShore(); return; }
-if (!state.isShore) { app.innerHTML = guardScreen(S.inlandMsg); wireBackShore(); return; }
+if (!state.isShore) { app.innerHTML = guardScreen(S.inlandMsg, true); wireBackShore(); return; }
 var html = "";
 // top rating card
 html += '<div class="topcard" style="border-color:' + c0 + '">' +
@@ -1884,7 +1900,7 @@ if (r[0]._err || r[1]._err) { state.loading = false; showError(); return; }
 var wx = r[0], mar = r[1];
 state.wx = wx; state.mar = mar;
 state.isOcean = mar.hourly.sea_surface_temperature.some(function(v) { return v != null && !isNaN(v); });
-state.isShore = state.isOcean && (mar.hourly.wave_height || []).some(function(v) { return v != null && !isNaN(v); });
+state.isShore = state.isOcean && (hasWaterOverride(state.loc) || (mar.hourly.wave_height || []).some(function(v) { return v != null && !isNaN(v); }));
 if (state.isShore) { try { localStorage.setItem("ff_last_shore", JSON.stringify({ name: state.loc.name, lat: state.loc.lat, lon: state.loc.lon })); } catch (e) {} }
 state.tides = r[2];
 var all = [];
