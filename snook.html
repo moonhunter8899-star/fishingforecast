@@ -489,15 +489,41 @@ function extractCoordsFromURL(u) {
   if (lat < -90 || lat > 90 || lon < -180 || lon > 180) return null;
   return { lat: lat, lon: lon };
 }
-function resolveMapLink(shortURL, done) {
-  var api = "https://api.allorigins.win/get?url=" + encodeURIComponent("https://unshorten.me/json/" + shortURL);
-  fetchJSON(api).then(function(j) {
-    var inner = null, c = null;
-    try { inner = JSON.parse(j.contents); } catch (e) {}
-    if (inner && inner.success && inner.resolved_url) c = extractCoordsFromURL(inner.resolved_url);
-    done(c);
-  }).catch(function() { done(null); });
-}
+  function coordsFromMicrolink(j) {
+    var d = (j && j.data) || {}, m;
+    var img = "";
+    try { img = decodeURIComponent((d.image && d.image.url) || ""); } catch (e) {}
+    m = img.match(/[?&]center=(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/);
+    if (m) {
+      var lat = +m[1], lon = +m[2];
+      if (lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180) return { lat: lat, lon: lon };
+    }
+    var t = (d.title || "").toUpperCase().replace(/[\u00B0\u00BA]/g, " ").replace(/[\u2032'\u2019]/g, " ").replace(/[\u2033\u201D]/g, " ").replace(/\s+/g, " ").trim();
+    m = t.match(/(\d+(?:\.\d+)?)\s+(\d+(?:\.\d+)?)\s+(\d+(?:\.\d+)?)\s+([NS])\s+(\d+(?:\.\d+)?)\s+(\d+(?:\.\d+)?)\s+(\d+(?:\.\d+)?)\s+([EW])/);
+    if (m) {
+      var la = +m[1] + +m[2] / 60 + +m[3] / 3600; if (m[4] === "S") la = -la;
+      var lo = +m[5] + +m[6] / 60 + +m[7] / 3600; if (m[8] === "W") lo = -lo;
+      return { lat: la, lon: lo };
+    }
+    return null;
+  }
+  function resolveMapLink(shortURL, done) {
+    var finished = false;
+    function fin(c) { if (!finished) { finished = true; done(c); } }
+    fetchJSON("https://api.microlink.io?url=" + encodeURIComponent(shortURL)).then(function(j) {
+      var c = coordsFromMicrolink(j);
+      if (c) fin(c); else expandFallback();
+      }).catch(expandFallback);
+      function expandFallback() {
+        var api = "https://api.allorigins.win/get?url=" + encodeURIComponent("https://unshorten.me/json/" + shortURL);
+        fetchJSON(api).then(function(j) {
+          var inner = null, c = null;
+          try { inner = JSON.parse(j.contents); } catch (e) {}
+          if (inner && inner.success && inner.resolved_url) c = extractCoordsFromURL(inner.resolved_url);
+          fin(c);
+          }).catch(function() { fin(null); });
+        }
+      }
 function doSearch(q) {
   var S = STR[state.lang], box = $("locResults");
   if (!q || q.length < 2) { box.innerHTML = ""; return; }
