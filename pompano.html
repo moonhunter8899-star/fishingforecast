@@ -902,8 +902,9 @@ function hourScore(wi, mi) {
   if (mm >= 2.5) s -= 30; else if (mm >= 0.5) s -= 15; else if (mm > 0) s -= 5;
   var wt = mar.sea_surface_temperature[mi];
   if (wt != null && !isNaN(wt)) {
-    if (wt >= 65 && wt <= 76) s -= 0;
-    else if ((wt >= 62 && wt < 65) || (wt > 76 && wt <= 80)) s -= 10;
+    // Angler consensus: bite starts ~62-65, prime ~65-75, slows approaching 80.
+    if (wt >= 65 && wt <= 75) s -= 0;
+    else if ((wt >= 62 && wt < 65) || (wt > 75 && wt <= 80)) s -= 10;
     else if ((wt >= 60 && wt < 62) || (wt > 80 && wt <= 84)) s -= 18;
     else s -= 28;
   }
@@ -954,7 +955,10 @@ function swellAdj(mi) {
   return -8;
 }
 function adjHourScore(wi, mi, ms) {
-  return hourScore(wi, mi) + tideAdj(ms) + pressureAdj(wi) + swellAdj(mi);
+  // Pompano feed best early morning and late afternoon with moving tide.
+  var hr = new Date(ms).getHours(), tod = 0;
+  if (hr >= 6 && hr <= 9) tod = 4; else if (hr >= 16 && hr <= 18) tod = 2;
+  return hourScore(wi, mi) + tideAdj(ms) + pressureAdj(wi) + swellAdj(mi) + tod;
 }
 function windowMoonBoost(startMs, endMs) {
   // (any Major overlap ? 10 : any Minor overlap ? 5 : 0) + (High tide event in window ? 7 : 0)
