@@ -437,10 +437,60 @@ function useMyLocation() {
       }).catch(function() { setLocation({ name: S.currentLoc, lat: lat, lon: lon }); });
   }, function() { locMsg(S.geoDenied); }, { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 });
 }
+/* Accept typed coordinates: "26.76, -80.11", "26.76 -80.11", "26.76N 80.11W" */
+function parseCoords(q) {
+  var t = String(q || "").trim();
+  if (!t) return null;
+  t = t.toUpperCase().replace(/[\u00B0\u00BA]/g, "").replace(/,/g, " ").replace(/\s+/g, " ").trim();
+  var merged = [], pending = null;
+  t.split(" ").forEach(function(p) {
+    if (/^[NSEW]$/.test(p)) { // lone hemisphere: suffix of previous number, else prefix of next
+      var prev = merged[merged.length - 1];
+      if (prev && /^-?\d+(?:\.\d+)?$/.test(prev)) merged[merged.length - 1] = prev + p;
+      else pending = p;
+      return;
+    }
+    if (pending) { p = pending + p; pending = null; }
+    merged.push(p);
+  });
+  var latH = null, lonH = null, nums = [];
+  merged.forEach(function(p) {
+    var m = p.match(/^([NS])?(-?\d+(?:\.\d+)?)([NS])?$/);
+    if (m) { var h = m[1] || m[3]; if (h === "N" || h === "S") latH = h; nums.push(parseFloat(m[2])); return; }
+    m = p.match(/^([EW])?(-?\d+(?:\.\d+)?)([EW])?$/);
+    if (m) { var h2 = m[1] || m[3]; if (h2 === "E" || h2 === "W") lonH = h2; nums.push(parseFloat(m[2])); return; }
+  });
+  if (nums.length !== 2) return null;
+  var lat = nums[0], lon = nums[1];
+  if (latH === "S") lat = -Math.abs(lat); else if (latH === "N") lat = Math.abs(lat);
+  if (lonH === "W") lon = -Math.abs(lon); else if (lonH === "E") lon = Math.abs(lon);
+  if (lat < -90 || lat > 90 || lon < -180 || lon > 180) return null;
+  return { lat: lat, lon: lon };
+}
+function setLocationFromCoords(lat, lon) {
+  var S = STR[state.lang];
+  var fallback = lat.toFixed(4) + ", " + lon.toFixed(4);
+  locMsg(S.locating);
+  fetchJSON("https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=" + lat + "&longitude=" + lon + "&localityLanguage=" + state.lang)
+    .then(function(j) {
+      var place = j.locality || j.city || "";
+      var st = (j.principalSubdivisionCode || "").split("-").pop();
+      setLocation({ name: place ? place + (st ? ", " + st : "") : fallback, lat: lat, lon: lon });
+    }).catch(function() { setLocation({ name: fallback, lat: lat, lon: lon }); });
+}
 var locSearchTimer = null;
 function doSearch(q) {
   var S = STR[state.lang], box = $("locResults");
   if (!q || q.length < 2) { box.innerHTML = ""; return; }
+  var cc = parseCoords(q);
+  if (cc) {
+    var label = cc.lat.toFixed(4) + ", " + cc.lon.toFixed(4);
+    box.innerHTML = '<button data-coords="1">' + escHTML(label) + "</button>";
+    box.querySelector("[data-coords]").addEventListener("click", function() {
+      setLocationFromCoords(cc.lat, cc.lon);
+    });
+    return;
+  }
   fetchJSON("https://geocoding-api.open-meteo.com/v1/search?name=" + encodeURIComponent(q) + "&count=6&language=" + state.lang + "&format=json")
     .then(function(j) {
       var res = (j && j.results) || [], html = "";
@@ -487,7 +537,7 @@ var STR = {
     rating: "SPANISH MACKEREL BITE RATING", today: "TODAY",
     pickDay: "Pick a day", best: "★ BEST", bestWeek: "BEST DAY THIS WEEK", goDay: "GO DAY",
     goFish: "BEST TIME TO FISH", inFish: function(d) { return "in " + d; }, nowFish: "NOW", gotAway: "The one that got away! 🎣", wind: "WIND", water: "WATER", cond: "CONDITION", rain: "RAIN", moon: "MOON", sunrise: "SUNRISE", sunset: "SUNSET", catch: "Catch",
-    searchPh: "Search a beach or town…", useMyLoc: "Use my location", homeBtn: "⌂ Jupiter Inlet",
+    searchPh: "Enter a beach, an inlet, or coordinates…", useMyLoc: "Use my location", homeBtn: "⌂ Jupiter Inlet",
     locating: "Locating…", geoDenied: "Location unavailable — check permission", geoUnsupported: "Geolocation not supported",
     currentLoc: "Current location", checkRegs: "Check local fishing regulations", noResults: "No places found",
     geoRough: "GPS fix is rough (\u00b1{mi} mi) \u2014 try again in the open",
@@ -530,7 +580,7 @@ var STR = {
     rating: "ĐIỂM CẮN CÂU CÁ THU", today: "HÔM NAY",
     pickDay: "Chọn ngày", best: "★ ĐẸP NHẤT", bestWeek: "NGÀY ĐẸP NHẤT TUẦN", goDay: "ĐI NGAY",
     goFish: "GIỜ CÂU TỐT NHẤT", inFish: function(d) { return "sau " + d; }, nowFish: "BÂY GIỜ", gotAway: "Cá chạy mất tiêu rồi! 🎣", wind: "GIÓ", water: "NƯỚC", cond: "THỜI TIẾT", rain: "MƯA", moon: "TRĂNG", sunrise: "BÌNH MINH", sunset: "HOÀNG HÔN", catch: "Cá câu được",
-    searchPh: "Tìm bãi biển hoặc thị trấn…", useMyLoc: "Vị trí của tôi", homeBtn: "⌂ Jupiter Inlet",
+    searchPh: "Nhập bãi biển, cửa lạch hoặc tọa độ…", useMyLoc: "Vị trí của tôi", homeBtn: "⌂ Jupiter Inlet",
     locating: "Đang định vị…", geoDenied: "Không lấy được vị trí — kiểm tra quyền", geoUnsupported: "Thiết bị không hỗ trợ định vị",
     currentLoc: "Vị trí hiện tại", checkRegs: "Kiểm tra quy định câu cá địa phương", noResults: "Không tìm thấy địa điểm",
     geoRough: "Định vị chưa chính xác (\u00b1{mi} dặm) — thử lại ở nơi thoáng",
