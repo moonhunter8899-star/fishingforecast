@@ -478,9 +478,40 @@ function setLocationFromCoords(lat, lon) {
     }).catch(function() { setLocation({ name: fallback, lat: lat, lon: lon }); });
 }
 var locSearchTimer = null;
+/* Paste a Google/Apple Maps link: coords come straight from full URLs; short links get expanded */
+function isMapsURL(q) { return /(maps\.app\.goo\.gl|goo\.gl\/maps|google\.[a-z.]+\/maps|maps\.google\.|maps\.apple\.com)/i.test(q); }
+function extractCoordsFromURL(u) {
+  var m = u.match(/[?&](?:q|ll|daddr|saddr)=(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/i), lat, lon;
+  if (!m) m = u.match(/@(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)(?:,|$|\?)/);
+  if (!m) m = u.match(/!3d(-?\d+(?:\.\d+)?)!4d(-?\d+(?:\.\d+)?)/);
+  if (!m) return null;
+  lat = +m[1]; lon = +m[2];
+  if (lat < -90 || lat > 90 || lon < -180 || lon > 180) return null;
+  return { lat: lat, lon: lon };
+}
+function resolveMapLink(shortURL, done) {
+  var api = "https://api.allorigins.win/get?url=" + encodeURIComponent("https://unshorten.me/json/" + shortURL);
+  fetchJSON(api).then(function(j) {
+    var inner = null, c = null;
+    try { inner = JSON.parse(j.contents); } catch (e) {}
+    if (inner && inner.success && inner.resolved_url) c = extractCoordsFromURL(inner.resolved_url);
+    done(c);
+  }).catch(function() { done(null); });
+}
 function doSearch(q) {
   var S = STR[state.lang], box = $("locResults");
   if (!q || q.length < 2) { box.innerHTML = ""; return; }
+  var um = String(q).match(/https?:\/\/\S*(?:maps\.app\.goo\.gl|goo\.gl\/maps|google\.[a-z.]+\/maps|maps\.google\.|maps\.apple\.com)\S*/i);
+  if (um) {
+    var link = um[0].replace(/[.,;)\]]+$/, ""), uc = extractCoordsFromURL(link);
+    if (uc) { setLocationFromCoords(uc.lat, uc.lon); return; }
+    box.innerHTML = '<div class="locmsg">' + escHTML(S.resolvingLink) + "</div>";
+    resolveMapLink(link, function(c2) {
+      if (c2) setLocationFromCoords(c2.lat, c2.lon);
+      else box.innerHTML = '<div class="locmsg">' + escHTML(S.linkFail) + "</div>";
+    });
+    return;
+  }
   var cc = parseCoords(q);
   if (cc) {
     var label = cc.lat.toFixed(4) + ", " + cc.lon.toFixed(4);
@@ -538,7 +569,7 @@ var STR = {
     goFish: "BEST TIME TO FISH", inFish: function(d) { return "in " + d; }, nowFish: "NOW", gotAway: "The one that got away! 🎣", wind: "WIND", water: "WATER", cond: "CONDITION", rain: "RAIN", moon: "MOON", sunrise: "SUNRISE", sunset: "SUNSET", catch: "Catch",
     searchPh: "Enter a beach, an inlet, or coordinates…", useMyLoc: "Use my location", homeBtn: "⌂ Jupiter Inlet",
     locating: "Locating…", geoDenied: "Location unavailable — check permission", geoUnsupported: "Geolocation not supported",
-    currentLoc: "Current location", checkRegs: "Check local fishing regulations", noResults: "No places found",
+    currentLoc: "Current location", checkRegs: "Check local fishing regulations", noResults: "No places found", resolvingLink: "Resolving map link\u2026", linkFail: "Couldn\u2019t read that map link \u2014 try coordinates like 26.76, -80.11",
     geoRough: "GPS fix is rough (\u00b1{mi} mi) \u2014 try again in the open",
     chgLoc: "Change location", radar: "RADAR", wind: "WIND", live: "LIVE",
     moonTitle: "🌙 Major / Minor bite times", major: "MAJOR", minor: "MINOR", now: "NOW",
@@ -582,7 +613,7 @@ var STR = {
     goFish: "GIỜ CÂU TỐT NHẤT", inFish: function(d) { return "sau " + d; }, nowFish: "BÂY GIỜ", gotAway: "Cá chạy mất tiêu rồi! 🎣", wind: "GIÓ", water: "NƯỚC", cond: "THỜI TIẾT", rain: "MƯA", moon: "TRĂNG", sunrise: "BÌNH MINH", sunset: "HOÀNG HÔN", catch: "Cá câu được",
     searchPh: "Nhập bãi biển, cửa lạch hoặc tọa độ…", useMyLoc: "Vị trí của tôi", homeBtn: "⌂ Jupiter Inlet",
     locating: "Đang định vị…", geoDenied: "Không lấy được vị trí — kiểm tra quyền", geoUnsupported: "Thiết bị không hỗ trợ định vị",
-    currentLoc: "Vị trí hiện tại", checkRegs: "Kiểm tra quy định câu cá địa phương", noResults: "Không tìm thấy địa điểm",
+    currentLoc: "Vị trí hiện tại", checkRegs: "Kiểm tra quy định câu cá địa phương", noResults: "Không tìm thấy địa điểm", resolvingLink: "Đang mở liên kết bản đồ\u2026", linkFail: "Không đọc được liên kết \u2014 thử tọa độ, ví dụ 26.76, -80.11",
     geoRough: "Định vị chưa chính xác (\u00b1{mi} dặm) — thử lại ở nơi thoáng",
     chgLoc: "Đổi địa điểm", radar: "RADAR", wind: "GIÓ", live: "TRỰC TIẾP",
     moonTitle: "🌙 Giờ cá cắn câu chính / phụ", major: "CHÍNH", minor: "PHỤ", now: "NGAY BÂY GIỜ",
