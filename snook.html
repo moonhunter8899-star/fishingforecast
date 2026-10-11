@@ -902,10 +902,10 @@ function hourScore(wi, mi) {
   if (mm >= 2.5) s -= 30; else if (mm >= 0.5) s -= 15; else if (mm > 0) s -= 5;
   var wt = mar.sea_surface_temperature[mi];
   if (wt != null && !isNaN(wt)) {
-    // Snook like it warm: 72-82F ideal. Cold water shuts them down fast.
-    if (wt >= 72 && wt <= 82) s -= 0;
-    else if ((wt >= 68 && wt < 72) || (wt > 82 && wt <= 86)) s -= 10;
-    else if ((wt >= 65 && wt < 68) || (wt > 86 && wt <= 90)) s -= 18;
+    // Angler consensus: feeding drops off below ~70 (cliff); prime ~75-85.
+    if (wt >= 72 && wt <= 84) s -= 0;
+    else if ((wt >= 70 && wt < 72) || (wt > 84 && wt <= 88)) s -= 10;
+    else if ((wt >= 65 && wt < 70) || (wt > 88 && wt <= 90)) s -= 18;
     else s -= 28;
   }
   var wv = mar.wave_height[mi] * 3.28084; // ft
