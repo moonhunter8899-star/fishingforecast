@@ -1,0 +1,1779 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Fishing Forecast">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="manifest" href="manifest.json">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f6f0df">
+<title>Spanish Mackerel Forecast — Tien Huynh</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,800;9..144,900&family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: #f6f0df; color: #2b2620;
+    font-family: "Public Sans", -apple-system, "Segoe UI", sans-serif;
+    font-variant-numeric: tabular-nums;
+  }
+  .wrap { max-width: 960px; margin: 0 auto; padding: 12px 16px 40px; }
+  html, body { overflow-x: hidden; }
+  h1, h2, h3, .serif { font-family: "Fraunces", Georgia, serif; }
+
+  /* Header */
+  .hd { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin: 4px 2px 12px; }
+  .hd > div:first-child { min-width: 0; }
+  .locline { font-family: "Fraunces", serif; font-weight: 800; font-size: 15px;
+    white-space: nowrap; margin: 0 2px 8px; }
+  .locbtn { background: none; border: none; padding: 0; width: 100%; text-align: left; cursor: pointer; font: inherit; color: inherit; }
+  .locbtn::after { content: " \25BE"; font-size: 11px; color: #8a7a5f; }
+  .locpanel { background: #f4ecda; border: 1px solid #d8c9a8; border-radius: 12px; padding: 10px; margin: -2px 2px 10px; }
+  .locsearch { width: 100%; box-sizing: border-box; font-size: 14px; padding: 8px 10px; border-radius: 9px; border: 1px solid #d8c9a8; background: #fff; font-family: inherit; color: #22312b; }
+  .locresults button { display: block; width: 100%; text-align: left; background: none; border: none; border-bottom: 1px solid #e7dcc2; padding: 8px 4px; font-size: 13px; font-weight: 600; color: #22312b; cursor: pointer; font-family: inherit; }
+  .locrow { display: flex; gap: 8px; margin-top: 8px; }
+  .locact { flex: 1; font-size: 12px; font-weight: 700; padding: 8px; border-radius: 9px; border: 1px solid #d8c9a8; background: #ede4cc; color: #22312b; cursor: pointer; font-family: inherit; }
+  .locchips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .locchips:empty { display: none; }
+  .locchip { font-size: 12px; font-weight: 700; padding: 6px 10px; border-radius: 20px; border: 1px solid #2e7d5b; background: #fff; color: #2e7d5b; cursor: pointer; font-family: inherit; }
+  .locmsg { font-size: 11px; color: #8a7a5f; margin-top: 6px; }
+  .locmsg:empty { display: none; }
+  .regsn { font-size: 11px; font-weight: 700; color: #8a7a5f; }
+  /* live precipitation radar */
+  .radarcap { margin: 0 0 16px; border-radius: 14px; overflow: hidden; border: 1px solid #d8c9a8; }
+  .radarmap { height: 230px; background: #dfe8ee; }
+  .radarmap { position: relative; }
+  .windcv { position: absolute; left: 0; top: 0; width: 100%; height: 100%; pointer-events: none; }
+  .seg { display: flex; border: 1px solid #d8c9a8; border-radius: 8px; overflow: hidden; flex: none; }
+  .seg button { border: 0; background: transparent; padding: 4px 10px; font-size: 10px; font-weight: 800; color: #8a7a5f; cursor: pointer; font-family: inherit; }
+  .seg button.on { background: #22312b; color: #fff; }
+  .radarfoot { flex: 1; }
+  .gofish { display: flex; align-items: center; gap: 8px; margin: 0 0 12px; padding: 9px 14px; border-radius: 12px; background: #f9ecd2; border: 1px solid #e6c877; font-size: 13px; color: #6d5416; }
+  .gofish b { letter-spacing: .05em; }
+  .gofish .gf-in { margin-left: auto; font-weight: 800; white-space: nowrap; }
+  .radarbar { display: flex; align-items: center; gap: 8px; padding: 6px 10px; background: #f4ecda; font-size: 10px; font-weight: 700; color: #8a7a5f; }
+  .radarattr { margin-left: auto; font-weight: 600; opacity: .75; }
+  .radarplay { border: 1px solid #d8c9a8; background: #fff; border-radius: 8px; padding: 3px 10px; font-size: 11px; cursor: pointer; color: #22312b; }
+  .scoremark { background: none; border: none; }
+  .scoredot { width: 16px; height: 16px; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,.4); }
+  .leaflet-container { font-family: "Public Sans", sans-serif; }
+
+  .locbar { display: flex; align-items: center; gap: 8px; margin: 0 2px 8px; }
+  .locbar .locbtn { width: auto; flex: 1 1 auto; min-width: 0; margin: 0; overflow: hidden; text-overflow: ellipsis; }
+  .locgps, .locchg { flex: none; font-size: 11px; font-weight: 700; padding: 7px 8px; border-radius: 9px; border: 1px solid #d8c9a8; background: #ede4cc; color: #22312b; cursor: pointer; font-family: inherit; white-space: nowrap; }
+  .locchg { background: #fff; border-color: #2e7d5b; color: #2e7d5b; }
+
+
+  .hd .t2 { color: #8a7a5f; font-size: 10px; margin-top: 2px; }
+  .hd .brand { font-family: "Fraunces", serif; font-weight: 900; font-size: 15px; color: #22312b; }
+  .hd .nick { font-size: 11px; font-weight: 700; color: #9a4a16; margin: 1px 0 7px; letter-spacing: .02em; }
+  .hdBtns { display: flex; align-items: center; gap: 8px; flex: none; }
+  .langbtn {
+    background: #fffaf0; border: 1.5px solid #d9c9a3; border-radius: 999px;
+    font-size: 11px; font-weight: 800; padding: 7px 10px; cursor: pointer; color: #8a7a5f;
+  }
+  .langbtn b { color: #9a4a16; }
+  .watchlink { text-decoration: none; display: inline-block; }
+  .rules { font-size: 11px; font-weight: 700; color: #8a7a5f; margin: 2px 2px 10px; }
+  .season { display: inline-block; font-size: 10px; font-weight: 800; letter-spacing: .04em;
+    border-radius: 999px; padding: 3px 10px; margin-left: 6px; vertical-align: 1px;
+    color: #fff; white-space: nowrap; }
+  .season.open { background: #1d9e6c; }
+  .season.closed { background: #c0392b; }
+  .rules b { color: #9a4a16; }
+  .refresh {
+    background: #bc5a1e; color: #fff; border: none; border-radius: 999px;
+    font-family: "Fraunces", serif; font-weight: 800; font-size: 13px;
+    padding: 8px 16px; cursor: pointer; flex: none;
+  }
+
+  /* Top rating card */
+  .topcard {
+    position: relative; overflow: hidden;
+    background: #22312b; border-radius: 22px; padding: 18px;
+    border: 2px solid #1d9e6c;
+    box-shadow: 0 4px 14px rgba(34,49,43,.25);
+    margin-bottom: 14px; color: #fff;
+  }
+  .topcard .wm { position: absolute; top: -8px; right: 6px; opacity: .14; pointer-events: none; }
+  .topcard .row { display: flex; align-items: center; gap: 16px; position: relative; padding: 2px 4px; }
+  .badge {
+    width: 58px; height: 58px; border-radius: 50%; background: #fff; flex: none;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .topcard .lbl { color: #e8c76a; font-size: 10px; font-weight: 700; letter-spacing: .18em; }
+  .topcard .big { font-family: "Fraunces", serif; font-weight: 900; font-size: 30px; color: #fff; margin-top: 2px; }
+  .topcard .big .sc { font-size: 22px; }
+  .topcard .ddate { color: rgba(255,255,255,.78); font-size: 12px; font-weight: 600; margin-top: 6px; letter-spacing: .02em; }
+
+  /* Day strip */
+  .pick { display: flex; align-items: baseline; justify-content: space-between; margin: 2px 2px 8px; }
+  .pick .ph { font-family: "Fraunces", serif; font-weight: 800; font-size: 13px; color: #9a4a16; }
+  .pick .pr { font-size: 11px; color: #8a7a5f; }
+  .strip { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-bottom: 10px; }
+  .dpill {
+    background: #fffaf0; border: 1px solid #e3d5b3; border-radius: 12px; padding: 8px 2px 7px;
+    text-align: center; cursor: pointer; position: relative; font-family: "Public Sans", sans-serif;
+    color: #2b2620;
+  }
+  .dpill .dw { font-size: 10px; color: #8a7a5f; font-weight: 600; text-transform: uppercase; }
+  .dpill .dn { font-family: "Fraunces", serif; font-size: 18px; font-weight: 800; }
+  .dpill .dsc { font-size: 12px; font-weight: 800; }
+  .dpill .dow2 { font-size: 8px; color: #8a7a5f; white-space: nowrap; letter-spacing: 0; }
+  .dpill.sel { color: #fff; border-color: transparent; }
+  .dpill.sel .dw, .dpill.sel .dow2 { color: rgba(255,255,255,.85); }
+  .dpill.best { background: #fff3cf; border: 2px solid #d9a441; box-shadow: 0 0 8px rgba(217,164,65,.5); }
+  .dpill .bestbadge {
+    position: absolute; top: -9px; left: 50%; transform: translateX(-50%);
+    background: #6b4a1f; color: #ffe9a8; font-size: 8px; font-weight: 800;
+    padding: 2px 6px; border-radius: 999px; letter-spacing: .06em; white-space: nowrap;
+  }
+
+  /* Day card */
+  .card {
+    background: #fffaf0; border-radius: 20px; padding: 16px; margin-bottom: 14px;
+    border: 1.5px solid #1d9e6c;
+  }
+  .card h3 { margin: 0; font-size: 19px; font-weight: 900; }
+  .card h3 .dt { font-family: "Public Sans", sans-serif; font-size: 12px; font-weight: 600; color: #8a7a5f; }
+  .card h3 .tday { color: #fff; font-size: 12px; font-weight: 900; letter-spacing: .06em;
+    padding: 4px 11px; border-radius: 999px; vertical-align: 3px; white-space: nowrap; }
+  .card h3 .drate { display: inline-flex; align-items: center; gap: 4px; margin-left: 8px;
+    font-family: "Public Sans", sans-serif; font-size: 14px; font-weight: 800; white-space: nowrap; }
+  .card h3 .drate svg { vertical-align: -4px; }
+
+
+  /* 4 weather tiles */
+  .tiles { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-bottom: 16px; }
+  .tile { background: #ede4cc; border-radius: 12px; padding: 10px 6px; text-align: center; }
+  .tile .k { font-size: 9px; font-weight: 700; letter-spacing: .06em; color: #8a7a5f; text-transform: uppercase; }
+  .tile .v { font-family: "Fraunces", serif; font-size: 15px; font-weight: 800; margin-top: 3px; white-space: nowrap; }
+  .tile .v svg { vertical-align: -4px; }
+  .tile .msub { font-size: 9px; font-weight: 700; color: #8a7a5f; margin-top: 2px; white-space: nowrap; }
+  .tile .sundrow { display: flex; align-items: stretch; justify-content: center; gap: 10px; }
+  .tile .sundiv { width: 1px; background: rgba(90,70,40,.25); }
+
+  /* Major / Minor section */
+  .moonsec { margin-bottom: 16px; }
+  .freshmsg { text-align:center; padding:64px 24px; color:#5a6b73; font-size:16px; line-height:1.7; }
+  .fmsg { margin-bottom:18px; }
+  .asklast { font-size:14px; font-weight:600; color:#5a6b73; margin-bottom:10px; }
+  .shorebtn { background:#0b6ea8; color:#fff; border:none; border-radius:999px; font-size:14px; font-weight:700; padding:10px 20px; cursor:pointer; box-shadow:0 4px 14px rgba(11,110,168,.35); }
+  .shorebtn:active { transform:scale(.97); }
+  .moonsec .mh { font-family: "Fraunces", serif; font-weight: 800; font-size: 15px; color: #9a4a16; margin-bottom: 2px; }
+  .cdline { font-size: 11px; color: #8a7a5f; margin: 0 0 8px; font-weight: 600; }
+  .mrow {
+    display: flex; align-items: center; gap: 10px;
+    background: #f3ecda; border: 1px solid #e0d2ae; border-radius: 12px;
+    padding: 9px 12px; margin-bottom: 7px; font-weight: 700; font-size: 14px;
+  }
+  .mrow.now { background: #fff3cf; border: 2px solid #d9a441; box-shadow: 0 0 8px rgba(217,164,65,.45); }
+  .mbadge {
+    font-size: 10px; font-weight: 800; letter-spacing: .06em; border-radius: 7px;
+    padding: 4px 8px; flex: none;
+  }
+  .mbadge.major { background: #bc5a1e; color: #fff; }
+  .mbadge.minor { background: #e3d5b3; color: #6b5f4c; }
+  .mrow .mt { font-family: "Fraunces", serif; font-weight: 800; }
+  .nowpill {
+    margin-left: auto; background: #1d9e6c; color: #fff; font-size: 10px; font-weight: 800;
+    border-radius: 999px; padding: 3px 10px; letter-spacing: .06em; flex: none;
+  }
+
+  /* Tide section */
+  .tidesec .th { font-family: "Fraunces", serif; font-weight: 800; font-size: 15px; color: #0f766e; margin-bottom: 2px; }
+  .tidechart { width: 100%; height: auto; display: block; margin: 4px 0 8px; }
+  .tchips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .tchip {
+    display: inline-flex; align-items: center; gap: 6px; border-radius: 999px;
+    padding: 6px 12px; font-size: 12px; font-weight: 700;
+    background: #ede4cc; border: 1px solid #d9c9a3; color: #2b2620;
+  }
+  .tchip.hi { background: #bc5a1e; border-color: #bc5a1e; color: #fff; }
+
+  /* Hour by hour */
+  .hsec .hh2 { font-family: "Fraunces", serif; font-weight: 800; font-size: 15px; color: #9a4a16; margin-bottom: 6px; }
+  .htable { width: 100%; border-collapse: collapse; font-size: 12px; table-layout: fixed; }
+  th.hhour, td.hhour { width: 15%; }
+  th.hscore, td.hscore { width: 21%; }
+  .htable td.hscore { padding: 6px 4px; }
+  th.hskyw, td.hskyw { width: 33%; }
+  th.hrain, td.hrain { width: 11%; }
+  th.htemp, td.htemp { width: 20%; }
+  .htable th {
+    font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em;
+    color: #8a7a5f; text-align: left; padding: 4px 6px; border-bottom: 1px solid #e3d5b3;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .htable td { padding: 6px; border-bottom: 1px solid #f0e7d2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .htable tr:last-child td { border-bottom: none; }
+  .hrow.inbite td { background: rgba(29,158,108,.12); }
+  .hhour { font-family: "Fraunces", serif; font-weight: 800; }
+  .hscore { font-weight: 800; }
+  .hscore svg { vertical-align: -5px; }
+  .hint { font-size: 10px; color: #8a7a5f; margin: 8px 2px 0; font-weight: 600; }
+
+  .loading, .err { text-align: center; padding: 40px 16px; color: #8a7a5f; font-size: 14px; }
+  .err button { margin-top: 10px; }
+  .foot { text-align: center; color: #b3a37f; font-size: 10px; margin-top: 18px; }
+
+  /* ===== responsive: phone -> desktop ===== */
+  /* hourly table is fluid at every width: fixed layout + % columns, never scrolls */
+  .hwrap { overflow-x: visible; }
+  .dpill { min-height: 48px; }
+  @media (max-width: 700px) {
+    .tiles { grid-template-columns: repeat(3, 1fr); }
+  }
+  @media (max-width: 430px) {
+    .wrap { padding: 10px 10px 32px; }
+    .hd { gap: 6px; }
+    .hdBtns { gap: 6px; }
+    .langbtn { padding: 6px 8px; font-size: 10px; }
+    .refresh { padding: 7px 12px; font-size: 12px; }
+    .tiles { grid-template-columns: repeat(2, 1fr); }
+    .strip { gap: 4px; }
+    .dpill { padding: 8px 1px 7px; }
+    .topcard .big { font-size: 26px; }
+    /* hourly table stays compact on phones (column widths are set globally above) */
+    .htable { font-size: 11px; }
+    .htable th, .htable td { padding: 5px 3px; }
+    .hscore svg { width: 16px; height: 16px; }
+  }
+  @media (min-width: 901px) {
+    .wrap { padding: 16px 24px 48px; }
+    .strip { gap: 8px; }
+  }
+</style>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <div class="hd">
+    <div>
+      <div class="brand">Spanish Mackerel Forecast</div>
+      <div class="t2" id="updLine"></div>
+    </div>
+    <div class="hdBtns">
+      <a class="langbtn watchlink" href="index.html" id="backBtn">‹ Home</a>
+      <a class="langbtn watchlink" href="watch.html" title="Apple Watch version">⌚</a>
+      <button class="langbtn" id="langBtn" title="Language / Ngôn ngữ"></button>
+      <button class="refresh" id="refBtn">Refresh</button>
+    </div>
+  </div>
+  <div class="locbar">
+    <button class="locline locbtn" id="locName">…</button>
+    <button class="locact locgps" id="locGPS2"></button>
+    <button class="locact locchg" id="locChange"></button>
+  </div>
+  <div class="locpanel" id="locPanel" hidden>
+    <input class="locsearch" id="locSearch" type="search" autocomplete="off">
+    <div class="locresults" id="locResults"></div>
+    <div class="locrow"><button class="locact" id="locGPS"></button><button class="locact" id="locHome"></button></div>
+    <div class="locchips" id="locRecents"></div>
+    <div class="locmsg" id="locMsg"></div>
+  </div>
+  <div class="rules" id="rules"></div>
+  <div id="app"><div class="loading" id="loading">Checking mackerel conditions…</div></div>
+  <div class="foot">Spanish Mackerel Forecast · Tien Huynh</div>
+</div>
+<script>
+"use strict";
+/* ================= constants ================= */
+var PIN = { lat: 26.9165914, lon: -80.0641906, name: "Jupiter Inlet, FL", station: "8722495" };
+var TIDE_STATIONS = [
+  ["8729333",30.468,-86.138],
+  ["8720213",30.42,-81.728],
+  ["8729572",30.406,-86.65],
+  ["8729806",30.337,-87.14],
+  ["8720291",30.283,-81.387],
+  ["8729210",30.214,-85.879],
+  ["8720434",30.08,-81.762],
+  ["8728130",30.078,-84.178],
+  ["8728957",29.997,-85.37],
+  ["8720554",29.917,-81.3],
+  ["8728412",29.878,-84.595],
+  ["8727792",29.797,-83.584],
+  ["8728786",29.707,-85.153],
+  ["8720767",29.595,-81.682],
+  ["8727648",29.437,-83.293],
+  ["8727520",29.135,-83.032],
+  ["8721147",29.063,-80.916],
+  ["8727328",28.863,-82.667],
+  ["8727151",28.533,-82.65],
+  ["8721604",28.416,-80.593],
+  ["8721843",28.083,-80.592],
+  ["8726724",27.978,-82.832],
+  ["8726667",27.913,-82.425],
+  ["8722125",27.632,-80.372],
+  ["8726347",27.602,-82.76],
+  ["8722329",27.252,-80.218],
+  ["8725899",27.123,-82.47],
+  ["8725791",26.988,-81.993],
+  ["8722495",26.943,-80.073],
+  ["8722588",26.77,-80.052],
+  ["8725541",26.707,-82.163],
+  ["8722761",26.447,-80.065],
+  ["8725351",26.438,-81.918],
+  ["8725110",26.132,-81.808],
+  ["8723080",25.903,-80.12],
+  ["8724963",25.895,-81.558],
+  ["8723465",25.373,-80.29],
+  ["8723962",24.718,-81.017],
+  ["8724698",24.632,-82.92],
+  ["8724493",24.575,-81.708],
+  ["8671946",31.89,-81.062],
+  ["8674301",31.575,-81.19],
+  ["8677406",31.145,-81.497],
+  ["8679598",30.778,-81.491],
+  ["8651370",36.183,-75.747],
+  ["8652437",35.845,-75.655],
+  ["8653244",35.585,-76.486],
+  ["8653471",35.509,-75.989],
+  ["8654400",35.223,-75.635],
+  ["8656201",34.797,-76.455],
+  ["8656613",34.687,-77.118],
+  ["8658163",34.213,-77.787],
+  ["8659182",33.902,-78.082],
+  ["8659897",33.865,-78.507],
+  ["8661070",33.655,-78.918],
+  ["8662245",33.352,-79.187],
+  ["8664022",33.008,-79.923],
+  ["8665763",32.747,-80.165],
+  ["8668498",32.34,-80.465],
+  ["8669246",32.214,-80.846]
+];
+
+/* ================= locations: GPS, search, saved spots ================= */
+function distMi(lat1, lon1, lat2, lon2) {
+  var p = Math.PI / 180, a = Math.sin((lat2 - lat1) * p / 2), b = Math.sin((lon2 - lon1) * p / 2);
+  var h = a * a + Math.cos(lat1 * p) * Math.cos(lat2 * p) * b * b;
+  return 2 * 3959 * Math.asin(Math.sqrt(h));
+}
+function nearestStation(lat, lon) {
+  var best = null, bd = 1e9, i, t, d;
+  for (i = 0; i < TIDE_STATIONS.length; i++) {
+    t = TIDE_STATIONS[i]; d = distMi(lat, lon, t[1], t[2]);
+    if (d < bd) { bd = d; best = t[0]; }
+  }
+  return bd <= 45 ? best : null;
+}
+function resolveLoc(l) {
+  l.station = nearestStation(l.lat, l.lon);
+  l.home = distMi(l.lat, l.lon, PIN.lat, PIN.lon) < 30;
+  return l;
+}
+function getSavedLoc() {
+  try {
+    var l = JSON.parse(localStorage.getItem("ff_loc"));
+    if (l && isFinite(l.lat) && isFinite(l.lon) && l.name)
+      return resolveLoc({ name: String(l.name).slice(0, 60), lat: +l.lat, lon: +l.lon });
+  } catch (e) {}
+  return resolveLoc({ name: PIN.name, lat: PIN.lat, lon: PIN.lon });
+}
+function getRecents() { try { return JSON.parse(localStorage.getItem("ff_recents")) || []; } catch (e) { return []; } }
+function saveRecent(loc) {
+  var r = getRecents().filter(function(x) { return distMi(x.lat, x.lon, loc.lat, loc.lon) > 1; });
+  r.unshift({ name: loc.name, lat: loc.lat, lon: loc.lon });
+  try { localStorage.setItem("ff_recents", JSON.stringify(r.slice(0, 5))); } catch (e) {}
+}
+function escHTML(t) { return String(t).replace(/[&<>"']/g, function(c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+
+function pinSVG(s) {
+  s = s || 13;
+  return '<svg width="' + s + '" height="' + Math.round(s * 1.25) + '" viewBox="0 0 24 30" fill="none" stroke="#3f3a32" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:6px">' +
+    '<path d="M12 2.8C7.3 2.8 3.7 6.4 3.7 11.1c0 6.3 8.3 16.1 8.3 16.1s8.3-9.8 8.3-16.1C20.3 6.4 16.7 2.8 12 2.8Z"/>' +
+    '<circle cx="12" cy="11" r="3.4"/></svg>';
+}
+function locMsg(t) { var el = $("locMsg"); if (el) el.textContent = t || ""; }
+function hideLocPanel() { var p = $("locPanel"); if (p) p.hidden = true; }
+function setLocation(loc) {
+  state.loc = resolveLoc({ name: loc.name, lat: loc.lat, lon: loc.lon });
+  try { localStorage.setItem("ff_loc", JSON.stringify({ name: state.loc.name, lat: state.loc.lat, lon: state.loc.lon })); } catch (e) {}
+  if (!state.loc.home) saveRecent(state.loc);
+  hideLocPanel();
+  boot();
+}
+function useMyLocation() {
+  var S = STR[state.lang];
+  locMsg(S.locating);
+  if (!navigator.geolocation) { locMsg(S.geoUnsupported); return; }
+  navigator.geolocation.getCurrentPosition(function(pos) {
+    var acc = pos.coords.accuracy || 1e9;
+    if (acc > 2000) { // rough network/IP fix, not real GPS — don't save a wrong spot
+      locMsg(S.geoRough.replace("{mi}", Math.max(1, Math.round(acc / 1609))));
+      return;
+    }
+    var lat = pos.coords.latitude, lon = pos.coords.longitude;
+    fetchJSON("https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=" + lat + "&longitude=" + lon + "&localityLanguage=en")
+      .then(function(j) {
+        var place = j.locality || j.city || "";
+        var st = (j.principalSubdivisionCode || "").split("-").pop();
+        setLocation({ name: place ? place + (st ? ", " + st : "") : S.currentLoc, lat: lat, lon: lon });
+      }).catch(function() { setLocation({ name: S.currentLoc, lat: lat, lon: lon }); });
+  }, function() { locMsg(S.geoDenied); }, { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 });
+}
+var locSearchTimer = null;
+function doSearch(q) {
+  var S = STR[state.lang], box = $("locResults");
+  if (!q || q.length < 2) { box.innerHTML = ""; return; }
+  fetchJSON("https://geocoding-api.open-meteo.com/v1/search?name=" + encodeURIComponent(q) + "&count=6&language=" + state.lang + "&format=json")
+    .then(function(j) {
+      var res = (j && j.results) || [], html = "";
+      res.forEach(function(r, i) {
+        var label = r.name + (r.admin1 ? ", " + r.admin1 : "") + (r.country_code && r.country_code !== "US" ? " " + r.country_code : "");
+        html += '<button data-gi="' + i + '">' + escHTML(label) + "</button>";
+      });
+      if (!res.length) html = '<div class="locmsg">' + escHTML(S.noResults) + "</div>";
+      box.innerHTML = html;
+      var btns = box.querySelectorAll("[data-gi]");
+      for (var i = 0; i < btns.length; i++) (function(b) {
+        b.addEventListener("click", function() {
+          var r = res[+b.getAttribute("data-gi")];
+          if (r) setLocation({ name: r.name + (r.admin1 ? ", " + r.admin1 : ""), lat: r.latitude, lon: r.longitude });
+        });
+      })(btns[i]);
+    }).catch(function() { box.innerHTML = ""; });
+}
+function renderRecents() {
+  var r = getRecents(), el = $("locRecents"), html = "";
+  r.forEach(function(x, i) { html += '<button class="locchip" data-ri="' + i + '">' + escHTML(x.name) + "</button>"; });
+  el.innerHTML = html;
+  var chips = el.querySelectorAll("[data-ri]");
+  for (var i = 0; i < chips.length; i++) (function(b) {
+    b.addEventListener("click", function() {
+      var x = getRecents()[+b.getAttribute("data-ri")];
+      if (x) setLocation(x);
+    });
+  })(chips[i]);
+}
+function wireLocUI() {
+  var S = STR[state.lang];
+  $("locSearch").placeholder = S.searchPh;
+  $("locGPS").innerHTML = pinSVG(12) + escHTML(S.useMyLoc);
+  var _ls = lastShore();
+  $("locHome").textContent = (_ls && _ls.name) ? "\u2302 " + _ls.name : S.homeBtn;
+  renderRecents();
+}
+
+/* ================= i18n ================= */
+var STR = {
+  en: {
+    loading: "Checking mackerel conditions…",
+    rating: "SPANISH MACKEREL BITE RATING", today: "TODAY",
+    pickDay: "Pick a day", best: "★ BEST", bestWeek: "BEST DAY THIS WEEK", goDay: "GO DAY",
+    goFish: "BEST TIME TO FISH", inFish: function(d) { return "in " + d; }, nowFish: "NOW", gotAway: "The one that got away! 🎣", wind: "WIND", water: "WATER", cond: "CONDITION", rain: "RAIN", moon: "MOON", sunrise: "SUNRISE", sunset: "SUNSET", catch: "Catch",
+    searchPh: "Search a beach or town…", useMyLoc: "Use my location", homeBtn: "⌂ Jupiter Inlet",
+    locating: "Locating…", geoDenied: "Location unavailable — check permission", geoUnsupported: "Geolocation not supported",
+    currentLoc: "Current location", checkRegs: "Check local fishing regulations", noResults: "No places found",
+    geoRough: "GPS fix is rough (\u00b1{mi} mi) \u2014 try again in the open",
+    chgLoc: "Change location", radar: "RADAR", wind: "WIND", live: "LIVE",
+    moonTitle: "🌙 Major / Minor bite times", major: "MAJOR", minor: "MINOR", now: "NOW",
+    tide: "Tide", high: "High", low: "Low", refresh: "Refresh", back: "‹ Home",
+    rules: "<b>Spanish Mackerel</b> — 15/day · min 12″ fork",
+    seasonYear: "OPEN · year-round", todayWord: "Today",
+    retry: "Try again", loadFail: "Could not load live data. Check your connection.",
+    great: "Great", good: "Good", fair: "Fair", poor: "Poor",
+    updated: function(d, t) { return "Updated " + d + " at " + t; },
+    dur: function(h, m) { return h > 0 ? h + "h " + m + "m" : m + "m"; },
+    nextMajor: function(d) { return "Next Major in " + d; },
+    nextMinor: function(d) { return "Next Minor in " + d; },
+    majorNow: "Major bite happening now", minorNow: "Minor bite happening now",
+    nextHigh: function(d) { return "High tide in " + d; },
+    nextLow: function(d) { return "Low tide in " + d; },
+    tideNote: "Tide data unavailable right now.", moonNote: "Moon bite times unavailable right now.", freshMsg: "Looks like freshwater \u2014 we only do saltwater fish.", inlandMsg: "Out of the mackerel zone! They\u2019re running the beach \u2014 you\u2019re not.", askLast: "Would you like to go to your last location?",
+    catchT0: "Skunked! The mackerel win today. 🎣",
+    catchT1: "Nice haul — dinner's on! 🐟",
+    catchT2: "Mackerel master! 🏆",
+    catchT3: "Unreal — are you running a charter?! 😄",
+    fullIn: function(d) { return "Full in " + d + "d"; },
+    fullTonight: "Full tonight 🌕",
+    hourly: "Hour by hour", thHour: "Hour", thScore: "Bite", thSkyWind: "Sky · Wind",
+    thRain: "Rain", thAirWtr: "Air/Wtr", biteHint: "Tinted rows fall inside a bite window.",
+    days: ["SUN","MON","TUE","WED","THU","FRI","SAT"],
+    months: ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
+    condName: {
+      0:"Clear", 1:"Mostly clear", 2:"Partly cloudy", 3:"Overcast",
+      45:"Fog", 48:"Fog", 51:"Drizzle", 53:"Drizzle", 55:"Drizzle",
+      56:"Freezing drizzle", 57:"Freezing drizzle", 61:"Light rain", 63:"Rain",
+      65:"Heavy rain", 66:"Freezing rain", 67:"Freezing rain", 71:"Snow",
+      73:"Snow", 75:"Snow", 77:"Snow", 80:"Showers", 81:"Showers", 82:"Showers",
+      85:"Snow showers", 86:"Snow showers", 95:"Thunderstorm", 96:"Storm", 99:"Storm"
+    },
+  },
+  vi: {
+    loading: "Đang kiểm tra điều kiện câu cá…",
+    rating: "ĐIỂM CẮN CÂU CÁ THU", today: "HÔM NAY",
+    pickDay: "Chọn ngày", best: "★ ĐẸP NHẤT", bestWeek: "NGÀY ĐẸP NHẤT TUẦN", goDay: "ĐI NGAY",
+    goFish: "GIỜ CÂU TỐT NHẤT", inFish: function(d) { return "sau " + d; }, nowFish: "BÂY GIỜ", gotAway: "Cá chạy mất tiêu rồi! 🎣", wind: "GIÓ", water: "NƯỚC", cond: "THỜI TIẾT", rain: "MƯA", moon: "TRĂNG", sunrise: "BÌNH MINH", sunset: "HOÀNG HÔN", catch: "Cá câu được",
+    searchPh: "Tìm bãi biển hoặc thị trấn…", useMyLoc: "Vị trí của tôi", homeBtn: "⌂ Jupiter Inlet",
+    locating: "Đang định vị…", geoDenied: "Không lấy được vị trí — kiểm tra quyền", geoUnsupported: "Thiết bị không hỗ trợ định vị",
+    currentLoc: "Vị trí hiện tại", checkRegs: "Kiểm tra quy định câu cá địa phương", noResults: "Không tìm thấy địa điểm",
+    geoRough: "Định vị chưa chính xác (\u00b1{mi} dặm) — thử lại ở nơi thoáng",
+    chgLoc: "Đổi địa điểm", radar: "RADAR", wind: "GIÓ", live: "TRỰC TIẾP",
+    moonTitle: "🌙 Giờ cá cắn câu chính / phụ", major: "CHÍNH", minor: "PHỤ", now: "NGAY BÂY GIỜ",
+    tide: "Thủy triều", high: "Nước lên", low: "Nước xuống", refresh: "Làm mới", back: "‹ Trang chủ",
+    rules: "<b>Cá thu</b> — 15 con/ngày · tối thiểu 12″ fork",
+    seasonYear: "MỞ · quanh năm", todayWord: "Hôm nay",
+    retry: "Thử lại", loadFail: "Không tải được dữ liệu. Kiểm tra kết nối mạng.",
+    great: "Tuyệt vời", good: "Tốt", fair: "Trung bình", poor: "Tệ",
+    updated: function(d, t) { return "Cập nhật " + d + " lúc " + t; },
+    dur: function(h, m) { return h > 0 ? h + " giờ " + m + " phút" : m + " phút"; },
+    nextMajor: function(d) { return "Cá cắn mạnh sau " + d; },
+    nextMinor: function(d) { return "Cá cắn nhẹ sau " + d; },
+    majorNow: "Đang cắn mạnh ngay bây giờ", minorNow: "Đang cắn nhẹ ngay bây giờ",
+    nextHigh: function(d) { return "Nước lên sau " + d; },
+    nextLow: function(d) { return "Nước xuống sau " + d; },
+    tideNote: "Hiện chưa có dữ liệu thủy triều.", moonNote: "Hiện chưa có giờ cá cắn theo mặt trăng.", freshMsg: "Có vẻ là nước ngọt \u2014 chúng tôi chỉ câu cá nước mặn.", inlandMsg: "Ra khỏi vùng cá thu rồi! Cá đang chạy ngoài bãi \u2014 còn bạn thì không.", askLast: "Bạn có muốn về lại điểm câu gần nhất không?",
+    catchT0: "Móm rồi! Hôm nay cá thắng rồi. 🎣",
+    catchT1: "Khá đấy — có cá ăn rồi! 🐟",
+    catchT2: "Cao thủ săn cá! 🏆",
+    catchT3: "Đỉnh quá — mở tàu câu luôn đi! 😄",
+    fullIn: function(d) { return "Trăng tròn sau " + d + "d"; },
+    fullTonight: "Trăng tròn tối nay 🌕",
+    hourly: "Từng giờ trong ngày", thHour: "Giờ", thScore: "Điểm cắn", thSkyWind: "Trời · Gió",
+    thRain: "Mưa", thAirWtr: "KK/Nước", biteHint: "Hàng tô màu nằm trong giờ cá cắn.",
+    days: ["CN","T2","T3","T4","T5","T6","T7"],
+    months: ["Th1","Th2","Th3","Th4","Th5","Th6","Th7","Th8","Th9","Th10","Th11","Th12"],
+    condName: {
+      0:"Trời quang", 1:"Ít mây", 2:"Mây rải rác", 3:"Nhiều mây",
+      45:"Sương mù", 48:"Sương mù", 51:"Mưa phùn", 53:"Mưa phùn", 55:"Mưa phùn",
+      56:"Mưa phùn", 57:"Mưa phùn", 61:"Mưa nhẹ", 63:"Mưa",
+      65:"Mưa to", 66:"Mưa đá", 67:"Mưa đá", 71:"Tuyết",
+      73:"Tuyết", 75:"Tuyết", 77:"Tuyết", 80:"Mưa rào", 81:"Mưa rào", 82:"Mưa rào",
+      85:"Mưa tuyết", 86:"Mưa tuyết", 95:"Dông", 96:"Dông", 99:"Dông"
+    },
+  }
+};
+
+/* ================= helpers ================= */
+function $(id) { return document.getElementById(id); }
+function pad(n) { return (n < 10 ? "0" : "") + n; }
+function compass(deg) {
+  var dirs = ["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSW","SW","WSW","W","WNW","NW","NNW"];
+  return dirs[Math.round(deg / 22.5) % 16];
+}
+function tstr(d, lang) { // 12h in both languages, e.g. "7:35p"
+  var h = d.getHours(), ap = h >= 12 ? "p" : "a";
+  h = h % 12; if (h === 0) h = 12;
+  return h + ":" + pad(d.getMinutes()) + ap;
+}
+function trange(a, b, lang) { return tstr(a, lang) + "–" + tstr(b, lang); }
+function clockStr(lang) { // 12h in both languages, e.g. "2:26 PM"
+  var d = new Date();
+  var h = d.getHours(), ap = h >= 12 ? "PM" : "AM";
+  h = h % 12; if (h === 0) h = 12;
+  return h + ":" + pad(d.getMinutes()) + " " + ap;
+}
+function fullDateStr(date, lang) { // EN: "Fri, Oct 9, 2026" · VI: "T6, 9 Th10 2026"
+  var S = STR[lang];
+  if (lang === "vi") {
+    return S.days[date.getDay()] + ", " + date.getDate() + " " + S.months[date.getMonth()] + " " + date.getFullYear();
+  }
+  var dn = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][date.getDay()];
+  return dn + ", " + S.months[date.getMonth()] + " " + date.getDate() + ", " + date.getFullYear();
+}
+function ratingColor(s) { return s >= 60 ? "#1d9e6c" : (s >= 40 ? "#d9a441" : "#c0392b"); }
+function ratingWord(s, lang) {
+  var S = STR[lang];
+  return s >= 80 ? S.great : s >= 60 ? S.good : s >= 40 ? S.fair : S.poor;
+}
+function moonPhaseInfo(deg) {
+  // deg: MET Norway moonphase — 0=new, 90=first quarter, 180=full, 270=last quarter
+  var p = ((((deg % 360) + 360) % 360) / 360);
+  var th = 2 * Math.PI * p;
+  var illum = (1 - Math.cos(th)) / 2;
+  var dFull = Math.round((((180 - deg) % 360) + 360) % 360 / 360 * 29.53058867);
+  return { illum: illum, daysToFull: dFull };
+}
+function catchKey(date) { return "pf_catch_" + ymdDash(date); }
+function getCatch(date) {
+  try {
+    var v = parseInt(localStorage.getItem(catchKey(date)) || "0", 10);
+    return (isNaN(v) || v < 0) ? 0 : v;
+  } catch (e) { return 0; }
+}
+function setCatch(date, n) {
+  try { localStorage.setItem(catchKey(date), String(Math.max(0, n))); } catch (e) {}
+}
+function catchMsg(n, lang) {
+  var S = STR[lang];
+  if (n <= 0) return S.catchT0;
+  if (n <= 5) return S.catchT1;
+  if (n <= 12) return S.catchT2;
+  return S.catchT3;
+}
+function catchRowHTML(date) {
+  var S = STR[state.lang];
+  var n = getCatch(date);
+  return '<div class="catchrow"><span class="ck">' + S.catch + ':</span>' +
+    '<button class="cbtn" id="catchMinus">−</button>' +
+    '<span class="cnum" id="catchNum">' + n + '</span>' +
+    '<button class="cbtn" id="catchPlus">+</button>' +
+    '<span class="cmsg" id="catchMsg">' + catchMsg(n, state.lang) + "</span></div>";
+}
+function bumpCatch(dateMs, d) {
+  var date = new Date(dateMs), n = Math.max(0, getCatch(date) + d);
+  setCatch(date, n);
+  var cn = $("catchNum"); if (cn) cn.textContent = n;
+  var cm = $("catchMsg"); if (cm) cm.textContent = catchMsg(n, state.lang);
+}
+function durText(ms, lang) {
+  if (ms < 0) ms = 0;
+  var m = Math.round(ms / 60000), h = Math.floor(m / 60);
+  return STR[lang].dur(h, m % 60);
+}
+function hx2rgb(h){h=h.replace("#","");if(h.length===3){h=h[0]+h[0]+h[1]+h[1]+h[2]+h[2];}return [parseInt(h.substr(0,2),16),parseInt(h.substr(2,2),16),parseInt(h.substr(4,2),16)];}
+function rgb2hx(r,g,b){function c(x){x=Math.max(0,Math.min(255,Math.round(x)));var s=x.toString(16);return s.length<2?"0"+s:s;}return "#"+c(r)+c(g)+c(b);}
+function shade(hex,p){var c=hx2rgb(hex);if(p>=0){return rgb2hx(c[0]+(255-c[0])*p/100,c[1]+(255-c[1])*p/100,c[2]+(255-c[2])*p/100);}var f=1+p/100;return rgb2hx(c[0]*f,c[1]*f,c[2]*f);}
+function mixc(h1,h2,p){var a=hx2rgb(h1),b=hx2rgb(h2);return rgb2hx(a[0]+(b[0]-a[0])*p/100,a[1]+(b[1]-a[1])*p/100,a[2]+(b[2]-a[2])*p/100);}
+var MACK_URI = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAWgAAAB5CAYAAAAUGLtfAABeKklEQVR42u1deXwU5fl/nved2d3cCUe4b1AMIkK0VasE76qoVVmUWlFbxdaj3vU2xNaj1drDeqG0v54q8aiK1dYzoOKFWoQAcgYIgZCQO9nszPs+vz9mZnd2dvYKAYKd5/PJh7DZnZ15j+/7PN/nAvDEkzQkGAzyefNKVW8kPPHEE0/6kJSXlyveKHjiiSee9C1gZgDAAAAWLFgw5vbbb51HixZx88/ojZAnnnjiyT6WYDDILWAmosCFF110zdQpUzaccuLxtUSkeADtiSeeeLKPhYiwtNTgmYmI3XTTdWcf+53vfDLxoIPlmOEjaMqhk1YQEfMA2hNP9o143KInAGDwzIgoAED7y1NPjT/nrLNv2bB+/WVtbW0AiELhCoa7wz5zzWjeiHniiSee7GVBRIvSACJSg8ELLj/26GM2HDRuAo0aPkKMGz1WjBszVo4aNpy+VXpE07L3lh1iadve6HniiadBe7L3hBERVVZWij/96U+Hzzz99F9s3rT5jPaOdmDINEVVVSICICBkDLrD3eydD95AAID58+cjAJA3hJ544gG0J70vHACE3++H888NXvrYI394oLGhsViA1BWuIiAY4Gwp2gBAumQNW3fnAwBMmjTJ06A98WRva1DeEPxvCRHhvNJ5KgCIVxa9MvLM757+10+Xf/rHXTt2FgOQzrnCCYjbwBkAACQBcc792Xk5YwAAVq1a5QG0J554GrQnvQnOiMgAQbviqqtmPPzor/+wdXPNJKHruqIqjIgUJzBHVGiO0KWFYe2m9ToAwHvvvecNqCeeeADtSW9IeXk5Q0SZlZUlzg8Gr/70gw9/3tjYUIiAgquKQtIAZpISGDMMKztUIwCAFEyERS4AQHt7u6dBe+LJXhaP4vjfAGeloqJCElHWaaed9sTyTz99pLF+V4HKmGCMcWnTmhEBQEoASQBEYGjUBCBBokRePLB4FADAzNyZnoPQE088DdqTPRS1oqJCu//++0efcMIJT23ZvPkk0a1pqqpwIuKAiXCWAMjQnA1VmVBIHWprtzIAgPfgPW9kPfHE06A96amUlpaqjDPtpz/96ZFvvPbafzZv2HCS1IVQVEWxZQTGiB2vI+Bssh9EAIHs7DGICFVVVd4Ae+KJB9CeZCpWyvbnX3yuPXD/A+d98uGHr2zauGkCAxTcoDQwkmYSYTASBzUjGQktgAAEcgDnPPI93mh74sneE4/i+OYJIiIHAG3upXNnP/ePZxY2NOzKVRRFACAnIoiBVTSAGW3MhsuvBo4TQVNjY5iiX+SNtieeeADtSbqaMyKiP+DXr/7JlTe/8cYb97S0NPtU1acTgEJAMWBsAXVCmDXBmxAAiAARoaW5GaUQ3mB74kkv7dn58+djdXU11tfXIwBA1YwZEioqpAfQ3zxwZkQkb7rpprvfeeutitbmZvAFApKkTDnPFvfs1JotACcA0DUd8vMLh0op8xGxrby8HCsqKrxoDk88yczEhVmzZvGNGzcyRCQA0GPeYPPveAD9DQJnv98vrr7y6rvfX1pVsbtxN/n9AdClZA5GI5GyHAfQdqRGRAQECIW6sr/44gs/ALSCV3LUE08ykmAwyCsrK7GyslIHAKGqKiz7z38GLPzboqFhER7U2trUr3jUkOpHf/PoVwDAPCfhN4TWCAQC4oeXXXL3kqXvVTQ1Nup+v590KTNmickM3SAEYGT8UKQskoSuUEh9++23swEA5sN8bwI88SQNMbsTYWVlpVAURX/33XdH/2DOnAtOOemkJ66//c5XPv3ik1c++eTj19ra2/42euT4IhPM0dOgD3hrCbmqqvqll15827Kq9+e3NDSFfYGAIkiydPTbZBq1neJAANAlQSArq4DCNBwAaubDfAZGAIgnnnjiojzNnj2bVVZWCjNRjN97z70nLfvogwvuuO326S3NzcM1Xffpug7hcBgK8vO6x40dN/uWG29cUl5ezioqKoQH0Ae2KAio/fDii+e8X7X03pbmZunz+7iU6YFzHKdBsXGXZDoJGQFIBEDOoLujS65evcKrx7EXNvOMGTM4AFgx5tI7/A5YrQmmT5+uIKIOAGLRokVZL7zwwill06df39zUfFR7W6tfSAkAKDnnuq7ren5err/0iCPufPSJJ14BAF5RUSEAvDjoA1aCwSDnnGs/veGn53/86Sd/bGtpRZ/qQyLiaS8kW6YgAQCxSFi0gdtkvEciABIgSElc4bnDh40sBgCYMWOGNxF7uJGDwSAvLS1VERGrqqr0qqoqnTGmc849cD5AqQwiUqqqqnQiCsyde+E5f/jdb/654ssv/7mlpqasubnJLwAE51wqCkcpBfgUNTB+/IQ//uPZZx8yMTky954GfQBKWVmZUllZqf+8vHz6q4tffXp3/S6/qvplouzAdOgNK+SOOagNO5iQJBIkc7pJHwAAUFdX5zkJ9+CArayshMrKSgEAgojYz352/bQtGzePDmn6EUOHDNvwxIIFC8059cD6AJnTiooKoSiK/Mnllx9//PEzrtnd0HBOW3MzSEShKCoypjAwlSgppE5SKiNGD//s+ptuvOmV1xYzc9tF5pt7w3rggXNVVZV+2403lrz11lvP1G3fMVhVfQRATGLUyecE2EQAbb3f0qat162/WcBNACCBQOEcVMRXq9es+QIAeF1dnQceGZyJ5eXlrKqqiqqrq0lVVXrkkYcP6+rW5j7xh0fLN63b9NPtdXWXtLW2lOXl5K75atWqt0pLSxVvjPv+vAIAq66ullVVVUNam5vv/e9XX923s27H1K7OTl3limRMUSJbzKifIKSu8wGDimtnX3De+XPm/KAmGAyy6urqmCQDj+I4wMynqqoq/emnnx665P33n9qxo368oqi6QU7YwJUgcQ0ku9acCLQT/Y0xEIIwFArnAADAcm9OMtGuAABNZ5H/nnvuOX3G9Okv/HHhn9+qq9nyq8ZdDSc37t49rK2tjUuC9qEjR74OADB27FgPnPuomKUOFONXwp9e/dMf3HLzze+u+O+KnzY17i5kyDRV9XNiTHFoS6TpGmbn5WmTDp1823XX/WzFvHnzVNOaSmjlenIAnNJEpJx55hmL1q5cfZau6RpXeKQ1lcQoQJONtkh6UYqlOJDcP4eIIDRdy87JUaceUfrws88+e+PUqVPV5cuXex2+UwxxSUmJWl1dHSYidt9995245L0lt+3YXnt8W1sbSAGgcDQcgowhSWL9+hduff7ddw8fVVjYZIZReslAfVBZqqioYIio33///SM/WfbJA+vWfT2no7UVkDFhTJrh1ZEY3WCIAFJKXVV9yuQphz300ksv3UxEKiJqbs0yPA36wKE2uM/nE9+bedZdX69ac5amabodnHtrMu0aOMZqCwCcgRQCardu1aSUsHy5p0Kn2sSm6RsuLy8/6KyzZj6yaNGif61ZXX18U1MTAYDgCiNCZICoAAAyZFhQWLhiVGFhk3EueuDcB+dVqaiokD6fT7/ssssueOXlV6q++u8Xc9paWySoigQETkCMyCitwCRE7VIigUTK6FEjq1544YX5RIREpCfqZOQB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";
+function fishSVG(color, size) {
+  // Spanish mackerel silhouette, tinted by the rating color (CSS mask).
+  var w = Math.round(size * 2.973);
+  var st = "display:inline-block;width:" + w + "px;height:" + size + "px;background:" + color + ";" +
+    "-webkit-mask-image:url(" + MACK_URI + ");-webkit-mask-repeat:no-repeat;" +
+    "-webkit-mask-position:center;-webkit-mask-size:contain;" +
+    "mask-image:url(" + MACK_URI + ");mask-repeat:no-repeat;" +
+    "mask-position:center;mask-size:contain;vertical-align:-4px;";
+  return '<span style="' + st + '"></span>';
+}
+/* Original line-art crescent moon with three sparkle stars (Tien's reference style).
+   Clean strokes in deep teal to match the warm-sand/deep-green theme. */
+function moonSVG(em) {
+  var s = em || 1.15, st = "#0f766e", sw = 2.2;
+  function spark(cx, cy, r) {
+    var k = +(r * 0.18).toFixed(2);
+    return '<path d="M' + cx + ' ' + (cy - r) +
+      ' Q' + (cx + k) + ' ' + (cy - k) + ' ' + (cx + r) + ' ' + cy +
+      ' Q' + (cx + k) + ' ' + (cy + k) + ' ' + cx + ' ' + (cy + r) +
+      ' Q' + (cx - k) + ' ' + (cy + k) + ' ' + (cx - r) + ' ' + cy +
+      ' Q' + (cx - k) + ' ' + (cy - k) + ' ' + cx + ' ' + (cy - r) + ' Z"/>';
+  }
+  return '<svg width="' + s + 'em" height="' + s + 'em" viewBox="0 0 32 32" ' +
+    'style="vertical-align:-0.18em" fill="none" stroke="' + st + '" stroke-width="' + sw + '" ' +
+    'stroke-linecap="round" stroke-linejoin="round">' +
+    '<path d="M13.7 6 A10 10 0 1 0 22.1 20.1 A8.2 8.2 0 0 1 13.7 6 Z"/>' +
+    spark(24, 6.5, 3.1) + spark(18, 12.5, 2.3) + spark(25, 14, 1.9) +
+    '</svg>';
+}
+/* Dynamic moon-phase icon (~30px): dark disc + accurately-shaped lit portion,
+   drawn from the MET Norway moonphase angle (0=new, 90=first quarter,
+   180=full, 270=last quarter). The terminator is a half-ellipse with
+   semi-minor axis r*|cos(phase)|; waxing lights the right side, waning the left.
+   Lit: warm pale yellow; dark: deep slate — reads on the warm-sand theme. */
+function moonPhaseSVG(deg, em) {
+  var th = ((((deg % 360) + 360) % 360) * Math.PI) / 180;
+  var r = 14, cx = 16, cy = 16;
+  var c = Math.cos(th);
+  if (Math.abs(c) < 1e-9) c = 0; // snap float noise at quarter points
+  var waxing = th <= Math.PI;
+  var rx = Math.abs(r * c).toFixed(2);
+  var outerSweep = waxing ? 1 : 0;
+  var termSweep = (c < 0) ? 1 : 0;
+  var s = em || 1.3;
+  var d = "M" + cx + " " + (cy - r) +
+    " A" + r + " " + r + " 0 0 " + outerSweep + " " + cx + " " + (cy + r) +
+    " A" + rx + " " + r + " 0 0 " + termSweep + " " + cx + " " + (cy - r) + " Z";
+  return '<svg width="' + s + 'em" height="' + s + 'em" viewBox="0 0 32 32" ' +
+    'style="vertical-align:-0.18em">' +
+    '<circle cx="16" cy="16" r="14" fill="#1f3a3a"/>' +
+    '<path d="' + d + '" fill="#f5e6b8"/>' +
+    '<circle cx="16" cy="16" r="13.2" fill="none" stroke="#0f766e" stroke-width="1.6"/>' +
+    '</svg>';
+}
+/* ============ Original line-art weather icons (drawn for this app) ============
+   One consistent style: 32x32 grid, deep teal #0f766e strokes, round caps/joins.
+   Sized ~1em for inline use; simple shapes stay crisp at 16px.
+   Night keeps Tien's crescent-moon-with-sparkles for clear skies. */
+var WXST = "#0f766e", WXSW = 2.2;
+function _wsvg(inner, em) {
+  var s = em || 1.15;
+  return '<svg width="' + s + 'em" height="' + s + 'em" viewBox="0 0 32 32" ' +
+    'style="vertical-align:-0.18em" fill="none" stroke="' + WXST + '" stroke-width="' + WXSW + '" ' +
+    'stroke-linecap="round" stroke-linejoin="round">' + inner + '</svg>';
+}
+function _wsun(cx, cy, r) {
+  var g = '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '"/>';
+  for (var i = 0; i < 8; i++) {
+    var a = i * Math.PI / 4;
+    g += '<line x1="' + (cx + (r + 2.2) * Math.cos(a)).toFixed(1) +
+         '" y1="' + (cy + (r + 2.2) * Math.sin(a)).toFixed(1) +
+         '" x2="' + (cx + (r + 4.6) * Math.cos(a)).toFixed(1) +
+         '" y2="' + (cy + (r + 4.6) * Math.sin(a)).toFixed(1) + '"/>';
+  }
+  return g;
+}
+/* Cloud body: bottom line, right bump, big top arc, left bump. Spans x~5..26, y~11..25. */
+function _wcloudP() { return '<path d="M10 25 h12 a4 4 0 0 0 0-8 a6 6 0 0 0-11.6-1.6 A4.5 4.5 0 0 0 10 25 Z"/>'; }
+function _wcloud(dy) { return '<g transform="translate(0 ' + (dy || 0) + ')">' + _wcloudP() + '</g>'; }
+function _wcloudSm() { return '<g transform="translate(6.5 7) scale(0.68)">' + _wcloudP() + '</g>'; }
+/* Small crescent for night combos (this app's own crescent geometry). */
+function _wcresSm() {
+  return '<g transform="translate(-1.5 -2.5) scale(0.6)">' +
+    '<path d="M13.7 6 A10 10 0 1 0 22.1 20.1 A8.2 8.2 0 0 1 13.7 6 Z"/></g>';
+}
+function _wrain(xs, y) {
+  var g = '';
+  for (var i = 0; i < xs.length; i++) {
+    var x = xs[i];
+    g += '<line x1="' + x + '" y1="' + y + '" x2="' + (x - 1.6).toFixed(1) + '" y2="' + (y + 4.2).toFixed(1) + '"/>';
+  }
+  return g;
+}
+function _wdriz(y) {
+  var g = '', xs = [12, 16.5, 21];
+  for (var i = 0; i < 3; i++)
+    g += '<circle cx="' + xs[i] + '" cy="' + (y + (i % 2)) + '" r="1.15" fill="' + WXST + '" stroke="none"/>';
+  return g;
+}
+function _wsnow(y) {
+  var g = '', xs = [11.5, 16.5, 21.5];
+  for (var i = 0; i < 3; i++) {
+    var x = xs[i];
+    g += '<path d="M' + x + ' ' + (y - 2.2) + 'V' + (y + 2.2) +
+      'M' + (x - 1.9).toFixed(1) + ' ' + (y - 1.1) + 'L' + (x + 1.9).toFixed(1) + ' ' + (y + 1.1) +
+      'M' + (x - 1.9).toFixed(1) + ' ' + (y + 1.1) + 'L' + (x + 1.9).toFixed(1) + ' ' + (y - 1.1) + '"/>';
+  }
+  return g;
+}
+function _wbolt() {
+  return '<path d="M18 23 L13 29 H16 L14.5 31.5 L20 26 H17.2 Z" fill="' + WXST + '" stroke="none"/>';
+}
+function _wfog(y) {
+  return '<line x1="9" y1="' + y + '" x2="23" y2="' + y + '"/>' +
+         '<line x1="11.5" y1="' + (y + 3) + '" x2="20.5" y2="' + (y + 3) + '"/>';
+}
+/* Stat-tile label icons: original line-art in the same style (replaces emoji). */
+function _lblWind() {
+  return _wsvg('<path d="M4 10 h12 a2.8 2.8 0 1 0-2.8-2.8"/>' +
+    '<line x1="4" y1="16" x2="24" y2="16"/>' +
+    '<path d="M4 22 h12 a2.8 2.8 0 1 1-2.8 2.8"/>', 1.05);
+}
+function _lblWater() {
+  return _wsvg('<path d="M16 5 C16 5 9 14 9 19 a7 7 0 0 0 14 0 C23 14 16 5 16 5 Z"/>', 1.05);
+}
+function _lblRain() {
+  return _wsvg(_wcloudSm() + _wrain([12, 16.5, 21], 25.5), 1.05);
+}
+/* Condition icon for a weather code + is_day flag (same interface as before). */
+function condIcon(code, isDay) {
+  var night = (isDay === 0), inner = "";
+  var RC = _wcloud(-2);                              /* cloud shifted up, room for precip */
+  var sky = night ? _wcresSm() : _wsun(10, 9, 3.5);   /* small sky body for combos */
+  switch (code) {
+    case 0: return night ? moonSVG(1.15) : _wsvg(_wsun(16, 13, 5.5));
+    case 1: inner = (night ? _wcresSm() : _wsun(10.5, 9.5, 3.8)) + _wcloudSm(); break;
+    case 2: inner = sky + _wcloud(0); break;
+    case 3: inner = _wcloud(0); break;
+    case 45: case 48: inner = RC + _wfog(26); break;
+    case 51: case 53: case 55:
+    case 56: case 57: inner = RC + _wdriz(26.5); break;
+    case 61: inner = RC + _wrain([13.5, 18.5], 24.5); break;
+    case 63: case 66: case 67: inner = RC + _wrain([11.5, 16.5, 21.5], 24.5); break;
+    case 65: inner = RC + _wrain([9.5, 14, 18.5, 23], 24.5); break;
+    case 71: case 73: case 75: case 77: inner = RC + _wsnow(27); break;
+    case 80: case 81: case 82: inner = sky + RC + _wrain([13.5, 18.5], 24.5); break;
+    case 85: case 86: inner = sky + RC + _wsnow(27); break;
+    case 95: inner = RC + _wbolt(); break;
+    case 96: case 99: inner = RC + _wbolt() + _wrain([9.5, 22.5], 24.5); break;
+    default: inner = sky + _wcloud(0);
+  }
+  return _wsvg(inner);
+}
+/* ================= state ================= */
+var state = {
+  lang: localStorage.getItem("pf_lang") || "en",
+  ready: false, sel: 0, days: [], moon: [], tides: [], moonPhase: {},
+  loc: getSavedLoc(),
+  updatedAt: null, isOcean: true, isShore: true
+};
+
+/* ================= data loading ================= */
+function fetchJSON(url) {
+  return fetch(url).then(function(r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); });
+}
+function ymd(d) { return d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()); }
+function ymdDash(d) { return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()); }
+
+function loadWeather(lat, lon) {
+  var u = "https://api.open-meteo.com/v1/forecast?latitude=" + lat + "&longitude=" + lon +
+    "&hourly=temperature_2m,precipitation_probability,precipitation,windspeed_10m,winddirection_10m,wind_gusts_10m,weather_code,is_day" +
+    "&daily=temperature_2m_max,temperature_2m_min,weather_code,precipitation_probability_max,sunrise,sunset" +
+    "&timezone=auto&forecast_days=7&temperature_unit=fahrenheit&windspeed_unit=mph";
+  return fetchJSON(u);
+}
+function loadMarine(lat, lon) {
+  var u = "https://marine-api.open-meteo.com/v1/marine?latitude=" + lat + "&longitude=" + lon +
+    "&hourly=wave_height,sea_surface_temperature&timezone=auto&forecast_days=7&temperature_unit=fahrenheit";
+  return fetchJSON(u);
+}
+function loadTides(station, fromD, toD) {
+  var u = "https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?begin_date=" + ymd(fromD) +
+    "&end_date=" + ymd(toD) + "&station=" + station +
+    "&product=predictions&datum=MLLW&time_zone=lst_ldt&units=english&interval=hilo&format=json&application=mackerel-forecast";
+  return fetchJSON(u).then(function(j) {
+    var out = [];
+    (j.predictions || []).forEach(function(p) {
+      // "2026-10-09 15:21" local station time
+      var m = /^(\d+)-(\d+)-(\d+) (\d+):(\d+)$/.exec(p.t);
+      if (!m) return;
+      out.push({ t: new Date(+m[1], +m[2] - 1, +m[3], +m[4], +m[5]).getTime(), type: p.type, v: parseFloat(p.v) });
+    });
+    out.sort(function(a, b) { return a.t - b.t; });
+    return out;
+  });
+}
+function loadMoonDay(lat, lon, date) {
+  // MET Norway sunrise API — the same moon source the Muse app uses.
+  // high_moon/low_moon -> Major (+/-1h); moonrise/moonset -> Minor (+/-30min).
+  // Times requested in UTC (+00:00) so daylight-saving can't shift them.
+  var u = "https://api.met.no/weatherapi/sunrise/3.0/moon?lat=" + lat + "&lon=" + lon +
+    "&date=" + ymdDash(date) + "&offset=" + encodeURIComponent("+00:00");
+  return fetchJSON(u).then(function(j) {
+    var p = (j && j.properties) || {}, wins = [];
+    // moonphase: phase angle in degrees (0=new, 90=first quarter, 180=full, 270=last quarter)
+    try {
+      state.moonPhase = state.moonPhase || {};
+      if (p.moonphase != null && !isNaN(+p.moonphase)) state.moonPhase[ymdDash(date)] = +p.moonphase;
+    } catch (e) {}
+    function T(ev) { return ev && ev.time ? new Date(ev.time).getTime() : null; }
+    [["high_moon"], ["low_moon"]].forEach(function(cfg) {
+      var t = T(p[cfg[0]]);
+      if (t != null && !isNaN(t)) wins.push({ type: "major", start: t - 3600000, end: t + 3600000, center: t });
+    });
+    [["moonrise"], ["moonset"]].forEach(function(cfg) {
+      var t = T(p[cfg[0]]);
+      if (t != null && !isNaN(t)) wins.push({ type: "minor", start: t - 1800000, end: t + 1800000, center: t });
+    });
+    return wins;
+  }).catch(function() { return []; });
+}
+function atHourly(hourly, isoIdx, key) { return hourly[key][isoIdx]; }
+function hourlyIndex(hourly, ms) {
+  // hourly.time entries "2026-10-09T14:00" local
+  var best = 0, bd = 1e15;
+  for (var i = 0; i < hourly.time.length; i++) {
+    var t = new Date(hourly.time[i]).getTime();
+    var d = Math.abs(t - ms);
+    if (d < bd) { bd = d; best = i; }
+  }
+  return best;
+}
+function tideAt(ms) {
+  // Cosine interpolation between hilo events: tides rise/fall fastest
+  // mid-tide and flatten at highs/lows, so the chart renders as a smooth
+  // natural curve instead of angular straight segments.
+  var T = state.tides;
+  if (!T.length) return 0;
+  if (ms <= T[0].t) return T[0].v;
+  for (var i = 0; i < T.length - 1; i++) {
+    if (ms >= T[i].t && ms <= T[i + 1].t) {
+      var f = (ms - T[i].t) / (T[i + 1].t - T[i].t);
+      var s = (1 - Math.cos(Math.PI * f)) / 2;
+      return T[i].v + s * (T[i + 1].v - T[i].v);
+    }
+  }
+  return T[T.length - 1].v;
+}
+/* ---- scoring (mirrors the Muse app's server/src/actions.ts) ----
+   Hourly score starts at 100 and subtracts penalties, clamped 0-100.
+   Tide adjustment is applied per hour afterwards, clamped to [-6, +14].
+   Moon boost applies ONLY to per-window bite ratings, never to day scores. */
+function hourScore(wi, mi) {
+  var wx = state.wx.hourly, mar = state.mar.hourly, s = 100;
+  var wsp = wx.windspeed_10m[wi];
+  if (wsp < 4) s -= 4;
+  else if (wsp <= 15) s -= 0;
+  else if (wsp <= 20) s -= 12;
+  else if (wsp <= 25) s -= 26;
+  else s -= 46;
+  var gust = wx.wind_gusts_10m ? wx.wind_gusts_10m[wi] : 0;
+  if (gust > wsp + 12) s -= 8;
+  if (gust > 30) s -= 18;
+  var rp = wx.precipitation_probability[wi];
+  if (rp >= 80) s -= 45; else if (rp >= 60) s -= 30; else if (rp >= 40) s -= 20; else if (rp >= 20) s -= 10;
+  var mm = wx.precipitation ? wx.precipitation[wi] : 0;
+  if (mm >= 2.5) s -= 30; else if (mm >= 0.5) s -= 15; else if (mm > 0) s -= 5;
+  var wt = mar.sea_surface_temperature[mi];
+  if (wt != null && !isNaN(wt)) {
+    if (wt >= 68 && wt <= 80) s -= 0;
+    else if ((wt >= 65 && wt < 68) || (wt > 80 && wt <= 84)) s -= 10;
+    else if ((wt >= 62 && wt < 65) || (wt > 84 && wt <= 88)) s -= 18;
+    else s -= 28;
+  }
+  var wv = mar.wave_height[mi] * 3.28084; // ft
+  if (!isNaN(wv)) {
+    if (wv < 0.5) s -= 6;
+    else if (wv <= 3) s -= 0;
+    else if (wv <= 4) s -= 8;
+    else if (wv <= 5) s -= 18;
+    else if (wv <= 6) s -= 28;
+    else s -= 40;
+  }
+  return Math.max(0, Math.min(100, Math.round(s)));
+}
+function tideAdj(ms) {
+  // Mackerel ambush bait on moving water either way: +6 for any next event.
+  // -8 within 0.5h of an event (slack), +2 within 1h, +6 within 3h (mid-tide flow).
+  var T = state.tides;
+  if (!T.length) return 0;
+  var next = null, nearest = 1e15, i, d;
+  for (i = 0; i < T.length; i++) {
+    d = Math.abs(T[i].t - ms);
+    if (d < nearest) nearest = d;
+    if (T[i].t > ms && !next) next = T[i];
+  }
+  var a = next ? 6 : 0;
+  if (nearest <= 1800000) a -= 8; else if (nearest <= 3600000) a += 2; else if (nearest <= 10800000) a += 6;
+  return Math.max(-6, Math.min(14, a));
+}
+function adjHourScore(wi, mi, ms) {
+  // Spanish mackerel are visual dawn feeders: first light is prime time.
+  var hr = new Date(ms).getHours(), dawn = 0;
+  if (hr >= 5 && hr <= 8) dawn = 6; else if (hr >= 16 && hr <= 18) dawn = 3;
+  return hourScore(wi, mi) + tideAdj(ms) + dawn;
+}
+function windowMoonBoost(startMs, endMs) {
+  // (any Major overlap ? 10 : any Minor overlap ? 5 : 0) + (High tide event in window ? 7 : 0)
+  var b = 0, minor = false, i;
+  for (i = 0; i < state.moon.length; i++) {
+    var w = state.moon[i];
+    if (w.end >= startMs && w.start <= endMs) {
+      if (w.type === "major") { b = 10; break; }
+      minor = true;
+    }
+  }
+  if (b === 0 && minor) b = 5;
+  for (i = 0; i < state.tides.length; i++) {
+    var e = state.tides[i];
+    if (e.type === "H" && e.t >= startMs && e.t <= endMs) { b += 7; break; }
+  }
+  return b;
+}
+function buildDays(wx, mar) {
+  var days = [];
+  var now = new Date();
+  for (var d = 0; d < 7; d++) {
+    var date = new Date(now.getFullYear(), now.getMonth(), now.getDate() + d);
+    // tide-adjusted hourly scores for this date (spot-local hours)
+    var hs = [];
+    for (var i = 0; i < wx.hourly.time.length; i++) {
+      var dt = new Date(wx.hourly.time[i]);
+      if (dt.getFullYear() === date.getFullYear() && dt.getMonth() === date.getMonth() &&
+          dt.getDate() === date.getDate()) {
+        var mi = hourlyIndex(mar.hourly, dt.getTime());
+        hs.push({ t: dt.getTime(), s: adjHourScore(i, mi, dt.getTime()) });
+      }
+    }
+    // day score = rounded mean of the 05:00-19:00 pool (else all hours) — no moon boost
+    var pool = hs.filter(function(h) { var hh = new Date(h.t).getHours(); return hh >= 5 && hh <= 19; });
+    if (!pool.length) pool = hs;
+    var dayScore = 0;
+    if (pool.length) {
+      var sum = 0;
+      pool.forEach(function(h) { sum += h.s; });
+      dayScore = Math.max(0, Math.min(100, Math.round(sum / pool.length)));
+    }
+    // bite windows: local maxima of hourly scores (>=40, >=2h apart, top 4), +/-1h each
+    var peaks = [];
+    for (var k = 1; k < hs.length - 1; k++) {
+      if (hs[k].s >= hs[k-1].s && hs[k].s >= hs[k+1].s && hs[k].s >= 40) {
+        var ok = true;
+        for (var q = 0; q < peaks.length; q++) {
+          if (Math.abs(peaks[q].t - hs[k].t) < 7200000) {
+            ok = false;
+            if (hs[k].s > peaks[q].s) peaks[q] = hs[k];
+          }
+        }
+        if (ok) peaks.push(hs[k]);
+      }
+    }
+    peaks.sort(function(a, b) { return b.s - a.s; });
+    peaks = peaks.slice(0, 4);
+    var windows = peaks.map(function(p) {
+      var st = p.t - 3600000, en = p.t + 3600000, wsum = 0, n = 0;
+      hs.forEach(function(h) { if (h.t >= st && h.t <= en) { wsum += h.s; n++; } });
+      var sc = n ? wsum / n : p.s;
+      sc = Math.min(100, Math.round(sc + windowMoonBoost(st, en)));
+      return { start: new Date(st), end: new Date(en), score: sc };
+    });
+    windows.sort(function(a, b) { return a.start - b.start; });
+    var best = null;
+    windows.forEach(function(w) { if (!best || w.score > best.score) best = w; });
+    // weather tiles at best-window peak (or noon)
+    var refT = best ? best.start.getTime() + 3600000 : date.getTime() + 43200000;
+    var wi = hourlyIndex(wx.hourly, refT), mi2 = hourlyIndex(mar.hourly, refT);
+    var wv = mar.hourly.wave_height[mi2] * 3.28084;
+    days.push({
+      date: date, score: dayScore, windows: windows, best: best,
+      wind: Math.round(wx.hourly.windspeed_10m[wi]),
+      windDir: compass(wx.hourly.winddirection_10m[wi]),
+      gust: (wx.hourly.wind_gusts_10m && wi >= 0 && wx.hourly.wind_gusts_10m[wi] != null) ? Math.round(wx.hourly.wind_gusts_10m[wi]) : null,
+      water: (function(w){ return (w == null || isNaN(w)) ? null : Math.round(w * 10) / 10; })(mar.hourly.sea_surface_temperature[mi2]),
+      waveFt: Math.round(wv * 10) / 10,
+      condCode: wx.hourly.weather_code[wi],
+      condDay: (wx.hourly.is_day && wx.hourly.is_day[wi] != null) ? wx.hourly.is_day[wi] : 1,
+      rain: wx.daily.precipitation_probability_max[d],
+      sunrise: (wx.daily.sunrise && wx.daily.sunrise[d]) ? new Date(wx.daily.sunrise[d]) : null,
+      sunset: (wx.daily.sunset && wx.daily.sunset[d]) ? new Date(wx.daily.sunset[d]) : null
+    });
+  }
+  return days;
+}
+/* ================= render ================= */
+function moonScore(w) {
+  // App's solunarRatingForWindow: tide-adjusted hourly score at the window + 10 (Major) / 5 (Minor), capped at 100.
+  if (w._score == null) {
+    try {
+      var wi = hourlyIndex(state.wx.hourly, w.center), mi = hourlyIndex(state.mar.hourly, w.center);
+      w._score = Math.min(100, Math.round(adjHourScore(wi, mi, w.center) + (w.type === "major" ? 10 : 5)));
+    } catch (e) { w._score = 0; }
+  }
+  return w._score || 0;
+}
+function moonRowsHTML(day) {
+  var S = STR[state.lang], now = Date.now();
+  var d0 = day.date.getTime(), d1 = d0 + 86400000;
+  var isToday = now >= d0 && now < d1;
+  var rows = state.moon.filter(function(w) {
+    return w.end > d0 && w.start < d1 && (!isToday || w.end > now);
+  });
+  rows.sort(function(a, b) { return a.start - b.start; });
+  if (!rows.length) return "";
+  var html = "";
+  rows.forEach(function(w) {
+    var sc = moonScore(w), c = ratingColor(sc);
+    var active = now >= w.start && now <= w.end;
+    html += '<div class="mrow' + (active ? " now" : "") + '">' +
+      '<span class="mbadge ' + w.type + '">' + (w.type === "major" ? S.major : S.minor) + "</span>" +
+      '<span class="mt">' + trange(new Date(w.start), new Date(w.end), state.lang) + "</span>" +
+      '<span style="display:inline-flex;align-items:center;gap:6px;margin-left:4px;">' +
+        fishSVG(c, 22) + '<span class="mt" style="color:' + c + '">' + sc + "</span></span>" +
+      (active ? '<span class="nowpill">' + S.now + "</span>" : "") +
+      "</div>";
+  });
+  return html;
+}
+function moonCountdownHTML() {
+  var S = STR[state.lang], now = Date.now();
+  function next(type) {
+    var best = null;
+    state.moon.forEach(function(w) {
+      if (w.type !== type || w.end <= now) return;
+      if (!best || w.start < best.start) best = w;
+    });
+    return best;
+  }
+  var parts = [];
+  [["major", S.nextMajor, S.majorNow], ["minor", S.nextMinor, S.minorNow]].forEach(function(cfg) {
+    var w = next(cfg[0]);
+    if (!w) return;
+    parts.push(now >= w.start ? cfg[2] : cfg[1](durText(w.start - now, state.lang)));
+  });
+  return parts.join(" · ");
+}
+function tideCountdownHTML() {
+  var S = STR[state.lang], now = Date.now();
+  var nh = null, nl = null;
+  state.tides.forEach(function(e) {
+    if (e.t <= now) return;
+    if (e.type === "H" && !nh) nh = e;
+    if (e.type === "L" && !nl) nl = e;
+  });
+  var parts = [];
+  if (nh) parts.push(S.nextHigh(durText(nh.t - now, state.lang)));
+  if (nl) parts.push(S.nextLow(durText(nl.t - now, state.lang)));
+  return parts.join(" · ");
+}
+function tideSVG(day) {
+  var W = 360, H = 176, pL = 8, pR = 8, pT = 56, pB = 22;
+  var d0 = day.date.getTime(), d1 = d0 + 86400000;
+  var pts = [];
+  for (var t = d0; t <= d1; t += 900000) pts.push([t, tideAt(t)]);
+  var vs = pts.map(function(p) { return p[1]; });
+  var mn = Math.min.apply(null, vs), mx = Math.max.apply(null, vs);
+  if (mx - mn < 0.3) { mx += 0.15; mn -= 0.15; }
+  function X(t) { return pL + (t - d0) / 86400000 * (W - pL - pR); }
+  function Y(v) { return pT + (1 - (v - mn) / (mx - mn)) * (H - pT - pB); }
+  // Catmull-Rom -> cubic Bezier for a smooth tide curve
+  function smoothPath() {
+    var d = "M" + X(pts[0][0]).toFixed(1) + "," + Y(pts[0][1]).toFixed(1);
+    for (var i = 0; i < pts.length - 1; i++) {
+      var p0 = pts[Math.max(0, i - 1)], p1 = pts[i],
+          p2 = pts[i + 1], p3 = pts[Math.min(pts.length - 1, i + 2)];
+      var c1x = X(p1[0]) + (X(p2[0]) - X(p0[0])) / 6,
+          c1y = Y(p1[1]) + (Y(p2[1]) - Y(p0[1])) / 6;
+      var c2x = X(p2[0]) - (X(p3[0]) - X(p1[0])) / 6,
+          c2y = Y(p2[1]) - (Y(p3[1]) - Y(p1[1])) / 6;
+      d += "C" + c1x.toFixed(1) + "," + c1y.toFixed(1) + " " +
+           c2x.toFixed(1) + "," + c2y.toFixed(1) + " " +
+           X(p2[0]).toFixed(1) + "," + Y(p2[1]).toFixed(1);
+    }
+    return d;
+  }
+  var line = smoothPath();
+  var svg = '<svg class="tidechart" viewBox="0 0 ' + W + " " + H + '">';
+  svg += '<defs><linearGradient id="tideg" x1="0" y1="0" x2="0" y2="1">' +
+    '<stop offset="0" stop-color="#14b8a6" stop-opacity=".30"/>' +
+    '<stop offset=".6" stop-color="#14b8a6" stop-opacity=".10"/>' +
+    '<stop offset="1" stop-color="#14b8a6" stop-opacity=".03"/>' +
+    "</linearGradient></defs>";
+  // soft panel backdrop so the chart sits gently on the warm-sand theme
+  svg += '<rect x="0" y="0" width="' + W + '" height="' + H + '" rx="14" fill="#f8f2e3"/>';
+  // shade bite windows
+  (day.windows || []).forEach(function(w, i) {
+    var isBest = day.best && w.start.getTime() === day.best.start.getTime();
+    svg += '<rect x="' + X(w.start.getTime()).toFixed(1) + '" y="' + (pT - 4) + '" width="' +
+      (X(w.end.getTime()) - X(w.start.getTime())).toFixed(1) + '" height="' + (H - pT - pB + 8) +
+      '" fill="' + (isBest ? "rgba(20,184,166,.20)" : "rgba(20,184,166,.09)") + '" rx="6"/>';
+  });
+  svg += '<path d="' + line + " L" + X(d1).toFixed(1) + "," + (H - pB) + " L" + X(d0).toFixed(1) + "," + (H - pB) +
+    ' Z" fill="url(#tideg)" stroke="none"/>';
+  svg += '<path d="' + line + '" fill="none" stroke="#14b8a6" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"/>';
+  // high / low dots
+  state.tides.forEach(function(e) {
+    if (e.t < d0 || e.t > d1) return;
+    svg += '<circle cx="' + X(e.t).toFixed(1) + '" cy="' + Y(e.v).toFixed(1) +
+      '" r="4.5" fill="#fff" stroke="#0f766e" stroke-width="2"/>';
+  });
+  // now line
+  var now = Date.now();
+  state.tideScale = null;
+  if (now >= d0 && now <= d1) {
+    svg += '<line x1="' + X(now).toFixed(1) + '" y1="' + (pT - 6) + '" x2="' + X(now).toFixed(1) + '" y2="' + (H - pB) +
+      '" stroke="#d9a441" stroke-width="1.75" stroke-dasharray="5,4" stroke-linecap="round"/>';
+    // remember the chart scale so the live fish marker can be repositioned as time passes
+    state.tideScale = { d0: d0, mn: mn, mx: mx, W: W, H: H, pL: pL, pR: pR, pT: pT, pB: pB };
+  }
+  // best-bite marker
+  if (day.best) {
+    var bt = day.best.start.getTime() + 3600000, bv = tideAt(bt);
+    svg += '<circle cx="' + X(bt).toFixed(1) + '" cy="' + (Y(bv) - 13).toFixed(1) +
+      '" r="9.5" fill="#fff" stroke="#bc5a1e" stroke-width="2"/>';
+    svg += '<text x="' + X(bt).toFixed(1) + '" y="' + (Y(bv) - 9.5).toFixed(1) +
+      '" text-anchor="middle" font-size="10">🎣</text>';
+  }
+  // Major bite markers: small rating-colored fish on the curve at each Major window's midpoint
+  var fcol = ratingColor(day.score);
+  var pmk = 0;
+  state.moon.forEach(function(w) {
+    if (w.type !== "major") return;
+    if (w.end < d0 || w.start > d1) return;
+    var mid = (w.start + w.end) / 2;
+    var mx = X(mid), my = Y(tideAt(mid));
+    if (now >= w.start && now <= w.end) {
+      svg += '<circle cx="' + mx.toFixed(1) + '" cy="' + my.toFixed(1) + '" r="15" fill="none" stroke="' + fcol +
+        '" stroke-width="2" opacity="0.55"/>';
+    }
+    var iw = 27, ih = 14, mkid = "pompm" + (pmk++);
+    var mxx = (mx - iw / 2).toFixed(1), myy = (my - ih / 2).toFixed(1);
+    svg += '<mask id="' + mkid + '" maskUnits="userSpaceOnUse" x="' + mxx + '" y="' + myy + '" width="' + iw + '" height="' + ih + '">' +
+      '<image href="' + MACK_URI + '" x="' + mxx + '" y="' + myy + '" width="' + iw + '" height="' + ih + '"/></mask>' +
+      '<rect x="' + mxx + '" y="' + myy + '" width="' + iw + '" height="' + ih + '" fill="' + fcol + '" mask="url(#' + mkid + ')"/>';
+  });
+  // live fishing-rod marker riding the tide curve at the current time.
+  // Cartoon rod inspired by Tien's reference photo: brown tapered blank angled
+  // up-right, dark grip, spinning reel, 3 line guides, line hanging from the tip
+  // to a pink bobber + hook. Rating number above in rating color, live time below it.
+  if (state.tideScale) {
+    var fxx = X(now), fyy = Y(tideAt(now));
+    svg += '<g id="tiderod" transform="translate(' + fxx.toFixed(1) + ',' + fyy.toFixed(1) + ')">' +
+      '<text x="0" y="-34" text-anchor="middle" font-size="13" font-weight="700" fill="' + fcol + '">' + day.score + '</text>' +
+      '<text id="rodtim" x="0" y="-21" text-anchor="middle" font-size="9.5" font-weight="700" fill="#8a7a5f">' + clockStr(state.lang) + '</text>' +
+      '<g transform="scale(0.7)">' +
+      '<path d="M-17.5,17.5 L-9.5,9.5" stroke="#161616" stroke-width="8.6" stroke-linecap="round"/>' +
+      '<path d="M-17.5,17.5 L-9.5,9.5" stroke="#7c4f30" stroke-width="6.2" stroke-linecap="round"/>' +
+      '<polygon points="-11.2,14.8 -14.8,11.2 14.2,-15.8 15.8,-14.2" fill="#b07a52" stroke="#161616" stroke-width="1.4" stroke-linejoin="round"/>' +
+      '<path d="M-4.5,7.6 L-5.4,5.8" stroke="#161616" stroke-width="1.6"/>' +
+      '<circle cx="-4.5" cy="12" r="4.6" fill="#e9f2ff" stroke="#161616" stroke-width="1.6"/>' +
+      '<circle cx="-4.5" cy="12" r="2" fill="#1f2937"/>' +
+      '<path d="M-0.6,14.2 L2.8,16.2" stroke="#161616" stroke-width="1.6" stroke-linecap="round"/><circle cx="3.4" cy="16.5" r="1.5" fill="#1f2937"/>' +
+      '<circle cx="-1.8" cy="1.8" r="1.7" fill="#fffdf7" stroke="#161616" stroke-width="1.3"/>' +
+      '<circle cx="4.4" cy="-4.4" r="1.7" fill="#fffdf7" stroke="#161616" stroke-width="1.3"/>' +
+      '<circle cx="10.5" cy="-10.5" r="1.7" fill="#fffdf7" stroke="#161616" stroke-width="1.3"/>' +
+      '<path d="M-4.5,7.4 L-1.8,1.8 L4.4,-4.4 L10.5,-10.5 L15,-15 C16.5,-9 12,-2.5 3.5,-0.5" stroke="#161616" stroke-width="1.1" fill="none" stroke-linecap="round"/>' +
+      '<circle cx="5.5" cy="-1.1" r="2" fill="#f472a0" stroke="#161616" stroke-width="1"/>' +
+      '<path d="M3.5,-0.5 L3.5,3.5 Q3.5,6 1,6 Q-1,6 -1,4" stroke="#161616" stroke-width="1.4" fill="none" stroke-linecap="round"/></g></g>';
+  }
+  // x labels — 12h style in both languages
+  var S = STR[state.lang];
+  [["12a", 0], ["6a", 6], ["12p", 12], ["6p", 18]].forEach(function(l) {
+    var lab = l[0];
+    svg += '<text x="' + X(d0 + l[1] * 3600000).toFixed(1) + '" y="' + (H - 7) +
+      '" text-anchor="middle" font-size="9" fill="#a89a7c">' + lab + "</text>";
+  });
+  svg += '<text x="' + (W - pR) + '" y="' + (pT - 6) + '" text-anchor="end" font-size="9" fill="#a89a7c">ft</text>';
+  return svg + "</svg>";
+}
+function tideChipsHTML(day) {
+  var S = STR[state.lang];
+  var d0 = day.date.getTime(), d1 = d0 + 86400000;
+  var html = "";
+  state.tides.forEach(function(e) {
+    if (e.t < d0 || e.t > d1) return;
+    var hi = e.type === "H";
+    html += '<span class="tchip' + (hi ? " hi" : "") + '">' + (hi ? "▲" : "▼") + " " +
+      (hi ? S.high : S.low) + " " + tstr(new Date(e.t), state.lang) + " · " + e.v.toFixed(1) + " ft</span>";
+  });
+  return html;
+}
+function hourLabel(d) { // 12h in both languages, e.g. "2 PM" — never 24h/military
+  var h = d.getHours(), ap = h >= 12 ? "PM" : "AM";
+  h = h % 12; if (h === 0) h = 12;
+  return h + " " + ap;
+}
+function hourlyHTML(day) {
+  var S = STR[state.lang];
+  var wx = state.wx.hourly, mar = state.mar.hourly;
+  var rows = "";
+  for (var i = 0; i < wx.time.length; i++) {
+    var dt = new Date(wx.time[i]);
+    if (dt.getFullYear() !== day.date.getFullYear() || dt.getMonth() !== day.date.getMonth() ||
+        dt.getDate() !== day.date.getDate()) continue;
+    var ms = dt.getTime();
+    var mi = hourlyIndex(mar, ms);
+    var sc = Math.max(0, Math.min(100, Math.round(adjHourScore(i, mi, ms))));
+    var c = ratingColor(sc);
+    var code = wx.weather_code[i];
+    var isDay = (wx.is_day && wx.is_day[i] != null) ? wx.is_day[i] : 1;
+    var wsp = Math.round(wx.windspeed_10m[i]);
+    var wdir = compass(wx.winddirection_10m[i]);
+    var gst = (wx.wind_gusts_10m && wx.wind_gusts_10m[i] != null) ? Math.round(wx.wind_gusts_10m[i]) : null;
+    var sky = condIcon(code, isDay) + " " + wsp + (gst != null ? " | " + gst : "") + " " + wdir;
+    var rp = wx.precipitation_probability[i];
+    var air = Math.round(wx.temperature_2m[i]);
+    var wtr = mar.sea_surface_temperature[mi];
+    var wtrS = (wtr == null || isNaN(wtr)) ? "—" : (Math.round(wtr * 10) / 10) + "°";
+    var inbite = false;
+    (day.windows || []).forEach(function(w) {
+      if (ms >= w.start.getTime() && ms < w.end.getTime()) inbite = true;
+    });
+    rows += '<tr class="hrow' + (inbite ? " inbite" : "") + '">' +
+      '<td class="hhour">' + hourLabel(dt) + "</td>" +
+      '<td class="hscore">' + fishSVG(c, 13) + ' <span style="color:' + c + '">' + sc + "</span></td>" +
+      "<td class=\"hskyw\">" + sky + "</td>" +
+      "<td class=\"hrain\">" + rp + "%</td>" +
+      "<td class=\"htemp\">" + air + "°/" + wtrS + "</td></tr>";
+  }
+  if (!rows) return "";
+  return '<div class="card"><div class="hsec"><div class="hh2">🕐 ' + S.hourly + "</div>" +
+    '<div class="hwrap"><table class="htable"><tr><th class="hhour">' + S.thHour + '</th><th class="hscore">' + S.thScore + '</th><th class="hskyw">' +
+    S.thSkyWind + '</th><th class="hrain">' + S.thRain + '</th><th class="htemp">' + S.thAirWtr + "</th></tr>" +
+    rows + '</table></div><p class="hint">' + S.biteHint + "</p></div></div>";
+}
+function seasonPillHTML() {
+  // Spanish mackerel have no closed season in Florida state waters.
+  return '<span class="season open">' + STR[state.lang].seasonYear + "</span>";
+}
+function renderHeader() {
+  var S = STR[state.lang], L = state.loc;
+  $("locName").innerHTML = pinSVG(13) + escHTML(L.name);
+  var d = new Date();
+  var ds = state.lang === "vi"
+    ? d.getDate() + " " + S.months[d.getMonth()]
+    : S.months[d.getMonth()] + " " + d.getDate();
+  $("updLine").textContent = state.updatedAt ? S.updated(ds, clockStr(state.lang)) : "";
+  $("langBtn").innerHTML = state.lang === "en" ? "<b>EN</b> | VI" : "EN | <b>VI</b>";
+  $("refBtn").textContent = S.refresh;
+  $("backBtn").textContent = S.back;
+  $("locGPS2").textContent = S.currentLoc;
+  $("locChange").textContent = S.chgLoc;
+  $("rules").innerHTML = state.loc.home ? S.rules + " " + seasonPillHTML() : '<span class="regsn">' + S.checkRegs + "</span>";
+}
+
+/* ================= live map: radar (RainViewer) + wind particles (Open-Meteo) ================= */
+var radarMap = null, radarTimer = null, radarCache = { at: 0, frames: [] };
+var radarLayer = null, windCanvas = null, windRAF = null, windGrid = null;
+var windGridCache = { key: "", grid: null }, mapMode = "wind", windResizeBound = false, radarInCONUS = false;
+function frameTime(t) { return tstr(new Date(t * 1000), state.lang); }
+function radarTileURL(fr) { return "https://tilecache.rainviewer.com" + fr.path + "/256/{z}/{x}/{y}/2/1_1.png"; }
+function stopWind() { if (windRAF) { cancelAnimationFrame(windRAF); windRAF = null; } }
+
+function loadWindGrid() {
+  var key = state.loc.lat.toFixed(2) + "," + state.loc.lon.toFixed(2);
+  if (windGridCache.key === key && windGridCache.grid) {
+    windGrid = windGridCache.grid;
+    if (mapMode === "wind") startWind();
+    return;
+  }
+  var N = 5, lats = [], lons = [];
+  for (var i = 0; i < N; i++) for (var j = 0; j < N; j++) {
+    lats.push((state.loc.lat - 1.2 + i * 0.6).toFixed(2));
+    lons.push((state.loc.lon - 1.6 + j * 0.8).toFixed(2));
+  }
+  fetchJSON("https://api.open-meteo.com/v1/forecast?latitude=" + lats.join(",") + "&longitude=" + lons.join(",") +
+    "&current=wind_speed_10m,wind_direction_10m&wind_speed_unit=mph&forecast_days=1").then(function(d) {
+    var arr = Array.isArray(d) ? d : [d], v = [];
+    for (var k = 0; k < arr.length && k < N * N; k++) {
+      var cur = arr[k].current || {}, sp = +cur.wind_speed_10m || 0, dr = +cur.wind_direction_10m || 0;
+      var r = dr * Math.PI / 180;
+      v.push([-sp * Math.sin(r), -sp * Math.cos(r)]);
+    }
+    if (v.length === N * N) {
+      windGrid = { n: N, lat0: state.loc.lat - 1.2, lon0: state.loc.lon - 1.6, dlat: 0.6, dlon: 0.8, v: v };
+      windGridCache = { key: key, grid: windGrid };
+      if (mapMode === "wind") startWind();
+    }
+  }).catch(function() {});
+}
+function windFoot() {
+  var ft = $("radarFoot");
+  if (ft && mapMode === "wind" && state.days.length) {
+    var d = state.days[state.sel];
+    ft.textContent = STR[state.lang].wind + " \u00b7 " + d.wind + " mph " + d.windDir;
+  }
+}
+
+function startWind() {
+  stopWind();
+  if (!windCanvas || !radarMap || !windGrid) return;
+  var map = radarMap, cv = windCanvas, G = windGrid, N = G.n;
+  var dpr = Math.min(window.devicePixelRatio || 1, 2);
+  var W = cv.clientWidth || 300, H = cv.clientHeight || 230;
+  cv.width = W * dpr; cv.height = H * dpr;
+  var ctx = cv.getContext("2d");
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  if (!windResizeBound) { windResizeBound = true; window.addEventListener("resize", function() { if (mapMode === "wind" && windCanvas) startWind(); }); }
+  function vecAt(lat, lon) {
+    var fx = (lon - G.lon0) / G.dlon, fy = (lat - G.lat0) / G.dlat;
+    if (fx < 0) fx = 0; if (fy < 0) fy = 0;
+    if (fx > N - 1.001) fx = N - 1.001; if (fy > N - 1.001) fy = N - 1.001;
+    var ix = Math.floor(fx), iy = Math.floor(fy), ax = fx - ix, ay = fy - iy, g = G.v, i00 = iy * N + ix;
+    var w00 = (1 - ax) * (1 - ay), w10 = ax * (1 - ay), w01 = (1 - ax) * ay, w11 = ax * ay;
+    return [g[i00][0] * w00 + g[i00 + 1][0] * w10 + g[i00 + N][0] * w01 + g[i00 + N + 1][0] * w11,
+            g[i00][1] * w00 + g[i00 + 1][1] * w10 + g[i00 + N][1] * w01 + g[i00 + N + 1][1] * w11];
+  }
+  var P = [], COUNT = 150;
+  function spawn(p) {
+    var b = map.getBounds();
+    p.lat = b.getSouth() + Math.random() * (b.getNorth() - b.getSouth());
+    p.lon = b.getWest() + Math.random() * (b.getEast() - b.getWest());
+    p.plat = p.lat; p.plon = p.lon; p.age = 0; p.max = 80 + Math.random() * 160;
+    return p;
+  }
+  for (var i = 0; i < COUNT; i++) P.push(spawn({}));
+  var lastT = performance.now(), K = 2.1;
+  ctx.lineCap = "round";
+  function frame(now) {
+    if (mapMode !== "wind") return;
+    windRAF = requestAnimationFrame(frame);
+    var dt = Math.min(0.05, (now - lastT) / 1000); lastT = now;
+    var c = map.getCenter(), p0 = map.latLngToContainerPoint([c.lat, c.lng]);
+    var pxL = Math.abs(map.latLngToContainerPoint([c.lat, c.lng + 0.1]).x - p0.x) / 0.1 || 1;
+    var pxA = Math.abs(map.latLngToContainerPoint([c.lat + 0.1, c.lng]).y - p0.y) / 0.1 || 1;
+    ctx.clearRect(0, 0, W, H);
+    var b = map.getBounds(), bs = b.getSouth(), bn = b.getNorth(), bw = b.getWest(), be = b.getEast();
+    for (var i = 0; i < P.length; i++) {
+      var p = P[i];
+      p.age++;
+      var vv = vecAt(p.lat, p.lon), sp = Math.sqrt(vv[0] * vv[0] + vv[1] * vv[1]);
+      if (sp < 0.5 || p.age > p.max || p.lat < bs || p.lat > bn || p.lon < bw || p.lon > be) { spawn(p); continue; }
+      var step = sp * K * dt, ux = vv[0] / sp, uy = vv[1] / sp;
+      p.lat += uy * step / pxA; p.lon += ux * step / pxL;
+      var q = map.latLngToContainerPoint([p.lat, p.lon]);
+      var dx = ux * pxL, dy = -uy * pxA, dl = Math.sqrt(dx * dx + dy * dy) || 1;
+      var nx = dx / dl, ny = dy / dl;
+      var AL = 11 + sp * 0.12, HS = 4.5;
+      var hx = q.x, hy = q.y;
+      var tx = hx - nx * AL, ty = hy - ny * AL;
+      var bx = hx - nx * HS, by = hy - ny * HS;
+      var pxn = -ny, pyn = nx;
+      var fade = Math.min(1, p.age / 25) * Math.min(1, (p.max - p.age) / 25);
+      var a = (0.55 + Math.min(0.4, sp / 50)) * fade;
+      for (var pass = 0; pass < 2; pass++) {
+        var halo = pass === 0;
+        ctx.strokeStyle = halo ? "rgba(255,255,255," + (a * 0.85).toFixed(3) + ")" : "rgba(143,149,155," + a.toFixed(3) + ")";
+        ctx.fillStyle = ctx.strokeStyle;
+        ctx.lineWidth = halo ? 3.6 : 1.6;
+        ctx.beginPath(); ctx.moveTo(tx, ty); ctx.lineTo(bx, by); ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(hx, hy);
+        ctx.lineTo(bx + pxn * HS * 0.62, by + pyn * HS * 0.62);
+        ctx.lineTo(bx - pxn * HS * 0.62, by - pyn * HS * 0.62);
+        ctx.closePath(); ctx.fill();
+      }
+    }
+  }
+  windRAF = requestAnimationFrame(frame);
+}
+
+function setMapMode(m) {
+  mapMode = m;
+  var wB = $("modeWind"), rB = $("modeRadar"), play = $("radarPlay");
+  if (wB) wB.className = m === "wind" ? "on" : "";
+  if (rB) rB.className = m === "radar" ? "on" : "";
+  if (windCanvas) windCanvas.style.display = m === "wind" ? "block" : "none";
+  if (play) { play.hidden = m !== "radar" || radarInCONUS; if (m !== "radar" && radarTimer) { clearInterval(radarTimer); radarTimer = null; play.textContent = "\u25b6"; } }
+  if (radarLayer) radarLayer.setOpacity(m === "radar" ? (radarInCONUS ? 0.75 : 0.65) : 0);
+  if (m === "radar") {
+    stopWind();
+    var ft = $("radarFoot");
+    if (radarInCONUS) {
+      if (ft) ft.textContent = STR[state.lang].radar + " \u00b7 " + STR[state.lang].live;
+    } else {
+      var fr = radarCache.frames;
+      if (ft) ft.textContent = fr.length ? STR[state.lang].radar + " \u00b7 " + frameTime(fr[fr.length - 1].time) : STR[state.lang].radar;
+    }
+  } else {
+    startWind(); windFoot();
+  }
+}
+
+function initRadar() {
+  if (radarTimer) { clearInterval(radarTimer); radarTimer = null; }
+  stopWind();
+  if (radarMap) { try { radarMap.remove(); } catch (e) {} radarMap = null; }
+  radarLayer = null; windCanvas = null;
+  var el = $("radarmap");
+  if (!el || typeof L === "undefined" || !state.days.length) return;
+  var day = state.days[state.sel], c = ratingColor(day.score);
+  var map = L.map("radarmap", { scrollWheelZoom: false, attributionControl: false, maxZoom: 14 });
+  radarMap = map;
+  map.setView([state.loc.lat, state.loc.lon], 8);
+  L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19, detectRetina: true }).addTo(map);
+  L.marker([state.loc.lat, state.loc.lon], {
+    icon: L.divIcon({ className: "scoremark",
+      html: '<div class="scoredot" style="background:' + c + '"></div>',
+      iconSize: [16, 16], iconAnchor: [8, 8] }),
+    interactive: false, keyboard: false
+  }).addTo(map);
+  windCanvas = document.createElement("canvas");
+  windCanvas.className = "windcv";
+  windCanvas.style.zIndex = 500;
+  el.appendChild(windCanvas);
+  var wB = $("modeWind"), rB = $("modeRadar");
+  if (wB) wB.onclick = function() { setMapMode("wind"); };
+  if (rB) rB.onclick = function() { setMapMode("radar"); };
+  var show = function(frames) {
+    if (!radarMap) return;
+    radarInCONUS = state.loc.lat > 15 && state.loc.lat < 52 && state.loc.lon > -135 && state.loc.lon < -55;
+    var btn = $("radarPlay"), attr = $("radarAttr");
+    if (radarInCONUS) {
+      radarLayer = L.tileLayer("https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/nexrad-n0q-900913/{z}/{x}/{y}.png",
+        { opacity: 0, zIndex: 10, maxNativeZoom: 11 }).addTo(radarMap);
+      if (btn) { btn.hidden = true; btn.onclick = null; }
+      if (attr) attr.textContent = "\u00a9 OpenStreetMap \u00b7 IEM NEXRAD";
+    } else {
+      if (!frames || !frames.length) return;
+      radarLayer = L.tileLayer(radarTileURL(frames[frames.length - 1]),
+        { opacity: 0, zIndex: 10, maxNativeZoom: 7 }).addTo(radarMap);
+      if (btn && frames.length > 1) {
+        var i = frames.length - 1;
+        btn.onclick = function() {
+          if (mapMode !== "radar") return;
+          if (radarTimer) { clearInterval(radarTimer); radarTimer = null; btn.textContent = "\u25b6"; return; }
+          btn.textContent = "\u23f8";
+          var ft = $("radarFoot");
+          radarTimer = setInterval(function() {
+            i = (i + 1) % frames.length;
+            try { radarLayer.setUrl(radarTileURL(frames[i])); } catch (e) {}
+            if (ft && mapMode === "radar") ft.textContent = STR[state.lang].radar + " \u00b7 " + frameTime(frames[i].time);
+          }, 800);
+        };
+      }
+      if (attr) attr.textContent = "\u00a9 OpenStreetMap \u00b7 RainViewer";
+    }
+    setMapMode(mapMode);
+  };
+  loadWindGrid();
+  setMapMode(mapMode);
+  if (state.loc.lat > 15 && state.loc.lat < 52 && state.loc.lon > -135 && state.loc.lon < -55) { show([]); return; }
+  var now = Date.now();
+  if (radarCache.frames.length && now - radarCache.at < 600000) { show(radarCache.frames); return; }
+  fetchJSON("https://api.rainviewer.com/public/weather-maps.json").then(function(j) {
+    var fr = ((j && j.radar && j.radar.past) || []).filter(function(f) { return f && f.path; }).map(function(f) { return { time: f.time, path: f.path }; });
+    radarCache = { at: Date.now(), frames: fr };
+    show(fr);
+  }).catch(function() {});
+}
+function lastShore() { try { return JSON.parse(localStorage.getItem("ff_last_shore")); } catch (e) { return null; } }
+function renderAll() {
+  var S = STR[state.lang];
+  renderHeader();
+  var app = $("app");
+  if (!state.ready || !state.days.length) return;
+  var d0 = state.days[0];
+  var dx = state.days[state.sel];
+  var c0 = ratingColor(dx.score);
+  function guardScreen(msg) {
+    var btn = "", ls = lastShore();
+    if (ls && ls.name && (ls.lat !== state.loc.lat || ls.lon !== state.loc.lon))
+      btn = '<div class="asklast">' + S.askLast + '</div><button class="shorebtn" id="backShore">' + escHTML(ls.name) + " \u2192</button>";
+    return '<div class="freshmsg"><div class="fmsg">' + msg + "</div>" + btn + "</div>";
+  }
+  function wireBackShore() {
+    var b = $("backShore");
+    if (b) b.onclick = function() { var ls = lastShore(); if (ls) setLocation(ls); };
+  }
+  if (!state.isOcean) { app.innerHTML = guardScreen(S.freshMsg); wireBackShore(); return; }
+  if (!state.isShore) { app.innerHTML = guardScreen(S.inlandMsg); wireBackShore(); return; }
+  var html = "";
+  // top rating card
+  html += '<div class="topcard" style="border-color:' + c0 + '">' +
+    '<div class="wm">' + fishSVG(c0, 110) + "</div>" +
+    '<div class="row"><div class="badge">' + fishSVG(c0, 40) + "</div>" +
+    '<div><div class="lbl">' + S.rating + '</div>' +
+    '<div class="big">' + ratingWord(dx.score, state.lang).toUpperCase() +
+    ' <span class="sc" style="color:' + c0 + '">' + dx.score + '/100</span></div>' +
+    '<div class="ddate">' + fullDateStr(dx.date, state.lang) +
+    (state.sel === 0 ? ' · <span id="clock">' + clockStr(state.lang) + "</span>" : "") + "</div>" +
+    "</div></div>" +
+    "</div>";
+  // pick-a-day strip
+  var bestIdx = 0;
+  state.days.forEach(function(d, i) { if (d.score > state.days[bestIdx].score) bestIdx = i; });
+  html += '<div class="pick"><span class="ph">' + S.pickDay + "</span>" +
+    '<span class="pr">' + S.months[d0.date.getMonth()] + " " + d0.date.getDate() + " – " +
+    S.months[state.days[6].date.getMonth()] + " " + state.days[6].date.getDate() + "</span></div>";
+  html += '<div class="strip">';
+  state.days.forEach(function(d, i) {
+    var c = ratingColor(d.score);
+    var cls = "dpill" + (i === state.sel ? " sel" : "") + (i === bestIdx ? " best" : "");
+    var dw = i === 0 ? S.todayWord.toUpperCase() : S.days[d.date.getDay()];
+    html += '<div class="' + cls + '" data-day="' + i + '"' +
+      (i === state.sel ? ' style="background:' + c + '"' : "") + ">" +
+      (i === bestIdx ? '<span class="bestbadge">' + S.best + "</span>" : "") +
+      '<div class="dw">' + dw + '</div><div class="dn">' + d.date.getDate() + "</div>" +
+      '<div style="margin:2px 0">' + fishSVG(i === state.sel ? "#ffffff" : c, 22) + "</div>" +
+      '<div class="dsc" style="color:' + (i === state.sel ? "#fff" : c) + '">' + d.score + "</div>" +
+      '<div class="dow2">' + ratingWord(d.score, state.lang) + "</div></div>";
+  });
+  html += "</div>";
+  // slim go-fish band: best window hours, vanishes once the window passes
+  var gfD = state.days[state.sel], gfW = gfD.best, gfNow = Date.now(), gfHTML = "";
+  if (gfW && gfW.end.getTime() > gfNow) {
+    var gfIn = "";
+    if (state.sel === 0) {
+      gfIn = gfW.start.getTime() > gfNow
+        ? '<span class="gf-in" id="gfIn" data-start="' + gfW.start.getTime() + '">' + S.inFish(durText(gfW.start.getTime() - gfNow, state.lang)) + "</span>"
+        : '<span class="gf-in">' + S.nowFish + "</span>";
+    }
+    gfHTML = '<div class="gofish" id="gofish" data-end="' + gfW.end.getTime() + '">' +
+      fishSVG("#b3541e", 20) + "<span><b>" + S.goFish + "</b> \u00b7 " + trange(gfW.start, gfW.end, state.lang) + "</span>" + gfIn + "</div>";
+  }
+  html += gfHTML;
+  // day card
+  var day = state.days[state.sel];
+  var dc = ratingColor(day.score);
+  html += '<div class="card" style="border-color:' + dc + '">';
+  var cn = condIcon(day.condCode, day.condDay) + " " + (S.condName[day.condCode] || S.condName[2]);
+  var mph = (state.moonPhase && state.moonPhase[ymdDash(day.date)] != null) ? state.moonPhase[ymdDash(day.date)] : null;
+  var moonTile;
+  if (mph == null) {
+    moonTile = '<div class="tile"><div class="k">' + S.moon + '</div><div class="v">—</div></div>';
+  } else {
+    var mp = moonPhaseInfo(mph);
+    var msub = mp.daysToFull === 0 ? S.fullTonight : S.fullIn(mp.daysToFull);
+    moonTile = '<div class="tile"><div class="k">' + S.moon + '</div><div class="v">' + moonPhaseSVG(mph, 1.3) + " " +
+      Math.round(mp.illum * 100) + '%</div><div class="msub">' + msub + "</div></div>";
+  }
+  var sunTile = '<div class="tile"><div class="sundrow">' +
+    '<div><div class="k">' + S.sunrise + '</div><div class="v">' + (day.sunrise ? tstr(day.sunrise, state.lang) : "—") + "</div></div>" +
+    '<div class="sundiv"></div>' +
+    '<div><div class="k">' + S.sunset + '</div><div class="v">' + (day.sunset ? tstr(day.sunset, state.lang) : "—") + "</div></div>" +
+    "</div></div>";
+  html += '<div class="tiles">' +
+    '<div class="tile"><div class="k">' + _lblWind() + ' ' + S.wind + '</div><div class="v">' + day.wind + (day.gust != null ? " | " + day.gust : "") + " " + day.windDir + "</div></div>" +
+    '<div class="tile"><div class="k">' + _lblWater() + ' ' + S.water + '</div><div class="v">' + (day.water == null ? "\u2014" : day.water.toFixed(1) + "\u00b0F") + "</div></div>" +
+    '<div class="tile"><div class="k">' + S.cond + '</div><div class="v">' + cn + "</div></div>" +
+    '<div class="tile"><div class="k">' + _lblRain() + ' ' + S.rain + '</div><div class="v">' + day.rain + "%</div></div>" +
+    moonTile + sunTile +
+    "</div>";
+  // live precipitation radar with the day's score pinned at the spot
+  html += '<div class="radarcap"><div class="radarmap" id="radarmap"></div>' +
+    '<div class="radarbar"><span class="seg"><button id="modeWind" class="on">' + S.wind + '</button><button id="modeRadar">' + S.radar + '</button></span>' +
+    '<span id="radarFoot" class="radarfoot"></span>' +
+    '<span class="radarattr" id="radarAttr">\u00a9 OpenStreetMap \u00b7 RainViewer</span>' +
+    '<button class="radarplay" id="radarPlay" hidden>\u25b6</button></div></div>';
+  // major/minor — past windows disappear; countdown keeps pointing at the next bite
+  var moonRows = moonRowsHTML(day);
+  var moonSec = "";
+  if (moonRows) {
+    moonSec = '<div class="moonsec"><div class="mh">' + S.moonTitle + "</div>" +
+      '<p class="cdline" id="moonCd">' + moonCountdownHTML() + "</p>" +
+      '<div id="moonRows">' + moonRows + "</div></div>";
+  } else if (state.moon.some(function(w) { return w.end > day.date.getTime() && w.start < day.date.getTime() + 86400000; })) {
+    moonSec = '<div class="moonsec"><div class="mh">' + S.moonTitle + "</div>" +
+      '<p class="cdline" id="moonCd">' + moonCountdownHTML() + "</p></div>";
+  } else {
+    moonSec = '<div class="moonsec"><div class="mh">' + S.moonTitle + "</div>" +
+      '<p class="cdline">' + S.moonNote + "</p></div>";
+  }
+  html += moonSec;
+  // tide
+  html += '<div class="tidesec"><div class="th">🌊 ' + S.tide + " · " +
+    (state.sel === 0 ? S.todayWord : S.days[day.date.getDay()] + " " + day.date.getDate()) + "</div>" +
+    (state.tides.length
+      ? '<p class="cdline" id="tideCd">' + tideCountdownHTML() + "</p>" +
+        tideSVG(day) + '<div class="tchips">' + tideChipsHTML(day) + "</div>"
+      : '<p class="cdline">' + S.tideNote + "</p>") + "</div>";
+  html += "</div>";
+  // hour-by-hour card for the selected day, after the tide chart
+  html += hourlyHTML(day);
+  app.innerHTML = html;
+  // wire buttons
+  var pills = app.querySelectorAll("[data-day]");
+  for (var i = 0; i < pills.length; i++) {
+    (function(el) {
+      el.addEventListener("click", function() { state.sel = +el.getAttribute("data-day"); renderAll(); });
+    })(pills[i]);
+  }
+  var cday = state.days[state.sel];
+  var cmn = $("catchMinus"), cpl = $("catchPlus");
+  if (cmn && cday) cmn.addEventListener("click", function() { bumpCatch(cday.date.getTime(), -1); });
+  if (cpl && cday) cpl.addEventListener("click", function() { bumpCatch(cday.date.getTime(), 1); });
+  initRadar();
+}
+function tick() {
+  if (!state.ready) return;
+  var clk = $("clock");
+  if (clk) clk.textContent = clockStr(state.lang);
+  var mc = $("moonCd");
+  if (mc) mc.textContent = moonCountdownHTML();
+  var tc = $("tideCd");
+  if (tc) tc.textContent = tideCountdownHTML();
+  var mr = $("moonRows");
+  if (mr && state.days[state.sel]) {
+    var nr = moonRowsHTML(state.days[state.sel]);
+    if (nr) mr.innerHTML = nr; else mr.remove();
+  }
+  var gf = $("gofish");
+  if (gf) {
+    var gfn = Date.now(), gfe = +gf.getAttribute("data-end");
+    if (gfn >= gfe) { gf.remove(); }
+    else {
+      var gi = $("gfIn"), SS = STR[state.lang];
+      if (gi) gi.textContent = SS.inFish(durText(+gi.getAttribute("data-start") - gfn, state.lang));
+    }
+  }
+  renderHeader();
+  // if the phone's real clock has rolled past the rendered day (page left open
+  // across midnight), silently refetch so the rod, countdowns and scores match
+  // the real current day — never a stale or wrongly-placed marker
+  var nowMs = Date.now();
+  if (!state.loading && state.tideScale &&
+      (nowMs < state.tideScale.d0 || nowMs >= state.tideScale.d0 + 86400000)) {
+    startLoad();
+    return;
+  }
+  // move the live tide-chart rod every 30s so it rides the curve with the real time
+  if (++__tfN % 30 === 0) moveTideFish();
+}
+// repositions the #tiderod marker along the tide curve to the current time
+var __tfN = 0;
+function moveTideFish() {
+  var t = document.getElementById("tiderod"), sc = state.tideScale;
+  if (!t || !sc || !state.ready) return;
+  var now = Date.now(), d1 = sc.d0 + 86400000;
+  if (now < sc.d0 || now > d1) {
+    t.style.display = "none";
+    return;
+  }
+  t.style.display = "";
+  var fx = sc.pL + (now - sc.d0) / 86400000 * (sc.W - sc.pL - sc.pR);
+  var fy = sc.pT + (1 - (tideAt(now) - sc.mn) / (sc.mx - sc.mn)) * (sc.H - sc.pT - sc.pB);
+  t.setAttribute("transform", "translate(" + fx.toFixed(1) + "," + fy.toFixed(1) + ")");
+  var rt = document.getElementById("rodtim");
+  if (rt) rt.textContent = clockStr(state.lang);
+}
+function showError() {
+  var S = STR[state.lang];
+  $("app").innerHTML = '<div class="err">' + S.loadFail +
+    '<br><button class="refresh" onclick="boot(true)">' + S.retry + "</button></div>";
+}
+function dedupeMoon(wins) {
+  wins.sort(function(a, b) { return a.start - b.start; });
+  var out = [];
+  wins.forEach(function(w) {
+    var last = out[out.length - 1];
+    if (last && last.type === w.type && w.start <= last.end + 600000) {
+      last.end = Math.max(last.end, w.end);
+    } else out.push(w);
+  });
+  return out;
+}
+// Forecast for the selected location (Jupiter Inlet by default).
+function startLoad() {
+  var L = state.loc;
+  var lat = L.lat, lon = L.lon, station = L.station;
+  state.loading = true;
+  try { localStorage.setItem("ff_species", "mackerel"); } catch (e) {}
+  renderHeader();
+  var fromD = new Date(); fromD.setDate(fromD.getDate() - 1);
+  var toD = new Date(); toD.setDate(toD.getDate() + 7);
+  var moonPs = [];
+  for (var i = 0; i < 8; i++) {
+    var dt = new Date(); dt.setDate(dt.getDate() + i);
+    moonPs.push(loadMoonDay(lat, lon, dt));
+  }
+  // Each source is independent: weather+marine are essential, but tides and moon
+  // degrade gracefully (quiet note instead of a full-page error).
+  Promise.all([
+      loadWeather(lat, lon).catch(function(e) { return { _err: e }; }),
+      loadMarine(lat, lon).catch(function(e) { return { _err: e }; }),
+      (station ? loadTides(station, fromD, toD).catch(function() { return []; }) : Promise.resolve([])),
+      Promise.all(moonPs)
+    ])
+    .then(function(r) {
+      try {
+        if (r[0]._err || r[1]._err) { state.loading = false; showError(); return; }
+        var wx = r[0], mar = r[1];
+        state.wx = wx; state.mar = mar;
+        state.isOcean = mar.hourly.sea_surface_temperature.some(function(v) { return v != null && !isNaN(v); });
+        state.isShore = state.isOcean && (mar.hourly.wave_height || []).some(function(v) { return v != null && !isNaN(v); });
+        if (state.isShore) { try { localStorage.setItem("ff_last_shore", JSON.stringify({ name: state.loc.name, lat: state.loc.lat, lon: state.loc.lon })); } catch (e) {} }
+        state.tides = r[2];
+        var all = [];
+        r[3].forEach(function(arr) { arr.forEach(function(w) { all.push(w); }); });
+        state.moon = dedupeMoon(all);
+        state.days = buildDays(wx, mar);
+        state.sel = 0;
+        state.ready = true; state.loading = false;
+        state.updatedAt = new Date();
+        renderAll();
+      } catch (e) { state.loading = false; showError(); }
+    })
+    .catch(function() { state.loading = false; showError(); });
+}
+function boot() {
+  state.ready = false; state.sel = 0; state.days = []; state.moonPhase = {};
+  var S = STR[state.lang];
+  document.documentElement.lang = state.lang;
+  $("app").innerHTML = '<div class="loading">' + S.loading + "</div>";
+  renderHeader();
+  startLoad(); // selected location (Jupiter Inlet default)
+}
+$("langBtn").addEventListener("click", function() {
+  state.lang = state.lang === "en" ? "vi" : "en";
+  localStorage.setItem("pf_lang", state.lang);
+  document.documentElement.lang = state.lang;
+  if (state.ready) renderAll(); else boot();
+});
+$("refBtn").addEventListener("click", function() { boot(); });
+$("locName").addEventListener("click", function() {
+  var p = $("locPanel"); p.hidden = !p.hidden;
+  if (!p.hidden) { wireLocUI(); setTimeout(function() { $("locSearch").focus(); }, 60); }
+});
+$("locGPS").addEventListener("click", useMyLocation);
+$("locGPS2").addEventListener("click", function() { $("locPanel").hidden = false; wireLocUI(); useMyLocation(); });
+$("locChange").addEventListener("click", function() {
+  var p = $("locPanel"); p.hidden = !p.hidden;
+  if (!p.hidden) { wireLocUI(); setTimeout(function() { $("locSearch").focus(); }, 60); }
+});
+$("locHome").addEventListener("click", function() { var _l = lastShore(); setLocation((_l && _l.name) ? _l : { name: PIN.name, lat: PIN.lat, lon: PIN.lon }); });
+$("locSearch").addEventListener("input", function(e) {
+  clearTimeout(locSearchTimer);
+  var q = e.target.value;
+  locSearchTimer = setTimeout(function() { doSearch(q); }, 350);
+});
+boot();
+setInterval(tick, 1000);
+</script>
+</body>
+</html>
