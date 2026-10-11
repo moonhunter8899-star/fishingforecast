@@ -803,14 +803,14 @@ function ymdDash(d) { return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-"
 
 function loadWeather(lat, lon) {
   var u = "https://api.open-meteo.com/v1/forecast?latitude=" + lat + "&longitude=" + lon +
-    "&hourly=temperature_2m,precipitation_probability,precipitation,windspeed_10m,winddirection_10m,wind_gusts_10m,weather_code,is_day" +
+    "&hourly=temperature_2m,precipitation_probability,precipitation,windspeed_10m,winddirection_10m,wind_gusts_10m,weather_code,is_day,pressure_msl" +
     "&daily=temperature_2m_max,temperature_2m_min,weather_code,precipitation_probability_max,sunrise,sunset" +
     "&timezone=auto&forecast_days=7&temperature_unit=fahrenheit&windspeed_unit=mph";
   return fetchJSON(u);
 }
 function loadMarine(lat, lon) {
   var u = "https://marine-api.open-meteo.com/v1/marine?latitude=" + lat + "&longitude=" + lon +
-    "&hourly=wave_height,sea_surface_temperature&timezone=auto&forecast_days=7&temperature_unit=fahrenheit";
+    "&hourly=wave_height,sea_surface_temperature,swell_wave_period&timezone=auto&forecast_days=7&temperature_unit=fahrenheit";
   return fetchJSON(u);
 }
 function loadTides(station, fromD, toD) {
@@ -933,8 +933,28 @@ function tideAdj(ms) {
   if (nearest <= 1800000) a -= 8; else if (nearest <= 3600000) a += 2; else if (nearest <= 10800000) a += 6;
   return Math.max(-6, Math.min(14, a));
 }
+function pressureAdj(wi) {
+  // Falling pressure ahead of a front often turns the feed on; rapid swings shut it down.
+  var p = state.wx.hourly.pressure_msl;
+  if (!p || p[wi] == null || wi < 3 || p[wi - 3] == null) return 0;
+  var dp = p[wi] - p[wi - 3]; // hPa per 3h
+  if (dp < -3) return -6;
+  if (dp < -0.5) return 4;
+  if (dp <= 0.5) return 0;
+  if (dp <= 3) return -2;
+  return -6;
+}
+function swellAdj(mi) {
+  // Long-period swell = clean, organized water; short chop = washing machine.
+  var sp = state.mar.hourly.swell_wave_period ? state.mar.hourly.swell_wave_period[mi] : null;
+  if (sp == null || isNaN(sp)) return 0;
+  if (sp >= 9) return 3;
+  if (sp >= 6) return 0;
+  if (sp >= 4) return -4;
+  return -8;
+}
 function adjHourScore(wi, mi, ms) {
-  return hourScore(wi, mi) + tideAdj(ms);
+  return hourScore(wi, mi) + tideAdj(ms) + pressureAdj(wi) + swellAdj(mi);
 }
 function windowMoonBoost(startMs, endMs) {
   // (any Major overlap ? 10 : any Minor overlap ? 5 : 0) + (High tide event in window ? 7 : 0)
