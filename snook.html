@@ -10,6 +10,12 @@
 <link rel="manifest" href="manifest.json">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#f6f0df">
+<meta property="og:title" content="Snook Forecast">
+<meta property="og:description" content="Know before you go — 7-day snook bite forecast: tides, dock lights, water temp & moon.">
+<meta property="og:image" content="https://moonhunter8899-star.github.io/fishingforecast/icons/og-banner.png">
+<meta property="og:url" content="https://moonhunter8899-star.github.io/fishingforecast/snook.html">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
 <title>Snook Forecast — Tien Huynh</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -307,6 +313,7 @@ syncSticky();
 window.addEventListener('resize', syncSticky);
 window.addEventListener('load', syncSticky);
 setTimeout(syncSticky, 600);
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ syncSticky(); });
 /* ================= constants ================= */
 var PIN = { lat: 26.943311, lon: -80.070517, name: "Jupiter Inlet, FL", station: "8722495" };
 var BUOY_PROXY="https://fishing-proxy.moonhunter8899.workers.dev";
@@ -1461,6 +1468,7 @@ $("backBtn").textContent = S.back;
 $("locGPS2").textContent = S.currentLoc;
 $("locChange").textContent = S.chgLoc;
 $("rules").innerHTML = (state.loc.home ? S.rules + " " + seasonPillHTML() : '<span class="regsn">' + S.checkRegs + "</span>") + '<div class="regdis">' + S.regDis + '<a class="frlink" href="https://app.fishrulesapp.com/regulations/28687?species=Snook%20(all%20species)" target="_blank" rel="noopener">Fish Rules \u2192</a></div>';
+if (typeof syncSticky === "function") syncSticky();
 }
 
 /* ================= live map: radar (RainViewer) + wind particles (Open-Meteo) ================= */
