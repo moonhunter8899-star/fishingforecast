@@ -15,241 +15,227 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,800;9..144,900&family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
- *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
- html,body{margin:0;padding:0;}
- body{
- background:#f6f0df;color:#2b2620;
- font-family:"Public Sans",-apple-system,"Segoe UI",sans-serif;
- font-variant-numeric:tabular-nums;
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{margin:0;padding:0;}
+body{
+background:#f6f0df;color:#2b2620;
+font-family:"Public Sans",-apple-system,"Segoe UI",sans-serif;
+font-variant-numeric:tabular-nums;
 }
- .wrap{max-width:960px;margin:0 auto;padding:12px 16px 40px;}
- html,body{overflow-x:clip;}
- h1,h2,h3,.serif{font-family:"Fraunces",Georgia,serif;}
-
- /* Header */
- .hd{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin:4px 2px 12px;}
- .stickyhead{position:fixed;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:992px;box-sizing:border-box;z-index:1200;background:#f6f0df;padding:10px 16px 8px;border-bottom:1px solid #e7dcc2;}
- .hd > div:first-child{min-width:0;}
- .locline{font-family:"Fraunces",serif;font-weight:800;font-size:15px;
- white-space:nowrap;margin:0 2px 8px;}
- .locbtn{background:none;border:none;padding:0;width:100%;text-align:left;cursor:pointer;font:inherit;color:inherit;}
- .locbtn::after{content:" \25BE";font-size:11px;color:#8a7a5f;}
- .locpanel{background:#f4ecda;border:1px solid #d8c9a8;border-radius:12px;padding:10px;margin:-2px 2px 10px;}
- .locsearch{width:100%;box-sizing:border-box;font-size:14px;padding:8px 10px;border-radius:9px;border:1px solid #d8c9a8;background:#fff;font-family:inherit;color:#22312b;}
- .locresults button{display:block;width:100%;text-align:left;background:none;border:none;border-bottom:1px solid #e7dcc2;padding:8px 4px;font-size:13px;font-weight:600;color:#22312b;cursor:pointer;font-family:inherit;}
- .locrow{display:flex;gap:8px;margin-top:8px;}
- .locact{flex:1;font-size:12px;font-weight:700;padding:8px;border-radius:9px;border:1px solid #d8c9a8;background:#ede4cc;color:#22312b;cursor:pointer;font-family:inherit;}
- .locchips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
- .locchips:empty{display:none;}
- .locchip{font-size:12px;font-weight:700;padding:6px 10px;border-radius:20px;border:1px solid #2e7d5b;background:#fff;color:#2e7d5b;cursor:pointer;font-family:inherit;}
- .locmsg{font-size:11px;color:#8a7a5f;margin-top:6px;}
- .locmsg:empty{display:none;}
- .regsn{font-size:11px;font-weight:700;color:#8a7a5f;}
- /* live precipitation radar */
- .radarcap{margin:0 0 16px;border-radius:14px;overflow:hidden;border:1px solid #d8c9a8;}
- .radarmap{height:230px;background:#dfe8ee;}
- .radarmap{position:relative;}
- .windcv{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;}
- .seg{display:flex;border:1px solid #d8c9a8;border-radius:8px;overflow:hidden;flex:none;}
- .seg button{border:0;background:transparent;padding:4px 10px;font-size:10px;font-weight:800;color:#8a7a5f;cursor:pointer;font-family:inherit;}
- .seg button.on{background:#22312b;color:#fff;}
- .radarfoot{display:none;}
- .gofish{display:flex;align-items:center;gap:8px;margin:0 0 12px;padding:9px 14px;border-radius:12px;background:#f9ecd2;border:1px solid #e6c877;font-size:13px;color:#6d5416;}
- .gofish b{letter-spacing:.05em;}
- .gofish .gf-in{margin-left:auto;font-weight:800;white-space:nowrap;}
- .radarbar{display:flex;align-items:center;gap:8px;padding:6px 10px;background:#f4ecda;font-size:10px;font-weight:700;color:#8a7a5f;}
- .radarattr{margin-left:auto;font-weight:600;opacity:.5;font-size:9px;}
- .radarplay{border:1px solid #d8c9a8;background:#fff;border-radius:8px;padding:3px 10px;font-size:11px;cursor:pointer;color:#22312b;}
- .scoremark{background:none;border:none;}
- .scoredot{width:16px;height:16px;border-radius:50%;border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.4);}
- .leaflet-container{font-family:"Public Sans",sans-serif;}
-
- .locbar{display:flex;align-items:center;gap:8px;margin:0 2px 8px;}
- .locbar .locbtn{width:auto;flex:1 1 auto;min-width:0;margin:0;overflow:hidden;text-overflow:ellipsis;}
- .locgps,.locchg{flex:none;font-size:11px;font-weight:700;padding:7px 8px;border-radius:9px;border:1px solid #d8c9a8;background:#ede4cc;color:#22312b;cursor:pointer;font-family:inherit;white-space:nowrap;}
- .locchg{background:#fff;border-color:#2e7d5b;color:#2e7d5b;}
-
-
- .hd .t2{color:#8a7a5f;font-size:10px;margin-top:2px;}
- .hd .brand{font-family:"Fraunces",serif;font-weight:900;font-size:15px;color:#22312b;}
- .hd .nick{font-size:11px;font-weight:700;color:#9a4a16;margin:1px 0 7px;letter-spacing:.02em;}
- .hdBtns{display:flex;align-items:center;gap:8px;flex:none;}
- .langbtn{
- background:#fffaf0;border:1.5px solid #d9c9a3;border-radius:999px;
- font-size:11px;font-weight:800;padding:7px 10px;cursor:pointer;color:#8a7a5f;
+.wrap{max-width:960px;margin:0 auto;padding:12px 16px 40px;}
+html,body{overflow-x:clip;}
+h1,h2,h3,.serif{font-family:"Fraunces",Georgia,serif;}
+/* Header */
+.hd{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin:4px 2px 12px;}
+.stickyhead{position:fixed;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:992px;box-sizing:border-box;z-index:1200;background:#f6f0df;padding:10px 16px 8px;border-bottom:1px solid #e7dcc2;}
+.hd > div:first-child{min-width:0;}
+.locline{font-family:"Fraunces",serif;font-weight:800;font-size:15px;
+white-space:nowrap;margin:0 2px 8px;}
+.locbtn{background:none;border:none;padding:0;width:100%;text-align:left;cursor:pointer;font:inherit;color:inherit;}
+.locbtn::after{content:" \25BE";font-size:11px;color:#8a7a5f;}
+.locpanel{background:#f4ecda;border:1px solid #d8c9a8;border-radius:12px;padding:10px;margin:-2px 2px 10px;}
+.locsearch{width:100%;box-sizing:border-box;font-size:14px;padding:8px 10px;border-radius:9px;border:1px solid #d8c9a8;background:#fff;font-family:inherit;color:#22312b;}
+.locresults button{display:block;width:100%;text-align:left;background:none;border:none;border-bottom:1px solid #e7dcc2;padding:8px 4px;font-size:13px;font-weight:600;color:#22312b;cursor:pointer;font-family:inherit;}
+.locrow{display:flex;gap:8px;margin-top:8px;}
+.locact{flex:1;font-size:12px;font-weight:700;padding:8px;border-radius:9px;border:1px solid #d8c9a8;background:#ede4cc;color:#22312b;cursor:pointer;font-family:inherit;}
+.locchips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+.locchips:empty{display:none;}
+.locchip{font-size:12px;font-weight:700;padding:6px 10px;border-radius:20px;border:1px solid #2e7d5b;background:#fff;color:#2e7d5b;cursor:pointer;font-family:inherit;}
+.locmsg{font-size:11px;color:#8a7a5f;margin-top:6px;}
+.locmsg:empty{display:none;}
+.regsn{font-size:11px;font-weight:700;color:#8a7a5f;}
+/* live precipitation radar */
+.radarcap{margin:0 0 16px;border-radius:14px;overflow:hidden;border:1px solid #d8c9a8;}
+.radarmap{height:230px;background:#dfe8ee;}
+.radarmap{position:relative;}
+.windcv{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;}
+.seg{display:flex;border:1px solid #d8c9a8;border-radius:8px;overflow:hidden;flex:none;}
+.seg button{border:0;background:transparent;padding:4px 10px;font-size:10px;font-weight:800;color:#8a7a5f;cursor:pointer;font-family:inherit;}
+.seg button.on{background:#22312b;color:#fff;}
+.radarfoot{display:none;}
+.gofish{display:flex;align-items:center;gap:8px;margin:0 0 12px;padding:9px 14px;border-radius:12px;background:#f9ecd2;border:1px solid #e6c877;font-size:13px;color:#6d5416;}
+.gofish b{letter-spacing:.05em;}
+.gofish .gf-in{margin-left:auto;font-weight:800;white-space:nowrap;}
+.radarbar{display:flex;align-items:center;gap:8px;padding:6px 10px;background:#f4ecda;font-size:10px;font-weight:700;color:#8a7a5f;}
+.radarattr{margin-left:auto;font-weight:600;opacity:.5;font-size:9px;}
+.radarplay{border:1px solid #d8c9a8;background:#fff;border-radius:8px;padding:3px 10px;font-size:11px;cursor:pointer;color:#22312b;}
+.scoremark{background:none;border:none;}
+.scoredot{width:16px;height:16px;border-radius:50%;border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.4);}
+.leaflet-container{font-family:"Public Sans",sans-serif;}
+.locbar{display:flex;align-items:center;gap:8px;margin:0 2px 8px;}
+.locbar .locbtn{width:auto;flex:1 1 auto;min-width:0;margin:0;overflow:hidden;text-overflow:ellipsis;}
+.locgps,.locchg{flex:none;font-size:11px;font-weight:700;padding:7px 8px;border-radius:9px;border:1px solid #d8c9a8;background:#ede4cc;color:#22312b;cursor:pointer;font-family:inherit;white-space:nowrap;}
+.locchg{background:#fff;border-color:#2e7d5b;color:#2e7d5b;}
+.hd .t2{color:#8a7a5f;font-size:10px;margin-top:2px;}
+.hd .brand{font-family:"Fraunces",serif;font-weight:900;font-size:15px;color:#22312b;}
+.hd .nick{font-size:11px;font-weight:700;color:#9a4a16;margin:1px 0 7px;letter-spacing:.02em;}
+.hdBtns{display:flex;align-items:center;gap:8px;flex:none;}
+.langbtn{
+background:#fffaf0;border:1.5px solid #d9c9a3;border-radius:999px;
+font-size:11px;font-weight:800;padding:7px 10px;cursor:pointer;color:#8a7a5f;
 }
- .langbtn b{color:#9a4a16;}
- .watchlink{text-decoration:none;display:inline-block;}
- .rules{font-size:11px;font-weight:700;color:#8a7a5f;margin:2px 2px 10px;}
- .regdis{font-size:10px;font-weight:400;color:#a08b6d;margin-top:2px;}
- .season{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.04em;
- border-radius:999px;padding:3px 10px;margin-left:6px;vertical-align:1px;
- color:#fff;white-space:nowrap;}
- .season.open{background:#1d9e6c;}
- .season.closed{background:#c0392b;}
- .rules b{color:#9a4a16;}
- .refresh{
- background:#bc5a1e;color:#fff;border:none;border-radius:999px;
- font-family:"Fraunces",serif;font-weight:800;font-size:13px;
- padding:8px 16px;cursor:pointer;flex:none;
+.langbtn b{color:#9a4a16;}
+.watchlink{text-decoration:none;display:inline-block;}
+.rules{font-size:11px;font-weight:700;color:#8a7a5f;margin:2px 2px 10px;}
+.regdis{font-size:10px;font-weight:400;color:#a08b6d;margin-top:2px;}
+.season{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.04em;
+border-radius:999px;padding:3px 10px;margin-left:6px;vertical-align:1px;
+color:#fff;white-space:nowrap;}
+.season.open{background:#1d9e6c;}
+.season.closed{background:#c0392b;}
+.rules b{color:#9a4a16;}
+.refresh{
+background:#bc5a1e;color:#fff;border:none;border-radius:999px;
+font-family:"Fraunces",serif;font-weight:800;font-size:13px;
+padding:8px 16px;cursor:pointer;flex:none;
 }
-
- /* Top rating card */
- .topcard{
- position:relative;overflow:hidden;
- background:#22312b;border-radius:22px;padding:18px;
- border:2px solid #1d9e6c;
- box-shadow:0 4px 14px rgba(34,49,43,.25);
- margin-bottom:14px;color:#fff;
+/* Top rating card */
+.topcard{
+position:relative;overflow:hidden;
+background:#22312b;border-radius:22px;padding:18px;
+border:2px solid #1d9e6c;
+box-shadow:0 4px 14px rgba(34,49,43,.25);
+margin-bottom:14px;color:#fff;
 }
- .topcard .wm{position:absolute;top:-8px;right:6px;opacity:.14;pointer-events:none;}
- .topcard .row{display:flex;align-items:center;gap:16px;position:relative;padding:2px 4px;}
- .badge{
- width:58px;height:58px;border-radius:50%;background:#fff;flex:none;
- display:flex;align-items:center;justify-content:center;
+.topcard .wm{position:absolute;top:-8px;right:6px;opacity:.14;pointer-events:none;}
+.topcard .row{display:flex;align-items:center;gap:16px;position:relative;padding:2px 4px;}
+.badge{
+width:58px;height:58px;border-radius:50%;background:#fff;flex:none;
+display:flex;align-items:center;justify-content:center;
 }
- .topcard .lbl{color:#e8c76a;font-size:10px;font-weight:700;letter-spacing:.18em;}
- .topcard .big{font-family:"Fraunces",serif;font-weight:900;font-size:30px;color:#fff;margin-top:2px;}
- .topcard .big .sc{font-size:22px;}
- .topcard .ddate{color:rgba(255,255,255,.78);font-size:12px;font-weight:600;margin-top:6px;letter-spacing:.02em;}
-
- /* Day strip */
- .pick{display:flex;align-items:baseline;justify-content:space-between;margin:2px 2px 8px;}
- .pick .ph{font-family:"Fraunces",serif;font-weight:800;font-size:13px;color:#9a4a16;}
- .pick .pr{font-size:11px;color:#8a7a5f;}
- .strip{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:10px;}
- .dpill{
- background:#fffaf0;border:1px solid #e3d5b3;border-radius:12px;padding:8px 2px 7px;
- text-align:center;cursor:pointer;position:relative;font-family:"Public Sans",sans-serif;
- color:#2b2620;
+.topcard .lbl{color:#e8c76a;font-size:10px;font-weight:700;letter-spacing:.18em;}
+.topcard .big{font-family:"Fraunces",serif;font-weight:900;font-size:30px;color:#fff;margin-top:2px;}
+.topcard .big .sc{font-size:22px;}
+.topcard .ddate{color:rgba(255,255,255,.78);font-size:12px;font-weight:600;margin-top:6px;letter-spacing:.02em;}
+/* Day strip */
+.pick{display:flex;align-items:baseline;justify-content:space-between;margin:2px 2px 8px;}
+.pick .ph{font-family:"Fraunces",serif;font-weight:800;font-size:13px;color:#9a4a16;}
+.pick .pr{font-size:11px;color:#8a7a5f;}
+.strip{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:10px;}
+.dpill{
+background:#fffaf0;border:1px solid #e3d5b3;border-radius:12px;padding:8px 2px 7px;
+text-align:center;cursor:pointer;position:relative;font-family:"Public Sans",sans-serif;
+color:#2b2620;
 }
- .dpill .dw{font-size:10px;color:#8a7a5f;font-weight:600;text-transform:uppercase;}
- .dpill .dn{font-family:"Fraunces",serif;font-size:18px;font-weight:800;}
- .dpill .dsc{font-size:12px;font-weight:800;}
- .dpill .dow2{font-size:8px;color:#8a7a5f;white-space:nowrap;letter-spacing:0;}
- .dpill.sel{color:#fff;border-color:transparent;}
- .dpill.sel .dw,.dpill.sel .dow2{color:rgba(255,255,255,.85);}
- .dpill.best{background:#fff3cf;border:2px solid #d9a441;box-shadow:0 0 8px rgba(217,164,65,.5);}
- .dpill .bestbadge{
- position:absolute;top:-9px;left:50%;transform:translateX(-50%);
- background:#6b4a1f;color:#ffe9a8;font-size:8px;font-weight:800;
- padding:2px 6px;border-radius:999px;letter-spacing:.06em;white-space:nowrap;
+.dpill .dw{font-size:10px;color:#8a7a5f;font-weight:600;text-transform:uppercase;}
+.dpill .dn{font-family:"Fraunces",serif;font-size:18px;font-weight:800;}
+.dpill .dsc{font-size:12px;font-weight:800;}
+.dpill .dow2{font-size:8px;color:#8a7a5f;white-space:nowrap;letter-spacing:0;}
+.dpill.sel{color:#fff;border-color:transparent;}
+.dpill.sel .dw,.dpill.sel .dow2{color:rgba(255,255,255,.85);}
+.dpill.best{background:#fff3cf;border:2px solid #d9a441;box-shadow:0 0 8px rgba(217,164,65,.5);}
+.dpill .bestbadge{
+position:absolute;top:-9px;left:50%;transform:translateX(-50%);
+background:#6b4a1f;color:#ffe9a8;font-size:8px;font-weight:800;
+padding:2px 6px;border-radius:999px;letter-spacing:.06em;white-space:nowrap;
 }
-
- /* Day card */
- .card{
- background:#fffaf0;border-radius:20px;padding:16px;margin-bottom:14px;
- border:1.5px solid #1d9e6c;
+/* Day card */
+.card{
+background:#fffaf0;border-radius:20px;padding:16px;margin-bottom:14px;
+border:1.5px solid #1d9e6c;
 }
- .card h3{margin:0;font-size:19px;font-weight:900;}
- .card h3 .dt{font-family:"Public Sans",sans-serif;font-size:12px;font-weight:600;color:#8a7a5f;}
- .card h3 .tday{color:#fff;font-size:12px;font-weight:900;letter-spacing:.06em;
- padding:4px 11px;border-radius:999px;vertical-align:3px;white-space:nowrap;}
- .card h3 .drate{display:inline-flex;align-items:center;gap:4px;margin-left:8px;
- font-family:"Public Sans",sans-serif;font-size:14px;font-weight:800;white-space:nowrap;}
- .card h3 .drate svg{vertical-align:-4px;}
-
-
- /* 4 weather tiles */
- .tiles{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:16px;}
- .tile{background:#ede4cc;border-radius:12px;padding:10px 6px;text-align:center;}
- .tile .k{font-size:9px;font-weight:700;letter-spacing:.06em;color:#8a7a5f;text-transform:uppercase;}
- .tile .v{font-family:"Fraunces",serif;font-size:15px;font-weight:800;margin-top:3px;white-space:nowrap;}
- .tile .v svg{vertical-align:-4px;}
- .tile .msub{font-size:9px;font-weight:700;color:#8a7a5f;margin-top:2px;white-space:nowrap;}
- .tile .sundrow{display:flex;align-items:stretch;justify-content:center;gap:10px;}
- .tile .sundiv{width:1px;background:rgba(90,70,40,.25);}
-
- /* Major / Minor section */
- .moonsec{margin-bottom:16px;}
- .freshmsg{text-align:center;padding:64px 24px;color:#5a6b73;font-size:16px;line-height:1.7;}
- .fmsg{margin-bottom:18px;}
- .asklast{font-size:14px;font-weight:600;color:#5a6b73;margin-bottom:10px;}
- .shorebtn{background:#0b6ea8;color:#fff;border:none;border-radius:999px;font-size:14px;font-weight:700;padding:10px 20px;cursor:pointer;box-shadow:0 4px 14px rgba(11,110,168,.35);}
- .shorebtn:active{transform:scale(.97);}
- .moonsec .mh{font-family:"Fraunces",serif;font-weight:800;font-size:15px;color:#9a4a16;margin-bottom:2px;}
- .cdline{font-size:11px;color:#8a7a5f;margin:0 0 8px;font-weight:600;}
- .mrow{
- display:flex;align-items:center;gap:10px;
- background:#f3ecda;border:1px solid #e0d2ae;border-radius:12px;
- padding:9px 12px;margin-bottom:7px;font-weight:700;font-size:14px;
+.card h3{margin:0;font-size:19px;font-weight:900;}
+.card h3 .dt{font-family:"Public Sans",sans-serif;font-size:12px;font-weight:600;color:#8a7a5f;}
+.card h3 .tday{color:#fff;font-size:12px;font-weight:900;letter-spacing:.06em;
+padding:4px 11px;border-radius:999px;vertical-align:3px;white-space:nowrap;}
+.card h3 .drate{display:inline-flex;align-items:center;gap:4px;margin-left:8px;
+font-family:"Public Sans",sans-serif;font-size:14px;font-weight:800;white-space:nowrap;}
+.card h3 .drate svg{vertical-align:-4px;}
+/* 4 weather tiles */
+.tiles{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:16px;}
+.tile{background:#ede4cc;border-radius:12px;padding:10px 6px;text-align:center;}
+.tile .k{font-size:9px;font-weight:700;letter-spacing:.06em;color:#8a7a5f;text-transform:uppercase;}
+.tile .v{font-family:"Fraunces",serif;font-size:15px;font-weight:800;margin-top:3px;white-space:nowrap;}
+.tile .v svg{vertical-align:-4px;}
+.tile .msub{font-size:9px;font-weight:700;color:#8a7a5f;margin-top:2px;white-space:nowrap;}
+.tile .sundrow{display:flex;align-items:stretch;justify-content:center;gap:10px;}
+.tile .sundiv{width:1px;background:rgba(90,70,40,.25);}
+/* Major / Minor section */
+.moonsec{margin-bottom:16px;}
+.freshmsg{text-align:center;padding:64px 24px;color:#5a6b73;font-size:16px;line-height:1.7;}
+.fmsg{margin-bottom:18px;}
+.asklast{font-size:14px;font-weight:600;color:#5a6b73;margin-bottom:10px;}
+.shorebtn{background:#0b6ea8;color:#fff;border:none;border-radius:999px;font-size:14px;font-weight:700;padding:10px 20px;cursor:pointer;box-shadow:0 4px 14px rgba(11,110,168,.35);}
+.shorebtn:active{transform:scale(.97);}
+.moonsec .mh{font-family:"Fraunces",serif;font-weight:800;font-size:15px;color:#9a4a16;margin-bottom:2px;}
+.cdline{font-size:11px;color:#8a7a5f;margin:0 0 8px;font-weight:600;}
+.mrow{
+display:flex;align-items:center;gap:10px;
+background:#f3ecda;border:1px solid #e0d2ae;border-radius:12px;
+padding:9px 12px;margin-bottom:7px;font-weight:700;font-size:14px;
 }
- .mrow.now{background:#fff3cf;border:2px solid #d9a441;box-shadow:0 0 8px rgba(217,164,65,.45);}
- .mbadge{
- font-size:10px;font-weight:800;letter-spacing:.06em;border-radius:7px;
- padding:4px 8px;flex:none;
+.mrow.now{background:#fff3cf;border:2px solid #d9a441;box-shadow:0 0 8px rgba(217,164,65,.45);}
+.mbadge{
+font-size:10px;font-weight:800;letter-spacing:.06em;border-radius:7px;
+padding:4px 8px;flex:none;
 }
- .mbadge.major{background:#bc5a1e;color:#fff;}
- .mbadge.minor{background:#e3d5b3;color:#6b5f4c;}
- .mrow .mt{font-family:"Fraunces",serif;font-weight:800;}
- .nowpill{
- margin-left:auto;background:#1d9e6c;color:#fff;font-size:10px;font-weight:800;
- border-radius:999px;padding:3px 10px;letter-spacing:.06em;flex:none;
+.mbadge.major{background:#bc5a1e;color:#fff;}
+.mbadge.minor{background:#e3d5b3;color:#6b5f4c;}
+.mrow .mt{font-family:"Fraunces",serif;font-weight:800;}
+.nowpill{
+margin-left:auto;background:#1d9e6c;color:#fff;font-size:10px;font-weight:800;
+border-radius:999px;padding:3px 10px;letter-spacing:.06em;flex:none;
 }
-
- /* Tide section */
- .tidesec .th{font-family:"Fraunces",serif;font-weight:800;font-size:15px;color:#0f766e;margin-bottom:2px;}
- .tidechart{width:100%;height:auto;display:block;margin:4px 0 8px;}
- .tchips{display:flex;flex-wrap:wrap;gap:8px;}
- .tchip{
- display:inline-flex;align-items:center;gap:6px;border-radius:999px;
- padding:6px 12px;font-size:12px;font-weight:700;
- background:#ede4cc;border:1px solid #d9c9a3;color:#2b2620;
+/* Tide section */
+.tidesec .th{font-family:"Fraunces",serif;font-weight:800;font-size:15px;color:#0f766e;margin-bottom:2px;}
+.tidechart{width:100%;height:auto;display:block;margin:4px 0 8px;}
+.tchips{display:flex;flex-wrap:wrap;gap:8px;}
+.tchip{
+display:inline-flex;align-items:center;gap:6px;border-radius:999px;
+padding:6px 12px;font-size:12px;font-weight:700;
+background:#ede4cc;border:1px solid #d9c9a3;color:#2b2620;
 }
- .tchip.hi{background:#bc5a1e;border-color:#bc5a1e;color:#fff;}
-
- /* Hour by hour */
- .hsec .hh2{font-family:"Fraunces",serif;font-weight:800;font-size:15px;color:#9a4a16;margin-bottom:6px;}
- .htable{width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed;}
- th.hhour,td.hhour{width:15%;}
- th.hscore,td.hscore{width:21%;}
- .htable td.hscore{padding:6px 4px;}
- th.hskyw,td.hskyw{width:33%;}
- th.hrain,td.hrain{width:11%;}
- th.htemp,td.htemp{width:20%;}
- .htable th{
- font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;
- color:#8a7a5f;text-align:left;padding:4px 6px;border-bottom:1px solid #e3d5b3;
- white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+.tchip.hi{background:#bc5a1e;border-color:#bc5a1e;color:#fff;}
+/* Hour by hour */
+.hsec .hh2{font-family:"Fraunces",serif;font-weight:800;font-size:15px;color:#9a4a16;margin-bottom:6px;}
+.htable{width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed;}
+th.hhour,td.hhour{width:15%;}
+th.hscore,td.hscore{width:21%;}
+.htable td.hscore{padding:6px 4px;}
+th.hskyw,td.hskyw{width:33%;}
+th.hrain,td.hrain{width:11%;}
+th.htemp,td.htemp{width:20%;}
+.htable th{
+font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;
+color:#8a7a5f;text-align:left;padding:4px 6px;border-bottom:1px solid #e3d5b3;
+white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
- .htable td{padding:6px;border-bottom:1px solid #f0e7d2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
- .htable tr:last-child td{border-bottom:none;}
- .hrow.inbite td{background:rgba(29,158,108,.12);}
- .htable tr.past{opacity:.45;}
- .hhour{font-family:"Fraunces",serif;font-weight:800;}
- .hscore{font-weight:800;}
- .hscore svg{vertical-align:-5px;}
- .hint{font-size:10px;color:#8a7a5f;margin:8px 2px 0;font-weight:600;}
-
- .loading,.err{text-align:center;padding:40px 16px;color:#8a7a5f;font-size:14px;}
- .err button{margin-top:10px;}
- .foot{text-align:center;color:#b3a37f;font-size:10px;margin-top:18px;}
-
- /* ===== responsive:phone -> desktop ===== */
- /* hourly table is fluid at every width:fixed layout + % columns,never scrolls */
- .hwrap{overflow-x:visible;}
- .dpill{min-height:48px;}
- @media (max-width:700px){
- .tiles{grid-template-columns:repeat(3,1fr);}
+.htable td{padding:6px;border-bottom:1px solid #f0e7d2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.htable tr:last-child td{border-bottom:none;}
+.hrow.inbite td{background:rgba(29,158,108,.12);}
+.htable tr.past{opacity:.45;}
+.hhour{font-family:"Fraunces",serif;font-weight:800;}
+.hscore{font-weight:800;}
+.hscore svg{vertical-align:-5px;}
+.hint{font-size:10px;color:#8a7a5f;margin:8px 2px 0;font-weight:600;}
+.loading,.err{text-align:center;padding:40px 16px;color:#8a7a5f;font-size:14px;}
+.err button{margin-top:10px;}
+.foot{text-align:center;color:#b3a37f;font-size:10px;margin-top:18px;}
+/* ===== responsive:phone -> desktop ===== */
+/* hourly table is fluid at every width:fixed layout + % columns,never scrolls */
+.hwrap{overflow-x:visible;}
+.dpill{min-height:48px;}
+@media (max-width:700px){
+.tiles{grid-template-columns:repeat(3,1fr);}
 }
- @media (max-width:430px){
- .wrap{padding:10px 10px 32px;}
- .hd{gap:6px;}
- .hdBtns{gap:6px;}
- .langbtn{padding:6px 8px;font-size:10px;}
- .refresh{padding:7px 12px;font-size:12px;}
- .tiles{grid-template-columns:repeat(2,1fr);}
- .strip{gap:4px;}
- .dpill{padding:8px 1px 7px;}
- .topcard .big{font-size:26px;}
- /* hourly table stays compact on phones (column widths are set globally above) */
- .htable{font-size:11px;}
- .htable th,.htable td{padding:5px 3px;}
- .hscore svg{width:16px;height:16px;}
+@media (max-width:430px){
+.wrap{padding:10px 10px 32px;}
+.hd{gap:6px;}
+.hdBtns{gap:6px;}
+.langbtn{padding:6px 8px;font-size:10px;}
+.refresh{padding:7px 12px;font-size:12px;}
+.tiles{grid-template-columns:repeat(2,1fr);}
+.strip{gap:4px;}
+.dpill{padding:8px 1px 7px;}
+.topcard .big{font-size:26px;}
+/* hourly table stays compact on phones (column widths are set globally above) */
+.htable{font-size:11px;}
+.htable th,.htable td{padding:5px 3px;}
+.hscore svg{width:16px;height:16px;}
 }
- @media (min-width:901px){
- .wrap{padding:16px 24px 48px;}
- .strip{gap:8px;}
+@media (min-width:901px){
+.wrap{padding:16px 24px 48px;}
+.strip{gap:8px;}
 }
 </style>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -257,36 +243,37 @@
 </head>
 <body>
 <div class="wrap">
-  <div class="stickyhead">
-  <div class="hd">
-    <div>
-      <div class="brand">Lookdown Forecast</div>
-      <div class="t2" id="updLine"></div>
-    </div>
-    <div class="hdBtns">
-      <a class="langbtn watchlink" href="index.html" id="backBtn">‹ Home</a>
-      <a class="langbtn watchlink" href="watch.html" title="Apple Watch version">⌚</a>
-      <button class="langbtn" id="langBtn" title="Language / Ngôn ngữ"></button>
-      <button class="refresh" id="refBtn">Refresh</button>
-    </div>
-  </div>
-  <div class="locbar">
-    <button class="locline locbtn" id="locName">…</button>
-    <button class="locact locgps" id="locGPS2"></button>
-    <button class="locact locchg" id="locChange"></button>
-  </div>
-  <div class="locpanel" id="locPanel" hidden>
-    <input class="locsearch" id="locSearch" type="search" autocomplete="off">
-    <div class="locresults" id="locResults"></div>
-    <div class="locrow"><button class="locact" id="locGPS"></button><button class="locact" id="locHome"></button></div>
-    <div class="locchips" id="locRecents"></div>
-    <div class="locmsg" id="locMsg"></div>
-  </div>
-  </div>
-  <div class="rules" id="rules"></div>
-  <div id="app"><div class="loading" id="loading">Checking lookdown conditions…</div></div>
-  <div class="foot">Lookdown Forecast · Tien Huynh</div>
+<div class="stickyhead">
+<div class="hd">
+<div>
+<div class="brand">Lookdown Forecast</div>
+<div class="t2" id="updLine"></div>
 </div>
+<div class="hdBtns">
+<a class="langbtn watchlink" href="index.html" id="backBtn">‹ Home</a>
+<a class="langbtn watchlink" href="watch.html" title="Apple Watch version">⌚</a>
+<button class="langbtn" id="langBtn" title="Language / Ngôn ngữ"></button>
+<button class="refresh" id="refBtn">Refresh</button>
+</div>
+</div>
+<div class="locbar">
+<button class="locline locbtn" id="locName">…</button>
+<button class="locact locgps" id="locGPS2"></button>
+<button class="locact locchg" id="locChange"></button>
+</div>
+<div class="locpanel" id="locPanel" hidden>
+<input class="locsearch" id="locSearch" type="search" autocomplete="off">
+<div class="locresults" id="locResults"></div>
+<div class="locrow"><button class="locact" id="locGPS"></button><button class="locact" id="locHome"></button></div>
+<div class="locchips" id="locRecents"></div>
+<div class="locmsg" id="locMsg"></div>
+</div>
+</div>
+<div class="rules" id="rules"></div>
+<div id="app"><div class="loading" id="loading">Checking lookdown conditions…</div></div>
+<div class="foot">Lookdown Forecast · Tien Huynh</div>
+</div>
+<script src="buoys.js"></script>
 <script>
 "use strict";
 /* Fixed header: spacer keeps page flow; sync after panel toggles/resize */
@@ -306,6 +293,8 @@ window.addEventListener('load', syncSticky);
 setTimeout(syncSticky, 600);
 /* ================= constants ================= */
 var PIN = { lat: 26.943311, lon: -80.070517, name: "Jupiter Inlet, FL", station: "8722495" };
+var BUOY_PROXY="";
+
 var TIDE_STATIONS = [
 ["8729333",30.468,-86.138],
 ["8720213",30.42,-81.728],
@@ -368,7 +357,6 @@ var TIDE_STATIONS = [
 ["8668498",32.34,-80.465],
 ["8669246",32.214,-80.846]
 ];
-
 /* ================= locations: GPS, search, saved spots ================= */
 function distMi(lat1, lon1, lat2, lon2) {
 var p = Math.PI / 180, a = Math.sin((lat2 - lat1) * p / 2), b = Math.sin((lon2 - lon1) * p / 2);
@@ -383,6 +371,8 @@ if (d < bd) { bd = d; best = t[0]; }
 }
 return bd <= 45 ? best : null;
 }
+function nearestBuoy(lat,lon){if(typeof NDBC_BUOYS==="undefined")return null;var best=null,bd=1e9,i,b,d;for(i=0;i<NDBC_BUOYS.length;i++){b=NDBC_BUOYS[i];d=distMi(lat,lon,b[1],b[2]);if(d<bd){bd=d;best=b;}}return bd<=60?{id:best[0],dist:bd}:null;}
+function loadBuoy(lat,lon){if(!BUOY_PROXY)return Promise.resolve(null);var b=nearestBuoy(lat,lon);if(!b)return Promise.resolve(null);var url=BUOY_PROXY.replace(/\/$/,"")+"/?url="+encodeURIComponent("https://www.ndbc.noaa.gov/data/realtime2/"+b.id+".txt");return fetch(url).then(function(r){if(!r.ok)return null;return r.text();}).then(function(t){if(!t)return null;var lines=t.split("\n");for(var i=0;i<lines.length;i++){var L=lines[i].trim();if(!L||L.charAt(0)==="#")continue;var c=L.split(/\s+/);if(c.length<15)return null;var obsMs=Date.UTC(+c[0],+c[1]-1,+c[2],+c[3],+c[4]);var ageMin=(Date.now()-obsMs)/60000;if(!(ageMin>=0&&ageMin<=180))return null;var num=function(v){return(v==="MM"||v==null)?null:parseFloat(v);};var wvht=num(c[8]),wtmpC=num(c[14]);if(wvht==null&&wtmpC==null)return null;return{id:b.id,ageMin:Math.round(ageMin),wvht:wvht==null?null:Math.round(wvht*3.28084*10)/10,wtmp:wtmpC==null?null:Math.round((wtmpC*9/5+32)*10)/10};}return null;}).catch(function(){return null;});}
 function resolveLoc(l) {
 l.station = nearestStation(l.lat, l.lon);
 l.home = distMi(l.lat, l.lon, PIN.lat, PIN.lon) < 30;
@@ -403,7 +393,6 @@ r.unshift({ name: loc.name, lat: loc.lat, lon: loc.lon });
 try { localStorage.setItem("ff_recents", JSON.stringify(r.slice(0, 5))); } catch (e) {}
 }
 function escHTML(t) { return String(t).replace(/[&<>"']/g, function(c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
-
 function pinSVG(s) {
 s = s || 13;
 return '<svg width="' + s + '" height="' + Math.round(s * 1.25) + '" viewBox="0 0 24 30" fill="none" stroke="#3f3a32" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:6px">' +
@@ -587,7 +576,6 @@ var _ls = lastShore();
 $("locHome").textContent = (_ls && _ls.name) ? "\u2302 " + _ls.name : S.homeBtn;
 renderRecents();
 }
-
 /* ================= i18n ================= */
 var STR = {
 en: {
@@ -597,7 +585,7 @@ pickDay: "Pick a day", best: "★ BEST", bestWeek: "BEST DAY THIS WEEK", goDay: 
 goFish: "BEST TIME TO FISH", inFish: function(d) { return "in " + d; }, nowFish: "NOW", gotAway: "The one that got away! 🎣", wind: "WIND", water: "WATER", cond: "CONDITION", rain: "RAIN", moon: "MOON", sunrise: "SUNRISE", sunset: "SUNSET", catch: "Catch",
 searchPh: "Enter a beach, an inlet, or coordinates…", useMyLoc: "Use my location", homeBtn: "⌂ Jupiter Inlet",
 locating: "Locating…", geoDenied: "Location unavailable — check permission", geoUnsupported: "Geolocation not supported",
-currentLoc: "Current location", checkRegs: "Check local fishing regulations", regDis: "Info only, not legal advice \u2014 we are not responsible for your actions. Always verify current regulations yourself.", noResults: "No places found", resolvingLink: "Resolving map link\u2026", linkFail: "Couldn\u2019t read that map link \u2014 try coordinates like 26.76, -80.11",
+currentLoc: "Current location", checkRegs: "Check local fishing regulations", minAgo:" min ago", regDis: "Info only, not legal advice \u2014 we are not responsible for your actions. Always verify current regulations yourself.", noResults: "No places found", resolvingLink: "Resolving map link\u2026", linkFail: "Couldn\u2019t read that map link \u2014 try coordinates like 26.76, -80.11",
 geoRough: "GPS fix is rough (\u00b1{mi} mi) \u2014 try again in the open",
 chgLoc: "Change location", radar: "RADAR", wind: "WIND", live: "LIVE",
 moonTitle: "🌙 Major / Minor bite times", major: "MAJOR", minor: "MINOR", now: "NOW",
@@ -677,7 +665,6 @@ condName: {
 },
 }
 };
-
 /* ================= helpers ================= */
 function $(id) { return document.getElementById(id); }
 function pad(n) { return (n < 10 ? "0" : "") + n; }
@@ -919,16 +906,14 @@ var state = {
 lang: localStorage.getItem("pf_lang") || "en",
 ready: false, sel: 0, days: [], moon: [], tides: [], moonPhase: {},
 loc: getSavedLoc(),
-updatedAt: null, isOcean: true, isShore: true
+updatedAt: null, isOcean: true, isShore: true, buoy: null
 };
-
 /* ================= data loading ================= */
 function fetchJSON(url) {
 return fetch(url).then(function(r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); });
 }
 function ymd(d) { return d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()); }
 function ymdDash(d) { return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()); }
-
 function loadWeather(lat, lon) {
 var u = "https://api.open-meteo.com/v1/forecast?latitude=" + lat + "&longitude=" + lon +
 "&hourly=temperature_2m,precipitation_probability,precipitation,windspeed_10m,winddirection_10m,wind_gusts_10m,weather_code,is_day,pressure_msl" +
@@ -1434,7 +1419,6 @@ $("locGPS2").textContent = S.currentLoc;
 $("locChange").textContent = S.chgLoc;
 $("rules").innerHTML = (state.loc.home ? S.rules + " " + seasonPillHTML() : '<span class="regsn">' + S.checkRegs + "</span>") + '<div class="regdis">' + S.regDis + "</div>";
 }
-
 /* ================= live map: radar (RainViewer) + wind particles (Open-Meteo) ================= */
 var radarMap = null, radarTimer = null, radarCache = { at: 0, frames: [] };
 var radarLayer = null, windCanvas = null, windRAF = null, windGrid = null;
@@ -1442,7 +1426,6 @@ var windGridCache = { key: "", grid: null }, mapMode = "wind", windResizeBound =
 function frameTime(t) { return tstr(new Date(t * 1000), state.lang); }
 function radarTileURL(fr) { return "https://tilecache.rainviewer.com" + fr.path + "/256/{z}/{x}/{y}/2/1_1.png"; }
 function stopWind() { if (windRAF) { cancelAnimationFrame(windRAF); windRAF = null; } }
-
 function loadWindGrid() {
 var key = state.loc.lat.toFixed(2) + "," + state.loc.lon.toFixed(2);
 if (windGridCache.key === key && windGridCache.grid) {
@@ -1477,7 +1460,6 @@ var d = state.days[state.sel];
 ft.textContent = STR[state.lang].wind + " \u00b7 " + d.wind + " mph " + d.windDir;
 }
 }
-
 function startWind() {
 stopWind();
 if (!windCanvas || !radarMap || !windGrid) return;
@@ -1550,7 +1532,6 @@ ctx.closePath(); ctx.fill();
 }
 windRAF = requestAnimationFrame(frame);
 }
-
 function setMapMode(m) {
 mapMode = m;
 var wB = $("modeWind"), rB = $("modeRadar"), play = $("radarPlay");
@@ -1572,7 +1553,6 @@ if (ft) ft.textContent = fr.length ? STR[state.lang].radar + " \u00b7 " + frameT
 startWind(); windFoot();
 }
 }
-
 function initRadar() {
 if (radarTimer) { clearInterval(radarTimer); radarTimer = null; }
 stopWind();
@@ -1876,13 +1856,20 @@ Promise.all([
 loadWeather(lat, lon).catch(function(e) { return { _err: e }; }),
 loadMarine(lat, lon).catch(function(e) { return { _err: e }; }),
 (station ? loadTides(station, fromD, toD).catch(function() { return []; }) : Promise.resolve([])),
-Promise.all(moonPs)
+Promise.all(moonPs),
+loadBuoy(lat, lon).catch(function() { return null; })
 ])
 .then(function(r) {
 try {
 if (r[0]._err || r[1]._err) { state.loading = false; showError(); return; }
 var wx = r[0], mar = r[1];
 state.wx = wx; state.mar = mar;
+state.buoy = r[4];
+if (state.buoy) {
+var bi = hourlyIndex(mar.hourly, Date.now());
+if (state.buoy.wtmp != null) mar.hourly.sea_surface_temperature[bi] = state.buoy.wtmp;
+if (state.buoy.wvht != null) mar.hourly.wave_height[bi] = state.buoy.wvht;
+}
 state.isOcean = mar.hourly.sea_surface_temperature.some(function(v) { return v != null && !isNaN(v); });
 state.isShore = state.isOcean && ((mar.hourly.wave_height || []).some(function(v) { return v != null && !isNaN(v); }));
 if (state.isShore) { try { localStorage.setItem("ff_last_shore", JSON.stringify({ name: state.loc.name, lat: state.loc.lat, lon: state.loc.lon })); } catch (e) {} }
