@@ -35,7 +35,7 @@ white-space: nowrap; margin: 0 2px 8px; }
 .locbtn { background: none; border: none; padding: 0; width: 100%; text-align: left; cursor: pointer; font: inherit; color: inherit; }
 .locbtn::after { content: " \25BE"; font-size: 11px; color: #8a7a5f; }
 .locpanel { background: #f4ecda; border: 1px solid #d8c9a8; border-radius: 12px; padding: 10px; margin: -2px 2px 10px; }
-.locsearch { width: 100%; box-sizing: border-box; font-size: 14px; padding: 8px 10px; border-radius: 9px; border: 1px solid #d8c9a8; background: #fff; font-family: inherit; color: #22312b; }
+.locsearch { width: 100%; box-sizing: border-box; font-size: 16px; padding: 8px 10px; border-radius: 9px; border: 1px solid #d8c9a8; background: #fff; font-family: inherit; color: #22312b; }
 .locresults button { display: block; width: 100%; text-align: left; background: none; border: none; border-bottom: 1px solid #e7dcc2; padding: 8px 4px; font-size: 13px; font-weight: 600; color: #22312b; cursor: pointer; font-family: inherit; }
 .locrow { display: flex; gap: 8px; margin-top: 8px; }
 .locact { flex: 1; font-size: 12px; font-weight: 700; padding: 8px; border-radius: 9px; border: 1px solid #d8c9a8; background: #ede4cc; color: #22312b; cursor: pointer; font-family: inherit; }
@@ -561,6 +561,7 @@ html += '<button data-gi="' + i + '">' + escHTML(label) + "</button>";
 });
 if (!res.length) html = '<div class="locmsg">' + escHTML(S.noResults) + "</div>";
 box.innerHTML = html;
+if (typeof syncSticky === "function") syncSticky();
 var btns = box.querySelectorAll("[data-gi]");
 for (var i = 0; i < btns.length; i++) (function(b) {
 b.addEventListener("click", function() {
@@ -579,6 +580,7 @@ for (var i = 0; i < chips.length; i++) (function(b) {
 b.addEventListener("click", function() {
 var x = getRecents()[+b.getAttribute("data-ri")];
 if (x) setLocation(x);
+  if (typeof syncSticky === "function") syncSticky();
 });
 })(chips[i]);
 }
@@ -1889,14 +1891,14 @@ try {
 if (r[0]._err || r[1]._err) { state.loading = false; showError(); return; }
 var wx = r[0], mar = r[1];
 state.wx = wx; state.mar = mar;
+state.isOcean = mar.hourly.sea_surface_temperature.some(function(v) { return v != null && !isNaN(v); });
+state.isShore = state.isOcean && ((mar.hourly.wave_height || []).some(function(v) { return v != null && !isNaN(v); }));
 state.buoy = r[4];
 if (state.buoy) {
 var bi = hourlyIndex(mar.hourly, Date.now());
 if (state.buoy.wtmp != null) mar.hourly.sea_surface_temperature[bi] = state.buoy.wtmp;
 if (state.buoy.wvht != null) mar.hourly.wave_height[bi] = state.buoy.wvht;
 }
-state.isOcean = mar.hourly.sea_surface_temperature.some(function(v) { return v != null && !isNaN(v); });
-state.isShore = state.isOcean && ((mar.hourly.wave_height || []).some(function(v) { return v != null && !isNaN(v); }));
 if (state.isShore) { try { localStorage.setItem("ff_last_shore", JSON.stringify({ name: state.loc.name, lat: state.loc.lat, lon: state.loc.lon })); } catch (e) {} }
 state.tides = r[2];
 var all = [];
@@ -1941,6 +1943,11 @@ $("locSearch").addEventListener("input", function(e) {
 clearTimeout(locSearchTimer);
 var q = e.target.value;
 locSearchTimer = setTimeout(function() { doSearch(q); }, 350);
+});
+$("locSearch").addEventListener("keydown", function(e) {
+if (e.key === "Enter") { e.preventDefault();
+  var btn = document.querySelector("#locResults button");
+  if (btn) btn.click(); }
 });
 boot();
 setInterval(tick, 1000);
