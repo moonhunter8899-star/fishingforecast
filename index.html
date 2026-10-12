@@ -129,6 +129,38 @@
     .spcard2 { gap: 10px; border-radius: 14px; }
     .spname { font-size: 15px; }
   }
+  /* ---- install prompt ---- */
+  #instWrap {
+    position: fixed; inset: 0; z-index: 9999; display: none;
+    align-items: flex-end; justify-content: center;
+    background: rgba(4,12,20,.55); backdrop-filter: blur(2px);
+  }
+  #instWrap.show { display: flex; animation: instFade .25s ease; }
+  @keyframes instFade { from { opacity: 0; } to { opacity: 1; } }
+  #instCard {
+    width: 100%; max-width: 430px; margin: 0 12px 14px; padding: 20px 20px 16px;
+    background: linear-gradient(160deg, #123043 0%, #0b2231 70%);
+    border: 1px solid rgba(120,220,255,.25); border-radius: 20px;
+    box-shadow: 0 18px 50px rgba(0,0,0,.55), 0 0 24px rgba(64,200,255,.12);
+    color: #fff; text-align: center;
+    animation: instUp .3s cubic-bezier(.2,.9,.3,1.2);
+  }
+  @keyframes instUp { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+  #instCard img { width: 64px; height: 64px; border-radius: 16px; box-shadow: 0 6px 18px rgba(0,0,0,.5); }
+  #instCard h3 { margin: 10px 0 4px; font-size: 18px; font-family: Fraunces, serif; }
+  #instCard p { margin: 0 0 12px; font-size: 13.5px; color: rgba(255,255,255,.82); line-height: 1.45; }
+  #instSteps { text-align: left; font-size: 13.5px; color: rgba(255,255,255,.88); line-height: 1.9;
+    background: rgba(255,255,255,.07); border-radius: 12px; padding: 10px 14px; margin: 0 0 12px; display: none; }
+  #instSteps b { color: #7fe7ff; }
+  #instGo {
+    display: block; width: 100%; padding: 13px; border: 0; border-radius: 14px;
+    font-size: 16px; font-weight: 800; color: #06222e; cursor: pointer;
+    background: linear-gradient(180deg, #8ff0ff, #38c6f4);
+    box-shadow: 0 6px 20px rgba(56,198,244,.45);
+  }
+  #instGo:active { transform: scale(.98); }
+  #instNo { display: block; width: 100%; margin-top: 8px; padding: 8px; background: none; border: 0;
+    color: rgba(255,255,255,.55); font-size: 13px; cursor: pointer; }
 </style>
 </head>
 <body>
@@ -243,6 +275,98 @@ function applyTheme() {
 applyTheme();
 setInterval(applyTheme, 60000);
 render();
+</script>
+<div id="instWrap">
+  <div id="instCard">
+    <img src="icons/icon-192.png" alt="Fishing Forecast">
+    <h3 id="instTitle">Add Fishing Forecast to your home screen</h3>
+    <p id="instText">One tap to open, fullscreen, always ready before your next trip.</p>
+    <div id="instSteps"></div>
+    <button id="instGo">Add to Home Screen</button>
+    <button id="instNo">Not now</button>
+  </div>
+</div>
+<script>
+(function() {
+  // Never prompt if already running as an installed app, or already dismissed.
+  var dismissed = false;
+  try { dismissed = localStorage.getItem('ff_install_dismissed') === '1'; } catch (e) {}
+  var standalone = window.matchMedia('(display-mode: standalone)').matches ||
+                   window.matchMedia('(display-mode: fullscreen)').matches ||
+                   window.navigator.standalone === true;
+  if (standalone || dismissed) return;
+
+  var wrap = document.getElementById('instWrap'),
+      go = document.getElementById('instGo'),
+      no = document.getElementById('instNo'),
+      steps = document.getElementById('instSteps'),
+      title = document.getElementById('instTitle'),
+      text = document.getElementById('instText');
+  var deferred = null, shown = false;
+
+  function dismiss() {
+    try { localStorage.setItem('ff_install_dismissed', '1'); } catch (e) {}
+    wrap.classList.remove('show');
+  }
+  function show() {
+    if (shown) return; shown = true;
+    setTimeout(function() { wrap.classList.add('show'); }, 2500);
+  }
+  no.addEventListener('click', dismiss);
+  wrap.addEventListener('click', function(e) { if (e.target === wrap) dismiss(); });
+
+  var ua = navigator.userAgent || '';
+  var isIos = /iphone|ipad|ipod/i.test(ua);
+  var isAndroid = /android/i.test(ua);
+
+  if (isIos) {
+    // iOS Safari has no programmatic install — show the manual steps.
+    title.textContent = 'Add Fishing Forecast to your home screen';
+    text.textContent = 'Install it like an app for the best experience:';
+    steps.style.display = 'block';
+    steps.innerHTML = '1. Tap the <b>Share</b> button below<br>2. Tap <b>Add to Home Screen</b><br>3. Tap <b>Add</b> — done!';
+    go.textContent = 'Got it';
+    go.addEventListener('click', dismiss);
+    show();
+  } else {
+    // Android / desktop: use the native install prompt when available.
+    window.addEventListener('beforeinstallprompt', function(e) {
+      e.preventDefault();
+      deferred = e;
+      show();
+    });
+    var manualShown = false;
+    function showManual() {
+      if (manualShown) return; manualShown = true;
+      text.textContent = 'Install it like an app for the best experience:';
+      steps.style.display = 'block';
+      steps.innerHTML = isAndroid
+        ? '1. Tap the <b>&#8942;</b> menu in your browser<br>2. Tap <b>Add to Home screen</b> / <b>Install app</b>'
+        : '1. Open your browser menu<br>2. Choose <b>Install Fishing Forecast</b>';
+      go.textContent = 'Got it';
+      show();
+    }
+    go.addEventListener('click', function() {
+      if (deferred) {
+        deferred.prompt();
+        deferred.userChoice.then(function() { deferred = null; dismiss(); });
+      } else if (manualShown) {
+        dismiss();
+      } else {
+        showManual();
+      }
+    });
+    // Fallback: if the native prompt never fires, offer manual steps instead.
+    setTimeout(function() { if (!deferred && !shown) showManual(); }, 8000);
+  }
+
+  // Register the service worker (needed for Android installability).
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+      navigator.serviceWorker.register('sw.js').catch(function() {});
+    });
+  }
+})();
 </script>
 </body>
 </html>
