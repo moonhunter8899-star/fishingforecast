@@ -290,6 +290,7 @@
   <div id="app"><div class="loading" id="loading">Checking pompano conditions…</div></div>
   <div class="foot">Snook Forecast · Tien Huynh</div>
 </div>
+<script src="buoys.js"></script>
 <script>
 "use strict";
 /* Fixed header: spacer keeps page flow; sync after panel toggles/resize */
@@ -310,7 +311,7 @@ setTimeout(syncSticky, 600);
 /* ================= constants ================= */
 var PIN = { lat: 26.943311, lon: -80.070517, name: "Jupiter Inlet, FL", station: "8722495" };
 var BUOY_PROXY = ""; // Cloudflare worker URL, set when live
-var NDBC_BUOYS=[["41003",30.4,-80.1],["41005",31.7,-79.7],["41008",31.4,-80.866],["41009",28.508,-80.185],["41011",28.2,-80.1],["41012",30.042,-80.534],["41021",31.92,-80.85],["41022",31.89,-80.86],["41023",31.92,-80.93],["41068",27.593,-80.189],["41069",29.289,-80.803],["41070",29.289,-80.803],["41112",30.709,-81.292],["41113",28.4,-80.533],["41114",27.564,-80.215],["41116",28.523,-80.188],["41117",29.999,-81.079],["41118",28.609,-80.59],["41122",26.001,-80.096],["42003",25.925,-85.616],["42004",27.5,-85.5],["42005",30.0,-85.9],["42009",29.3,-87.5],["42012",30.061,-87.547],["42013",27.173,-82.924],["42014",25.254,-82.22],["42015",30.1,-88.2],["42016",30.2,-88.1],["42018",30.0,-88.2],["42021",28.311,-83.306],["42022",27.505,-83.741],["42023",26.01,-83.086],["42024",27.464,-84.219],["42025",24.9,-80.4],["42026",25.171,-83.475],["42027",29.045,-85.305],["42028",29.745,-86.227],["42031",30.09,-88.212],["42036",28.5,-84.505],["42037",24.5,-81.4],["42039",28.768,-86.024],["42040",29.207,-88.237],["42042",29.88,-88.32],["42053",29.55,-88.5],["42054",26.0,-87.73],["42078",24.5,-81.251],["42079",24.535,-81.242],["42080",24.396,-81.934],["42095",24.407,-81.968],["42097",25.704,-83.654],["42098",27.59,-82.931],["42099",27.352,-84.275],["42357",30.092,-88.212],["42408",25.2,-87.0],["42429",27.401,-85.671],["42430",27.0,-86.0],["42503",25.925,-85.615]];
+
 var TIDE_STATIONS = [
 ["8729333",30.468,-86.138],
 ["8720213",30.42,-81.728],
@@ -388,7 +389,7 @@ if (d < bd) { bd = d; best = t[0]; }
 }
 return bd <= 45 ? best : null;
 }
-function nearestBuoy(lat,lon){var best=null,bd=1e9,i,b,d;for(i=0;i<NDBC_BUOYS.length;i++){b=NDBC_BUOYS[i];d=distMi(lat,lon,b[1],b[2]);if(d<bd){bd=d;best=b;}}return bd<=60?{id:best[0],dist:bd}:null;}
+function nearestBuoy(lat,lon){if(typeof NDBC_BUOYS==="undefined")return null;var best=null,bd=1e9,i,b,d;for(i=0;i<NDBC_BUOYS.length;i++){b=NDBC_BUOYS[i];d=distMi(lat,lon,b[1],b[2]);if(d<bd){bd=d;best=b;}}return bd<=60?{id:best[0],dist:bd}:null;}
 function loadBuoy(lat,lon){if(!BUOY_PROXY)return Promise.resolve(null);var b=nearestBuoy(lat,lon);if(!b)return Promise.resolve(null);var url=BUOY_PROXY.replace(/\/$/,"")+"/?url="+encodeURIComponent("https://www.ndbc.noaa.gov/data/realtime2/"+b.id+".txt");return fetch(url).then(function(r){if(!r.ok)return null;return r.text();}).then(function(t){if(!t)return null;var lines=t.split("\n");for(var i=0;i<lines.length;i++){var L=lines[i].trim();if(!L||L.charAt(0)==="#")continue;var c=L.split(/\s+/);if(c.length<15)return null;var obsMs=Date.UTC(+c[0],+c[1]-1,+c[2],+c[3],+c[4]);var ageMin=(Date.now()-obsMs)/60000;if(!(ageMin>=0&&ageMin<=180))return null;var num=function(v){return(v==="MM"||v==null)?null:parseFloat(v);};var wvht=num(c[8]),wtmpC=num(c[14]);if(wvht==null&&wtmpC==null)return null;return{id:b.id,dist:Math.round(b.dist*10)/10,ageMin:Math.round(ageMin),wvht:wvht==null?null:Math.round(wvht*3.28084*10)/10,wtmp:wtmpC==null?null:Math.round((wtmpC*9/5+32)*10)/10};}return null;}).catch(function(){return null;});}
 function resolveLoc(l) {
 l.station = nearestStation(l.lat, l.lon);
