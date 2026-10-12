@@ -296,6 +296,7 @@
   <div class="foot">Snook Forecast · Tien Huynh</div>
 </div>
 <script src="buoys.js"></script>
+<script src="clarity.js"></script>
 <script>
 "use strict";
 /* Fixed header: spacer keeps page flow; sync after panel toggles/resize */
@@ -398,51 +399,6 @@ return bd <= 45 ? best : null;
 function nearestBuoy(lat,lon){if(typeof NDBC_BUOYS==="undefined")return null;var best=null,bd=1e9,i,b,d;for(i=0;i<NDBC_BUOYS.length;i++){b=NDBC_BUOYS[i];d=distMi(lat,lon,b[1],b[2]);if(d<bd){bd=d;best=b;}}return bd<=60?{id:best[0],dist:bd}:null;}
 function loadBuoy(lat,lon){if(!BUOY_PROXY)return Promise.resolve(null);var b=nearestBuoy(lat,lon);if(!b)return Promise.resolve(null);var url=BUOY_PROXY.replace(/\/$/,"")+"/?url="+encodeURIComponent("https://www.ndbc.noaa.gov/data/realtime2/"+b.id+".txt");return fetch(url).then(function(r){if(!r.ok)return null;return r.text();}).then(function(t){if(!t)return null;var lines=t.split("\n");for(var i=0;i<lines.length;i++){var L=lines[i].trim();if(!L||L.charAt(0)==="#")continue;var c=L.split(/\s+/);if(c.length<15)return null;var obsMs=Date.UTC(+c[0],+c[1]-1,+c[2],+c[3],+c[4]);var ageMin=(Date.now()-obsMs)/60000;if(!(ageMin>=0&&ageMin<=180))return null;var num=function(v){return(v==="MM"||v==null)?null:parseFloat(v);};var wvht=num(c[8]),wtmpC=num(c[14]);if(wvht==null&&wtmpC==null)return null;return{id:b.id,dist:Math.round(b.dist*10)/10,ageMin:Math.round(ageMin),wvht:wvht==null?null:Math.round(wvht*3.28084*10)/10,wtmp:wtmpC==null?null:Math.round((wtmpC*9/5+32)*10)/10};}return null;}).catch(function(){return null;});}
 
-function loadClarity(lat, lon) {
-  // Satellite water clarity (Kd490, m^-1; lower = clearer) via Cloudflare worker.
-  // Tries NRT daily (3-day latency), falls back to weekly composite. Silent null on failure.
-  if (typeof BUOY_PROXY === "undefined" || !BUOY_PROXY) return Promise.resolve(null);
-  var proxy = BUOY_PROXY.replace(/\/$/, "") + "/?url=";
-  function boxURL(dataset, d) {
-    var q = "kd_490%5B(last):1:(last)%5D%5B(0.0):1:(0.0)%5D" +
-      "%5B(" + (lat - d).toFixed(2) + "):1:(" + (lat + d).toFixed(2) + ")%5D" +
-      "%5B(" + (lon - d).toFixed(2) + "):1:(" + (lon + d).toFixed(2) + ")%5D";
-    return "https://coastwatch.pfeg.noaa.gov/erddap/griddap/" + dataset + ".json?" + q;
-  }
-  function parseClarity(text, maxAgeDays) {
-    try {
-      var rows = JSON.parse(text).table.rows;
-      if (!rows || !rows.length) return null;
-      var vals = [], t0 = null;
-      for (var i = 0; i < rows.length; i++) {
-        var v = rows[i][4];
-        if (v != null && !isNaN(v) && v > 0 && v < 30) { vals.push(v); if (!t0) t0 = rows[i][0]; }
-      }
-      if (vals.length < 3 || !t0) return null;
-      vals.sort(function(a, b) { return a - b; });
-      var ageDays = (Date.now() - Date.parse(t0)) / 86400000;
-      if (!(ageDays >= 0 && ageDays <= maxAgeDays)) return null;
-      return { kd: vals[Math.floor(vals.length / 2)], ageDays: ageDays };
-    } catch (e) { return null; }
-  }
-  function get(url, maxAge) {
-    return fetch(proxy + encodeURIComponent(url)).then(function(r) {
-      if (!r.ok) throw 0; return r.text();
-    }).then(function(t) { return parseClarity(t, maxAge); });
-  }
-  return get(boxURL("nesdisVHNkd490Daily", 0.12), 7).then(function(c) {
-    if (c) return c;
-    return get(boxURL("nesdisVHNkd490Weekly", 0.12), 21);
-  }).catch(function() { return null; });
-}
-
-function clarityMod(kd, ageDays) {
-  // Snook hunt by vibration too; slightly stained water helps ambush. Small effect either way.
-  if (kd == null) return 0;
-  var m = kd > 0.35 ? 1 : 0;
-  if (ageDays > 7) m = Math.round(m / 2);
-  return m;
-}
 function resolveLoc(l) {
 l.station = nearestStation(l.lat, l.lon);
 l.home = distMi(l.lat, l.lon, PIN.lat, PIN.lon) < 30;
@@ -2026,7 +1982,7 @@ r[3].forEach(function(arr) { arr.forEach(function(w) { all.push(w); }); });
 state.moon = dedupeMoon(all);
 state.days = buildDays(wx, mar);
 if (state.clarity && state.days.length) {
-  var _cm = clarityMod(state.clarity.kd, state.clarity.ageDays);
+  var _cm = clarityMod(state.clarity.kd, state.clarity.ageDays, "snook");
   if (_cm) state.days[0].score = Math.max(0, Math.min(100, state.days[0].score + _cm));
 }
 state.sel = 0;
