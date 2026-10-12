@@ -1,6 +1,6 @@
 /* Fishing Forecast service worker — minimal: enables PWA installability.
    Network-first so forecasts always use live data; cache is only a fallback. */
-const CACHE = 'ff-shell-v1';
+const CACHE = 'ff-shell-v2';
 const SHELL = ['index.html', 'manifest.json', 'icons/icon-192.png', 'icons/icon-512.png'];
 
 self.addEventListener('install', (e) => {
