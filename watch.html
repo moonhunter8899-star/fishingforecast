@@ -5,542 +5,178 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#f6f0df">
-<title>Pompano Watch — Tien Huynh</title>
+<meta name="apple-mobile-web-app-title" content="Bite Forecast">
+<meta name="theme-color" content="#0b2231">
+<title>Bite Forecast · Watch</title>
 <style>
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body { margin: 0; padding: 0; }
   body {
-    background: #f6f0df; color: #2b2620;
+    background: linear-gradient(180deg, #0e2a3f 0%, #0b2231 45%, #081824 100%);
+    background-attachment: fixed;
+    color: #fff; min-height: 100vh;
     font-family: -apple-system, "Segoe UI", "Public Sans", sans-serif;
     font-variant-numeric: tabular-nums;
   }
-  .wrap { max-width: 420px; margin: 0 auto; padding: 10px 10px 24px; }
-  .hd { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 2px 2px 10px; }
-  .loc { font-weight: 800; font-size: 14px; }
-  .langbtn {
-    background: #fffaf0; border: 1.5px solid #d9c9a3; border-radius: 999px;
-    font-size: 11px; font-weight: 800; padding: 6px 10px; cursor: pointer; color: #8a7a5f; flex: none;
+  .wrap { max-width: 430px; margin: 0 auto; padding: 12px 14px 30px; }
+  .top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .home { color: rgba(255,255,255,.75); text-decoration: none; font-size: 14px; font-weight: 600; }
+  .wtitle { font-size: 12px; letter-spacing: .22em; color: rgba(255,255,255,.5); font-weight: 700; }
+  .tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+  .tab {
+    flex: 1; text-align: center; padding: 10px 0; border-radius: 999px;
+    background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.12);
+    color: rgba(255,255,255,.75); font-size: 14px; font-weight: 700; cursor: pointer;
   }
-  .langbtn b { color: #9a4a16; }
-  .rcard {
-    background: #22312b; border-radius: 20px; padding: 16px;
-    border: 2px solid #1d9e6c; color: #fff; margin-bottom: 12px;
-    box-shadow: 0 4px 14px rgba(34,49,43,.25);
+  .tab.on { background: rgba(56,198,244,.18); border-color: rgba(56,198,244,.55); color: #8ff0ff; }
+  .hero { text-align: center; padding: 8px 0 2px; }
+  .rword {
+    font-size: 64px; font-weight: 900; letter-spacing: .02em; line-height: 1;
+    text-shadow: 0 0 26px currentColor;
   }
-  .rlbl { color: #e8c76a; font-size: 10px; font-weight: 700; letter-spacing: .18em; margin-bottom: 6px; }
-  .rrow { display: flex; align-items: center; gap: 14px; }
-  .badge {
-    width: 56px; height: 56px; border-radius: 50%; background: #fff; flex: none;
-    display: flex; align-items: center; justify-content: center;
+  .rscore { font-size: 40px; font-weight: 900; margin-top: 2px; text-shadow: 0 0 18px currentColor; }
+  .spot { margin-top: 8px; font-size: 14px; color: rgba(255,255,255,.78); font-weight: 600; }
+  .bite {
+    margin: 12px auto 0; display: inline-block; padding: 9px 18px; border-radius: 999px;
+    background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.14);
+    font-size: 14px; font-weight: 800; color: #ffd9a8;
   }
-  .rword { font-weight: 900; font-size: 34px; letter-spacing: .02em; line-height: 1; }
-  .rscore { font-weight: 800; font-size: 20px; margin-top: 4px; }
-  .gofish {
-    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
-    background: #bc5a1e; color: #fff; border-radius: 14px; padding: 12px 14px;
-    margin-bottom: 12px; font-weight: 900; font-size: 20px;
-    box-shadow: 0 3px 10px rgba(188,90,30,.35);
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
+  .box {
+    background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.1);
+    border-radius: 16px; padding: 12px 13px; backdrop-filter: blur(6px);
   }
-  .gofish .gs { margin-left: auto; font-size: 18px; white-space: nowrap; }
-  .cd {
-    background: #fffaf0; border: 1px solid #e3d5b3; border-radius: 14px;
-    padding: 12px 14px; margin-bottom: 10px; font-size: 15px; font-weight: 700; line-height: 1.45;
+  .box .k { font-size: 11px; letter-spacing: .14em; color: rgba(255,255,255,.55); font-weight: 700; margin-bottom: 5px; }
+  .box .v { font-size: 16px; font-weight: 800; line-height: 1.35; }
+  .box .v small { font-size: 12.5px; font-weight: 600; color: rgba(255,255,255,.65); }
+  .meta { text-align: center; margin-top: 14px; font-size: 12px; color: rgba(255,255,255,.45); }
+  .meta.stale { color: #ffcf7a; }
+  .meta a { color: #8ff0ff; }
+  .empty {
+    text-align: center; padding: 46px 20px; color: rgba(255,255,255,.75);
+    background: rgba(255,255,255,.05); border-radius: 18px; border: 1px solid rgba(255,255,255,.1);
+    margin-top: 20px; line-height: 1.6; font-size: 15px;
   }
-  .cd .ck { margin-right: 6px; }
-  .cd .note { color: #8a7a5f; font-weight: 600; }
-  .tidecard { margin-bottom: 10px; }
-  .tidecard svg { width: 100%; display: block; }
-  .upd { text-align: center; color: #8a7a5f; font-size: 11px; margin-top: 6px; }
-  .loading, .err { text-align: center; padding: 40px 16px; color: #8a7a5f; font-size: 14px; }
-  .refresh {
-    background: #bc5a1e; color: #fff; border: none; border-radius: 999px;
-    font-weight: 800; font-size: 13px; padding: 8px 16px; cursor: pointer; margin-top: 10px;
-  }
-  .foot { text-align: center; color: #b3a37f; font-size: 10px; margin-top: 14px; }
+  .empty a { color: #8ff0ff; font-weight: 700; }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="hd">
-    <div class="loc">📌 Jupiter Inlet, FL</div>
-    <button class="langbtn" id="langBtn" title="Language / Ngôn ngữ"></button>
+  <div class="top">
+    <a class="home" href="index.html">‹ Home</a>
+    <div class="wtitle">WATCH</div>
+    <div style="width:52px"></div>
   </div>
-  <div id="app"><div class="loading" id="loading">Checking pompano conditions…</div></div>
-  <div class="foot">Pompano Forecast · Tien Huynh</div>
+  <div class="tabs" id="tabs"></div>
+  <div id="view"></div>
+  <div class="meta" id="meta"></div>
 </div>
 <script>
-"use strict";
-/* Watch version — always pinned to Jupiter Inlet. Same live sources & scoring as index.html. */
-var PIN = { lat: 26.943311, lon: -80.070517, station: "8722495" };
-var STR = {
-  en: {
-    loading: "Checking pompano conditions…",
-    loadFail: "Could not load live data. Check your connection.",
-    retry: "Try again",
-    rating: "POMPANO BITE RATING",
-    goFish: "GO FISH",
-    great: "Great", good: "Good", fair: "Fair", poor: "Poor",
-    dur: function(h, m) { return h > 0 ? h + "h " + m + "m" : m + "m"; },
-    nextMajor: function(d) { return "Next Major in " + d; },
-    nextMinor: function(d) { return "Next Minor in " + d; },
-    majorNow: "Major bite happening now",
-    minorNow: "Minor bite happening now",
-    nextHigh: function(d) { return "High tide in " + d; },
-    nextLow: function(d) { return "Low tide in " + d; },
-    tideNote: "Tide data unavailable right now.",
-    moonNote: "Moon bite times unavailable right now.",
-    updated: function(t) { return "Updated " + t; }
-  },
-  vi: {
-    loading: "Đang kiểm tra điều kiện câu cá…",
-    loadFail: "Không tải được dữ liệu. Kiểm tra kết nối mạng.",
-    retry: "Thử lại",
-    rating: "ĐIỂM CẮN CÂU POMPANO",
-    goFish: "ĐI CÂU NGAY",
-    great: "Tuyệt vời", good: "Tốt", fair: "Trung bình", poor: "Tệ",
-    dur: function(h, m) { return h > 0 ? h + " giờ " + m + " phút" : m + " phút"; },
-    nextMajor: function(d) { return "Cá cắn mạnh sau " + d; },
-    nextMinor: function(d) { return "Cá cắn nhẹ sau " + d; },
-    majorNow: "Đang cắn mạnh ngay bây giờ",
-    minorNow: "Đang cắn nhẹ ngay bây giờ",
-    nextHigh: function(d) { return "Nước lên sau " + d; },
-    nextLow: function(d) { return "Nước xuống sau " + d; },
-    tideNote: "Hiện chưa có dữ liệu thủy triều.",
-    moonNote: "Hiện chưa có giờ cá cắn theo mặt trăng.",
-    updated: function(t) { return "Cập nhật lúc " + t; }
+(function() {
+  var SPECIES = [
+    { id: "pompano", name: "Pompano", page: "pompano.html" },
+    { id: "snook", name: "Snook", page: "snook.html" },
+    { id: "mackerel", name: "Mackerel", page: "mackerel.html" }
+  ];
+  var sp = "pompano";
+  try { sp = localStorage.getItem("ff_watch_species") || "pompano"; } catch (e) {}
+  if (!SPECIES.some(function(s) { return s.id === sp; })) sp = "pompano";
+
+  function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function(c) {
+    return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  function hourLabel(ms) {
+    var d = new Date(ms), h = d.getHours(), ap = h >= 12 ? "PM" : "AM";
+    h = h % 12; if (h === 0) h = 12;
+    var m = d.getMinutes(); return h + (m ? ":" + (m < 10 ? "0" : "") + m : "") + " " + ap;
   }
-};
-function $(id) { return document.getElementById(id); }
-function pad(n) { return (n < 10 ? "0" : "") + n; }
-function tstr(d, lang) { // 12h in both languages, e.g. "7:35p"
-  var h = d.getHours(), ap = h >= 12 ? "p" : "a";
-  h = h % 12; if (h === 0) h = 12;
-  return h + ":" + pad(d.getMinutes()) + ap;
-}
-function trange(a, b, lang) { return tstr(a, lang) + "–" + tstr(b, lang); }
-function ratingColor(s) { return s >= 60 ? "#1d9e6c" : (s >= 40 ? "#d9a441" : "#c0392b"); }
-function ratingWord(s, lang) {
-  var S = STR[lang];
-  return s >= 80 ? S.great : s >= 60 ? S.good : s >= 40 ? S.fair : S.poor;
-}
-function durText(ms, lang) {
-  if (ms < 0) ms = 0;
-  var m = Math.round(ms / 60000), h = Math.floor(m / 60);
-  return STR[lang].dur(h, m % 60);
-}
-function hx2rgb(h){h=h.replace("#","");if(h.length===3){h=h[0]+h[0]+h[1]+h[1]+h[2]+h[2];}return [parseInt(h.substr(0,2),16),parseInt(h.substr(2,2),16),parseInt(h.substr(4,2),16)];}
-function rgb2hx(r,g,b){function c(x){x=Math.max(0,Math.min(255,Math.round(x)));var s=x.toString(16);return s.length<2?"0"+s:s;}return "#"+c(r)+c(g)+c(b);}
-function shade(hex,p){var c=hx2rgb(hex);if(p>=0){return rgb2hx(c[0]+(255-c[0])*p/100,c[1]+(255-c[1])*p/100,c[2]+(255-c[2])*p/100);}var f=1+p/100;return rgb2hx(c[0]*f,c[1]*f,c[2]*f);}
-function mixc(h1,h2,p){var a=hx2rgb(h1),b=hx2rgb(h2);return rgb2hx(a[0]+(b[0]-a[0])*p/100,a[1]+(b[1]-a[1])*p/100,a[2]+(b[2]-a[2])*p/100);}
-function fishSVG(color, size) {
-  var u = (window.__fishUID = (window.__fishUID || 0) + 1);
-  var back = shade(color, -30), belly = mixc(color, "#f6dc8e", 62);
-  var tailA = mixc(color, "#d9a441", 55), tailB = mixc(color, "#9c742a", 35);
-  var finD = shade(color, -32), finDark = shade(color, -55);
-  return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 64 64">' +
-    '<defs>' +
-    '<linearGradient id="fbg' + u + '" x1="0" y1="0" x2="0" y2="1">' +
-    '<stop offset="0" stop-color="' + back + '"/><stop offset=".48" stop-color="' + color + '"/><stop offset="1" stop-color="' + belly + '"/>' +
-    '</linearGradient>' +
-    '<linearGradient id="ftg' + u + '" x1="0" y1="0" x2="1" y2="0">' +
-    '<stop offset="0" stop-color="' + tailA + '"/><stop offset="1" stop-color="' + tailB + '"/>' +
-    '</linearGradient>' +
-    '</defs>' +
-    '<path d="M47.5 27.5 C52 21, 56 16, 62 11 C59 19, 57.5 25.5, 56.5 32 C57.5 38.5, 59 45, 62 53 C56 48, 52 43, 47.5 36.5 Z" fill="url(#ftg' + u + ')"/>' +
-    '<path d="M8 28 C9 23, 11 20, 15 18 C24 13, 34 12.5, 42 19 C45.5 22, 48 25, 49.5 28.5 L49.5 35.5 C46 42, 40 46, 33 47.5 C25 49, 16 46, 9.5 40 C7.5 38, 7.5 30, 8 28 Z" fill="url(#fbg' + u + ')"/>' +
-    '<path d="M18 18 C26 10, 35 6, 44 4 C40 9, 39 13, 40 18.5 C32 14.5, 24 15, 18 18 Z" fill="' + finD + '"/>' +
-    '<path d="M40 44 C43 47, 45 50, 46 53 C44 50, 41 47, 39 44 Z" fill="' + finD + '"/>' +
-    '<path d="M29 47 C31 50.5, 33 53, 36 55 C34 51.5, 32 49, 30 47.5 Z" fill="' + finD + '"/>' +
-    '<path d="M20.5 35 C25 37, 28 41, 29 46 C25 44, 21.5 41, 19.5 37 Z" fill="' + finDark + '"/>' +
-    '<path d="M21 24.5 C24 29.5, 24 37, 21 42" stroke="rgba(255,255,255,.6)" stroke-width="1.6" fill="none" stroke-linecap="round"/>' +
-    '<path d="M26 33.5 C33 32, 41 32, 48 33.5" stroke="rgba(255,255,255,.35)" stroke-width="1" fill="none"/>' +
-    '<path d="M8 35 L11 36" stroke="' + finDark + '" stroke-width="1.4" stroke-linecap="round"/>' +
-    '<circle cx="13.5" cy="29" r="3.1" fill="#fff"/><circle cx="13.5" cy="29" r="1.7" fill="#22312b"/><circle cx="14.2" cy="28.3" r="0.7" fill="#fff"/>' +
-    '</svg>';
-}
-function clockStr(lang) { // 12h in both languages, e.g. "2:26 PM"
-  var d = new Date();
-  var h = d.getHours(), ap = h >= 12 ? "PM" : "AM";
-  h = h % 12; if (h === 0) h = 12;
-  return h + ":" + pad(d.getMinutes()) + " " + ap;
-}
-/* ---------- data (same sources & scoring as index.html) ---------- */
-var state = {
-  lang: localStorage.getItem("pf_lang") || "en",
-  ready: false, wx: null, mar: null, tides: [], moon: [],
-  today: null, updatedAt: null
-};
-function fetchJSON(url) {
-  return fetch(url).then(function(r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); });
-}
-function ymd(d) { return d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()); }
-function ymdDash(d) { return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()); }
-function loadWeather(lat, lon) {
-  var u = "https://api.open-meteo.com/v1/forecast?latitude=" + lat + "&longitude=" + lon +
-    "&hourly=temperature_2m,precipitation_probability,precipitation,windspeed_10m,winddirection_10m,wind_gusts_10m,weather_code" +
-    "&timezone=auto&forecast_days=3&temperature_unit=fahrenheit&windspeed_unit=mph";
-  return fetchJSON(u);
-}
-function loadMarine(lat, lon) {
-  var u = "https://marine-api.open-meteo.com/v1/marine?latitude=" + lat + "&longitude=" + lon +
-    "&hourly=wave_height,sea_surface_temperature&timezone=auto&forecast_days=3&temperature_unit=fahrenheit";
-  return fetchJSON(u);
-}
-function loadTides(station, fromD, toD) {
-  var u = "https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?begin_date=" + ymd(fromD) +
-    "&end_date=" + ymd(toD) + "&station=" + station +
-    "&product=predictions&datum=MLLW&time_zone=lst_ldt&units=english&interval=hilo&format=json&application=pompano-forecast-watch";
-  return fetchJSON(u).then(function(j) {
-    var out = [];
-    (j.predictions || []).forEach(function(p) {
-      var m = /^(\d+)-(\d+)-(\d+) (\d+):(\d+)$/.exec(p.t);
-      if (!m) return;
-      out.push({ t: new Date(+m[1], +m[2] - 1, +m[3], +m[4], +m[5]).getTime(), type: p.type, v: parseFloat(p.v) });
-    });
-    out.sort(function(a, b) { return a.t - b.t; });
-    return out;
-  });
-}
-function loadMoonDay(lat, lon, date) {
-  var u = "https://api.met.no/weatherapi/sunrise/3.0/moon?lat=" + lat + "&lon=" + lon +
-    "&date=" + ymdDash(date) + "&offset=" + encodeURIComponent("+00:00");
-  return fetchJSON(u).then(function(j) {
-    var p = (j && j.properties) || {}, wins = [];
-    function T(ev) { return ev && ev.time ? new Date(ev.time).getTime() : null; }
-    [["high_moon"], ["low_moon"]].forEach(function(k) {
-      var t = T(p[k[0]]);
-      if (t != null && !isNaN(t)) wins.push({ type: "major", start: t - 3600000, end: t + 3600000, center: t });
-    });
-    [["moonrise"], ["moonset"]].forEach(function(k) {
-      var t = T(p[k[0]]);
-      if (t != null && !isNaN(t)) wins.push({ type: "minor", start: t - 1800000, end: t + 1800000, center: t });
-    });
-    return wins;
-  }).catch(function() { return []; });
-}
-function hourlyIndex(hourly, ms) {
-  var best = 0, bd = 1e15;
-  for (var i = 0; i < hourly.time.length; i++) {
-    var t = new Date(hourly.time[i]).getTime();
-    var d = Math.abs(t - ms);
-    if (d < bd) { bd = d; best = i; }
+  function dur(ms) {
+    if (ms < 0) ms = 0;
+    var m = Math.round(ms / 60000), h = Math.floor(m / 60);
+    m = m % 60;
+    return h > 0 ? h + "h " + m + "m" : m + "m";
   }
-  return best;
-}
-function hourScore(wi, mi) {
-  var wx = state.wx.hourly, mar = state.mar.hourly, s = 100;
-  var wsp = wx.windspeed_10m[wi];
-  if (wsp < 4) s -= 4;
-  else if (wsp <= 15) s -= 0;
-  else if (wsp <= 20) s -= 12;
-  else if (wsp <= 25) s -= 26;
-  else s -= 46;
-  var gust = wx.wind_gusts_10m ? wx.wind_gusts_10m[wi] : 0;
-  if (gust > wsp + 12) s -= 8;
-  if (gust > 30) s -= 18;
-  var rp = wx.precipitation_probability[wi];
-  if (rp >= 80) s -= 45; else if (rp >= 60) s -= 30; else if (rp >= 40) s -= 20; else if (rp >= 20) s -= 10;
-  var mm = wx.precipitation ? wx.precipitation[wi] : 0;
-  if (mm >= 2.5) s -= 30; else if (mm >= 0.5) s -= 15; else if (mm > 0) s -= 5;
-  var wt = mar.sea_surface_temperature[mi];
-  if (wt != null && !isNaN(wt)) {
-    if (wt >= 65 && wt <= 76) s -= 0;
-    else if ((wt >= 62 && wt < 65) || (wt > 76 && wt <= 80)) s -= 10;
-    else if ((wt >= 60 && wt < 62) || (wt > 80 && wt <= 84)) s -= 18;
-    else s -= 28;
+  function ago(ms) {
+    var s = Math.floor(ms / 1000);
+    if (s < 60) return "just now";
+    var m = Math.floor(s / 60);
+    if (m < 60) return m + "m ago";
+    return Math.floor(m / 60) + "h " + (m % 60) + "m ago";
   }
-  var wv = mar.wave_height[mi] * 3.28084;
-  if (!isNaN(wv)) {
-    if (wv < 0.5) s -= 6;
-    else if (wv <= 3) s -= 0;
-    else if (wv <= 4) s -= 8;
-    else if (wv <= 5) s -= 18;
-    else if (wv <= 6) s -= 28;
-    else s -= 40;
-  }
-  return Math.max(0, Math.min(100, Math.round(s)));
-}
-function tideAdj(ms) {
-  var T = state.tides;
-  if (!T.length) return 0;
-  var next = null, nearest = 1e15, i, d;
-  for (i = 0; i < T.length; i++) {
-    d = Math.abs(T[i].t - ms);
-    if (d < nearest) nearest = d;
-    if (T[i].t > ms && !next) next = T[i];
-  }
-  var a = next ? (next.type === "H" ? 8 : 2) : 0;
-  if (nearest <= 1800000) a -= 8; else if (nearest <= 3600000) a += 2; else if (nearest <= 10800000) a += 6;
-  return Math.max(-6, Math.min(14, a));
-}
-function adjHourScore(wi, mi, ms) { return hourScore(wi, mi) + tideAdj(ms); }
-function windowMoonBoost(startMs, endMs) {
-  var b = 0, minor = false, i;
-  for (i = 0; i < state.moon.length; i++) {
-    var w = state.moon[i];
-    if (w.end >= startMs && w.start <= endMs) {
-      if (w.type === "major") { b = 10; break; }
-      minor = true;
-    }
-  }
-  if (b === 0 && minor) b = 5;
-  for (i = 0; i < state.tides.length; i++) {
-    var e = state.tides[i];
-    if (e.type === "H" && e.t >= startMs && e.t <= endMs) { b += 7; break; }
-  }
-  return b;
-}
-function dedupeMoon(wins) {
-  wins.sort(function(a, b) { return a.start - b.start; });
-  var out = [];
-  wins.forEach(function(w) {
-    var last = out[out.length - 1];
-    if (last && last.type === w.type && w.start <= last.end + 600000) {
-      last.end = Math.max(last.end, w.end);
-    } else out.push(w);
-  });
-  return out;
-}
-function buildToday() {
-  var wx = state.wx, mar = state.mar;
-  var now = new Date();
-  var date = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  var hs = [];
-  for (var i = 0; i < wx.hourly.time.length; i++) {
-    var dt = new Date(wx.hourly.time[i]);
-    if (dt.getFullYear() === date.getFullYear() && dt.getMonth() === date.getMonth() &&
-        dt.getDate() === date.getDate()) {
-      var mi = hourlyIndex(mar.hourly, dt.getTime());
-      hs.push({ t: dt.getTime(), s: adjHourScore(i, mi, dt.getTime()) });
-    }
-  }
-  var pool = hs.filter(function(h) { var hh = new Date(h.t).getHours(); return hh >= 6 && hh <= 19; });
-  if (!pool.length) pool = hs;
-  var dayScore = 0;
-  if (pool.length) {
-    var sum = 0;
-    pool.forEach(function(h) { sum += h.s; });
-    dayScore = Math.max(0, Math.min(100, Math.round(sum / pool.length)));
-  }
-  var peaks = [];
-  for (var k = 1; k < hs.length - 1; k++) {
-    if (hs[k].s >= hs[k-1].s && hs[k].s >= hs[k+1].s && hs[k].s >= 40) {
-      var ok = true;
-      for (var q = 0; q < peaks.length; q++) {
-        if (Math.abs(peaks[q].t - hs[k].t) < 7200000) {
-          ok = false;
-          if (hs[k].s > peaks[q].s) peaks[q] = hs[k];
-        }
-      }
-      if (ok) peaks.push(hs[k]);
-    }
-  }
-  peaks.sort(function(a, b) { return b.s - a.s; });
-  peaks = peaks.slice(0, 4);
-  var windows = peaks.map(function(p) {
-    var st = p.t - 3600000, en = p.t + 3600000, wsum = 0, n = 0;
-    hs.forEach(function(h) { if (h.t >= st && h.t <= en) { wsum += h.s; n++; } });
-    var sc = n ? wsum / n : p.s;
-    sc = Math.min(100, Math.round(sc + windowMoonBoost(st, en)));
-    return { start: new Date(st), end: new Date(en), score: sc };
-  });
-  windows.sort(function(a, b) { return a.start - b.start; });
-  var best = null;
-  windows.forEach(function(w) { if (!best || w.score > best.score) best = w; });
-  return { score: dayScore, best: best };
-}
-/* ---------- render ---------- */
-function moonCountdowns() {
-  var S = STR[state.lang], now = Date.now(), parts = [];
-  [["major", S.nextMajor, S.majorNow], ["minor", S.nextMinor, S.minorNow]].forEach(function(cfg) {
-    var best = null;
-    state.moon.forEach(function(w) {
-      if (w.type !== cfg[0] || w.end <= now) return;
-      if (!best || w.start < best.start) best = w;
-    });
-    if (best) parts.push(now >= best.start ? cfg[2] : cfg[1](durText(best.start - now, state.lang)));
-  });
-  return parts.length ? parts.join(" · ") : S.moonNote;
-}
-function tideCountdowns() {
-  var S = STR[state.lang], now = Date.now(), nh = null, nl = null;
-  state.tides.forEach(function(e) {
-    if (e.t <= now) return;
-    if (e.type === "H" && !nh) nh = e;
-    if (e.type === "L" && !nl) nl = e;
-  });
-  var parts = [];
-  if (nh) parts.push(S.nextHigh(durText(nh.t - now, state.lang)));
-  if (nl) parts.push(S.nextLow(durText(nl.t - now, state.lang)));
-  return parts.length ? parts.join(" · ") : S.tideNote;
-}
-/* Compact tide chart for today: cosine-interpolated curve (same as the main
-   page), sea-teal with soft gradient fill, high/low dots, a small cartoon rod
-   riding the curve at the current time with the day's rating number and the
-   live time above it, and small Major fish markers at each Major window's
-   midpoint. Number-only rating + 12h clock need no translation, so EN/VI
-   both work unchanged. */
-function tideChartSVG() {
-  var T = state.tides;
-  if (!T.length) return "";
-  var nowD = new Date();
-  var d0 = new Date(nowD.getFullYear(), nowD.getMonth(), nowD.getDate()).getTime();
-  var d1 = d0 + 86400000;
-  function tideAt(ms) {
-    if (ms <= T[0].t) return T[0].v;
-    for (var i = 0; i < T.length - 1; i++) {
-      if (ms >= T[i].t && ms <= T[i + 1].t) {
-        var f = (ms - T[i].t) / (T[i + 1].t - T[i].t);
-        var s = (1 - Math.cos(Math.PI * f)) / 2;
-        return T[i].v + s * (T[i + 1].v - T[i].v);
-      }
-    }
-    return T[T.length - 1].v;
-  }
-  var W = 380, H = 138, pL = 6, pR = 6, pT = 46, pB = 12;
-  var pts = [], t;
-  for (t = d0; t <= d1; t += 900000) pts.push([t, tideAt(t)]);
-  var vs = pts.map(function(p) { return p[1]; });
-  var mn = Math.min.apply(null, vs), mx = Math.max.apply(null, vs);
-  if (mx - mn < 0.3) { mx += 0.15; mn -= 0.15; }
-  function X(tt) { return pL + (tt - d0) / 86400000 * (W - pL - pR); }
-  function Y(v) { return pT + (1 - (v - mn) / (mx - mn)) * (H - pT - pB); }
-  var d = "M" + X(pts[0][0]).toFixed(1) + "," + Y(pts[0][1]).toFixed(1);
-  for (var i = 0; i < pts.length - 1; i++) {
-    var p0 = pts[Math.max(0, i - 1)], p1 = pts[i], p2 = pts[i + 1], p3 = pts[Math.min(pts.length - 1, i + 2)];
-    var c1x = X(p1[0]) + (X(p2[0]) - X(p0[0])) / 6, c1y = Y(p1[1]) + (Y(p2[1]) - Y(p0[1])) / 6;
-    var c2x = X(p2[0]) - (X(p3[0]) - X(p1[0])) / 6, c2y = Y(p2[1]) - (Y(p3[1]) - Y(p1[1])) / 6;
-    d += "C" + c1x.toFixed(1) + "," + c1y.toFixed(1) + " " + c2x.toFixed(1) + "," + c2y.toFixed(1) +
-         " " + X(p2[0]).toFixed(1) + "," + Y(p2[1]).toFixed(1);
-  }
-  var svg = '<svg viewBox="0 0 ' + W + " " + H + '">';
-  svg += '<defs><linearGradient id="wtideg" x1="0" y1="0" x2="0" y2="1">' +
-    '<stop offset="0" stop-color="#14b8a6" stop-opacity=".30"/>' +
-    '<stop offset=".6" stop-color="#14b8a6" stop-opacity=".10"/>' +
-    '<stop offset="1" stop-color="#14b8a6" stop-opacity=".03"/>' +
-    "</linearGradient></defs>";
-  svg += '<rect x="0" y="0" width="' + W + '" height="' + H + '" rx="12" fill="#f8f2e3"/>';
-  svg += '<path d="' + d + " L" + X(d1).toFixed(1) + "," + (H - pB) + " L" + X(d0).toFixed(1) + "," + (H - pB) +
-    '" fill="url(#wtideg)" stroke="none"/>';
-  svg += '<path d="' + d + '" fill="none" stroke="#14b8a6" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"/>';
-  T.forEach(function(e) {
-    if (e.t < d0 || e.t > d1) return;
-    svg += '<circle cx="' + X(e.t).toFixed(1) + '" cy="' + Y(e.v).toFixed(1) +
-      '" r="4" fill="#fff" stroke="#0f766e" stroke-width="1.75"/>';
-  });
-  var now = Date.now();
-  var nc = state.today ? ratingColor(state.today.score) : "#1d9e6c";
-  // small Major fish markers at each Major window's midpoint (skipped quietly if moon data failed)
-  (state.moon || []).forEach(function(w) {
-    if (w.type !== "major") return;
-    var mid = (w.start + w.end) / 2;
-    if (mid < d0 || mid > d1) return;
-    svg += '<g transform="translate(' + (X(mid) - 7.5).toFixed(1) + "," + (Y(tideAt(mid)) - 7.5).toFixed(1) + ')">' + fishSVG(nc, 15) + "</g>";
-  });
-  // small cartoon rod riding the curve at the current time, with the day's
-  // rating number (rating color) above and the live time between rod and number
-  if (now >= d0 && now <= d1 && state.today) {
-    var nx = X(now), ny = Y(tideAt(now));
-    // keep the labels inside the chart horizontally (rod itself stays exact)
-    var lx = (Math.min(Math.max(nx, 28), W - 28) - nx).toFixed(1);
-    svg += '<g transform="translate(' + nx.toFixed(1) + "," + ny.toFixed(1) + ')">' +
-      '<text x="' + lx + '" y="-23" text-anchor="middle" font-size="10.5" font-weight="700" fill="' + nc + '">' + state.today.score + "</text>" +
-      '<text x="' + lx + '" y="-13.5" text-anchor="middle" font-size="8" fill="#8a7a5f">' + clockStr(state.lang) + "</text>" +
-      '<g transform="scale(0.45)">' +
-      '<path d="M-17.5,17.5 L-9.5,9.5" stroke="#161616" stroke-width="8.6" stroke-linecap="round"/>' +
-      '<path d="M-17.5,17.5 L-9.5,9.5" stroke="#7c4f30" stroke-width="6.2" stroke-linecap="round"/>' +
-      '<polygon points="-11.2,14.8 -14.8,11.2 14.2,-15.8 15.8,-14.2" fill="#b07a52" stroke="#161616" stroke-width="1.4" stroke-linejoin="round"/>' +
-      '<path d="M-4.5,7.6 L-5.4,5.8" stroke="#161616" stroke-width="1.6"/>' +
-      '<circle cx="-4.5" cy="12" r="4.6" fill="#e9f2ff" stroke="#161616" stroke-width="1.6"/>' +
-      '<circle cx="-4.5" cy="12" r="2" fill="#1f2937"/>' +
-      '<path d="M-0.6,14.2 L2.8,16.2" stroke="#161616" stroke-width="1.6" stroke-linecap="round"/><circle cx="3.4" cy="16.5" r="1.5" fill="#1f2937"/>' +
-      '<circle cx="-1.8" cy="1.8" r="1.7" fill="#fffdf7" stroke="#161616" stroke-width="1.3"/>' +
-      '<circle cx="4.4" cy="-4.4" r="1.7" fill="#fffdf7" stroke="#161616" stroke-width="1.3"/>' +
-      '<circle cx="10.5" cy="-10.5" r="1.7" fill="#fffdf7" stroke="#161616" stroke-width="1.3"/>' +
-      '<path d="M-4.5,7.4 L-1.8,1.8 L4.4,-4.4 L10.5,-10.5 L15,-15 C16.5,-9 12,-2.5 3.5,-0.5" stroke="#161616" stroke-width="1.1" fill="none" stroke-linecap="round"/>' +
-      '<circle cx="5.5" cy="-1.1" r="2" fill="#f472a0" stroke="#161616" stroke-width="1"/>' +
-      '<path d="M3.5,-0.5 L3.5,3.5 Q3.5,6 1,6 Q-1,6 -1,4" stroke="#161616" stroke-width="1.4" fill="none" stroke-linecap="round"/>' +
-      "</g></g>";
-  }
-  svg += '<text x="' + (W - pR - 2) + '" y="' + (pT - 3) + '" text-anchor="end" font-size="8.5" fill="#a89a7c">ft</text>';
-  return svg + "</svg>";
-}
-function renderAll() {
-  var S = STR[state.lang], lang = state.lang;
-  $("langBtn").innerHTML = lang === "en" ? "<b>EN</b> | VI" : "EN | <b>VI</b>";
-  if (!state.ready || !state.today) return;
-  var t = state.today, c = ratingColor(t.score);
-  var html = "";
-  html += '<div class="rcard" style="border-color:' + c + '">' +
-    '<div class="rlbl">' + S.rating + "</div>" +
-    '<div class="rrow"><div class="badge">' + fishSVG(c, 40) + "</div>" +
-    '<div><div class="rword">' + ratingWord(t.score, lang).toUpperCase() + "</div>" +
-    '<div class="rscore" style="color:' + c + '">' + t.score + "/100</div></div></div></div>";
-  if (t.best) {
-    var bc = ratingColor(t.best.score);
-    html += '<div class="gofish"><span>🎣 ' + S.goFish + "</span><span>" +
-      trange(t.best.start, t.best.end, lang) + '</span><span class="gs">' +
-      fishSVG(bc, 24) + " " + t.best.score + "</span></div>";
-  }
-  html += '<div class="tidecard">' + tideChartSVG() + "</div>";
-  html += '<div class="cd"><span class="ck">🌊</span><span id="tideCd">' + tideCountdowns() + "</span></div>";
-  html += '<div class="cd"><span class="ck">🌙</span><span id="moonCd">' + moonCountdowns() + "</span></div>";
-  html += '<div class="upd">' + S.updated(clockStr(lang)) + "</div>";
-  $("app").innerHTML = html;
-}
-function tick() {
-  if (!state.ready) return;
-  renderAll();
-}
-function showError() {
-  var S = STR[state.lang];
-  $("app").innerHTML = '<div class="err">' + S.loadFail +
-    '<br><button class="refresh" onclick="boot()">' + S.retry + "</button></div>";
-}
-function boot() {
-  state.ready = false; state.today = null;
-  var S = STR[state.lang];
-  document.documentElement.lang = state.lang;
-  $("langBtn").innerHTML = state.lang === "en" ? "<b>EN</b> | VI" : "EN | <b>VI</b>";
-  $("app").innerHTML = '<div class="loading">' + S.loading + "</div>";
-  var lat = PIN.lat, lon = PIN.lon;
-  var fromD = new Date(); fromD.setDate(fromD.getDate() - 1);
-  var toD = new Date(); toD.setDate(toD.getDate() + 3);
-  var moonPs = [];
-  for (var i = 0; i < 3; i++) {
-    var dt = new Date(); dt.setDate(dt.getDate() + i);
-    moonPs.push(loadMoonDay(lat, lon, dt));
-  }
-  // Per-source isolation: weather+marine are essential; tides and moon degrade quietly.
-  Promise.all([
-    loadWeather(lat, lon).catch(function(e) { return { _err: e }; }),
-    loadMarine(lat, lon).catch(function(e) { return { _err: e }; }),
-    loadTides(PIN.station, fromD, toD).catch(function() { return []; }),
-    Promise.all(moonPs)
-  ]).then(function(r) {
+  function snap(id) {
     try {
-      if (r[0]._err || r[1]._err) { showError(); return; }
-      state.wx = r[0]; state.mar = r[1];
-      state.tides = r[2];
-      var all = [];
-      r[3].forEach(function(arr) { arr.forEach(function(w) { all.push(w); }); });
-      state.moon = dedupeMoon(all);
-      state.today = buildToday();
-      state.ready = true;
-      state.updatedAt = new Date();
-      renderAll();
-    } catch (e) { showError(); }
-  }).catch(function() { showError(); });
-}
-$("langBtn").addEventListener("click", function() {
-  state.lang = state.lang === "en" ? "vi" : "en";
-  localStorage.setItem("pf_lang", state.lang);
-  document.documentElement.lang = state.lang;
-  if (state.ready) renderAll(); else boot();
-});
-boot();
-setInterval(tick, 30000);
+      var raw = localStorage.getItem("ff_watch_" + id);
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) { return null; }
+  }
+
+  var tabsEl = document.getElementById("tabs"),
+      viewEl = document.getElementById("view"),
+      metaEl = document.getElementById("meta");
+
+  function renderTabs() {
+    tabsEl.innerHTML = SPECIES.map(function(s) {
+      return '<div class="tab' + (s.id === sp ? " on" : "") + '" data-sp="' + s.id + '">' + s.name + "</div>";
+    }).join("");
+    var els = tabsEl.querySelectorAll("[data-sp]");
+    for (var i = 0; i < els.length; i++) (function(el) {
+      el.addEventListener("click", function() {
+        sp = el.getAttribute("data-sp");
+        try { localStorage.setItem("ff_watch_species", sp); } catch (e) {}
+        render();
+      });
+    })(els[i]);
+  }
+
+  function biteLine(d) {
+    var now = Date.now();
+    if (d.bestStart == null || d.bestEnd == null) return "—";
+    if (now >= d.bestStart && now <= d.bestEnd)
+      return '<span style="color:#7dffb0">● NOW</span>';
+    if (d.bestEnd <= now) return "—";
+    return "in " + dur(d.bestStart - now);
+  }
+
+  function render() {
+    renderTabs();
+    var d = snap(sp);
+    var spInfo = SPECIES.filter(function(s) { return s.id === sp; })[0];
+    if (!d) {
+      viewEl.innerHTML = '<div class="empty">No ' + esc(spInfo.name) +
+        ' data on this device yet.<br>Open the <a href="' + spInfo.page + '">' + esc(spInfo.name) +
+        ' forecast</a> once — this glance view will light up after.</div>';
+      metaEl.textContent = "";
+      return;
+    }
+    var col = d.color || "#1d9e6c";
+    var tideV = d.tideH == null ? "—"
+      : d.tideH.toFixed(1) + " ft <small>" + (d.tideDir > 0 ? "▲ Rising" : d.tideDir < 0 ? "▼ Falling" : "") + "</small>";
+    var bitesV = (d.nextMajor == null && d.nextMinor == null) ? "—"
+      : "<small>Major</small> " + (d.nextMajor == null ? "—" : hourLabel(d.nextMajor)) +
+        "<br><small>Minor</small> " + (d.nextMinor == null ? "—" : hourLabel(d.nextMinor));
+    var windV = (d.wind == null ? "—" : Math.round(d.wind) +
+      (d.gust != null ? " | " + Math.round(d.gust) : "") + " <small>" + esc(d.windDir || "") + "</small>");
+    viewEl.innerHTML =
+      '<div class="hero">' +
+        '<div class="rword" style="color:' + esc(col) + '">' + esc(String(d.word || "").toUpperCase()) + "</div>" +
+        '<div class="rscore" style="color:' + esc(col) + '">' + d.score + "</div>" +
+        '<div class="spot">' + esc(d.loc || "") + "</div>" +
+        '<div><span class="bite">◷ BEST BITE ' + biteLine(d) + "</span></div>" +
+      "</div>" +
+      '<div class="grid">' +
+        '<div class="box"><div class="k">TIDE</div><div class="v">' + tideV + "</div></div>" +
+        '<div class="box"><div class="k">BITES</div><div class="v">' + bitesV + "</div></div>" +
+        '<div class="box"><div class="k">WIND</div><div class="v">' + windV + "</div></div>" +
+        '<div class="box"><div class="k">RAIN</div><div class="v">' + (d.rain == null ? "—" : d.rain + "<small>%</small>") + "</div></div>" +
+      "</div>";
+    var ageMs = Date.now() - d.at, stale = ageMs > 3 * 3600000;
+    metaEl.className = "meta" + (stale ? " stale" : "");
+    metaEl.innerHTML = "Updated " + ago(ageMs) +
+      (stale ? ' · <a href="' + spInfo.page + '">refresh on the ' + esc(spInfo.name) + ' page →</a>' : "");
+  }
+
+  render();
+  setInterval(render, 30000);
+})();
 </script>
 </body>
 </html>
