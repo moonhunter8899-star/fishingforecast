@@ -1720,6 +1720,24 @@ var f = $("findOther"); if (f) f.hidden = false;
 }
 if (!state.isOcean) { app.innerHTML = guardScreen(S.freshMsg); wireBackShore(); return; }
 if (!state.isShore) { app.innerHTML = guardScreen(S.inlandMsg, true); wireBackShore(); return; }
+  // watch.html glance snapshot — today's key numbers, refreshed on every load
+  try {
+    var _gd = state.days[0], _now = Date.now();
+    var _nw = function(t) { var b = null; state.moon.forEach(function(w) { if (w.type !== t || w.end <= _now) return; if (!b || w.start < b.start) b = w; }); return b; };
+    var _mj = _nw("major"), _mn = _nw("minor"), _bb = _gd.best;
+    var _th = state.tides.length ? tideAt(_now) : null;
+    localStorage.setItem("ff_watch_snook", JSON.stringify({
+      at: _now, loc: state.loc.name,
+      score: _gd.score, word: ratingWord(_gd.score, state.lang), color: ratingColor(_gd.score),
+      bestStart: _bb ? new Date(_bb.start).getTime() : null,
+      bestEnd: _bb ? new Date(_bb.end).getTime() : null,
+      tideH: _th == null ? null : Math.round(_th * 10) / 10,
+      tideDir: _th == null ? 0 : (tideAt(_now + 1800000) > _th ? 1 : -1),
+      nextMajor: _mj ? _mj.start : null, nextMinor: _mn ? _mn.start : null,
+      wind: _gd.wind, gust: _gd.gust, windDir: _gd.windDir, rain: _gd.rain
+    }));
+  } catch (e) {}
+
 var html = "";
 // top rating card
 html += '<div class="topcard" style="border-color:' + c0 + '">' +
