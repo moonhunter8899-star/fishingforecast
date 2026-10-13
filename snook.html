@@ -53,6 +53,11 @@
   .locchip { font-size: 12px; font-weight: 700; padding: 6px 10px; border-radius: 20px; border: 1px solid #2e7d5b; background: #fff; color: #2e7d5b; cursor: pointer; font-family: inherit; }
   .pierlabel { font-size: 11px; font-weight: 700; color: #8a7a52; margin: 10px 0 2px; text-align: left; }
 .piernearest { display: flex; justify-content: space-between; align-items: center; width: 100%; box-sizing: border-box; font-size: 13px; font-weight: 700; padding: 10px 12px; border-radius: 12px; border: 1px solid #2e7d5b; background: #fff; color: #2e7d5b; cursor: pointer; font-family: inherit; margin-top: 6px; }
+.spotcols { display: flex; gap: 10px; }
+.spotcol { flex: 1; min-width: 0; }
+.spotcol .piernearest { flex-direction: column; align-items: flex-start; gap: 1px; padding: 8px 10px; }
+.spotcol .piernearest .pdist { margin-left: 0; }
+.spotcol .piernearest .pname { font-size: 12px; }
 .piernearest .pdist { font-size: 12px; font-weight: 600; color: #8a7a52; white-space: nowrap; margin-left: 8px; }
   .locmsg { font-size: 11px; color: #8a7a5f; margin-top: 6px; }
   .locmsg:empty { display: none; }
@@ -303,8 +308,16 @@
     <div class="locresults" id="locResults"></div>
     <div class="locrow"><button class="locact" id="locGPS"></button><button class="locact" id="locHome"></button></div>
     <div class="locchips" id="locRecents"></div>
-    <div class="pierlabel" id="pierLabel"></div>
-    <div class="locchips" id="locPiers"></div>
+    <div class="spotcols">
+      <div class="spotcol">
+        <div class="pierlabel" id="pierLabel"></div>
+        <div id="locPiers"></div>
+      </div>
+      <div class="spotcol">
+        <div class="pierlabel" id="inletLabel"></div>
+        <div id="locInlets"></div>
+      </div>
+    </div>
     <div class="locmsg" id="locMsg"></div>
   </div>
   </div>
@@ -445,27 +458,9 @@ r.unshift({ name: loc.name, lat: loc.lat, lon: loc.lon });
 try { localStorage.setItem("ff_recents", JSON.stringify(r.slice(0, 5))); } catch (e) {}
 }
 
-var PIERS = [
-  { n: "Juno Beach Pier", lat: 26.893291, lon: -80.055917 },
-  { n: "Lake Worth Pier", lat: 26.612818, lon: -80.036515 },
-  { n: "Deerfield Pier", lat: 26.316472, lon: -80.07272 },
-  { n: "Pompano Pier", lat: 26.23517, lon: -80.083 },
-  { n: "Dania Pier", lat: 26.058344, lon: -80.111189 },
-  { n: "Newport Fishing Pier", lat: 25.930011, lon: -80.120541 },
-  { n: "Venice Fishing Pier", lat: 27.072544, lon: -82.452779 },
-  { n: "Skyway North Pier", lat: 27.63266, lon: -82.665934 },
-  { n: "Skyway South Pier", lat: 27.605569, lon: -82.650613 },
-  { n: "Cocoa Beach Pier", lat: 28.367756, lon: -80.601902 },
-  { n: "Sunglow Pier", lat: 29.14671, lon: -80.964279 },
-  { n: "Daytona Beach Pier", lat: 29.227203, lon: -80.999 },
-  { n: "Jacksonville Beach Pier", lat: 30.293076, lon: -81.389326 },
-  { n: "M.B. Miller Pier", lat: 30.186604, lon: -85.833921 },
-  { n: "Russell-Fields Pier", lat: 30.215651, lon: -85.877206 },
-  { n: "Pensacola Beach Pier", lat: 30.327339, lon: -87.141922 },
-  { n: "Navarre Beach Pier", lat: 30.375995, lon: -86.863044 },
-  { n: "Okaloosa Island Pier", lat: 30.390465, lon: -86.593264 }
-];
-var PIER_ICON = '<img src="data:image/png;base64,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" width="30" height="14" style="vertical-align:-3px;margin-right:5px" alt="">';
+var PIERS="Juno Beach Pier|26.89329|-80.05592;Lake Worth Pier|26.61282|-80.03651;Deerfield Pier|26.31647|-80.07272;Pompano Pier|26.23517|-80.083;Dania Pier|26.05834|-80.11119;Newport Fishing Pier|25.93001|-80.12054;Venice Fishing Pier|27.07254|-82.45278;Skyway North Pier|27.63266|-82.66593;Skyway South Pier|27.60557|-82.65061;Cocoa Beach Pier|28.36776|-80.6019;Sunglow Pier|29.14671|-80.96428;Daytona Beach Pier|29.2272|-80.999;Jacksonville Beach Pier|30.29308|-81.38933;M.B. Miller Pier|30.1866|-85.83392;Russell-Fields Pier|30.21565|-85.87721;Pensacola Beach Pier|30.32734|-87.14192;Navarre Beach Pier|30.37599|-86.86304;Okaloosa Island Pier|30.39046|-86.59326".split(";").map(function(s){var p=s.split("|");return {n:p[0],lat:+p[1],lon:+p[2]};});
+var PIER_ICON = '<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACQAAAARCAYAAAC1tw6GAAAEmUlEQVR42sVVTWtVVxRde59z3rt5eSaaaCJWYoWqqcaIeakfMTUUJTxTJwqWFKROigMn1hYR2sDDjjvpDwgdawbOnFjUgBMRLUIMTYm0TZTU0Jcv8z7uPfec3UFuShqj0A7sggMX1tnstdfZe1/gLaFQKDAAnDhxYm93d/cPFy5c2JZQhP8JGgBaW1v76+vrJZ/Pf7BS6FvHcuKTJ0+2HDhw4Fp7e3vtWvfU2xI0PDwMABgYGIiDIEBdXd3o48eP4zVtXAPLNvo1OEqO/w+xuHv3LgNQ5XKZ3hT8z4xEnoh8wtOKw0QkzOxXiSMAVCgUmIh8wq+ORaFQ4MHBwcUgCCr/dhK+7Ovr61o1BQQAPT09W48fP/7NoUOHGlbxDAD5fL6vt7f3/BoFEwCcOnXq0tmzZ68sF7iW/SthAMS5XO5ec3Pzz93d3Tfm5uYyALyIUDabrY6Njb0/Ojr61f79+79taWl5Xi6XDRFJHMeqqalp8cdbtz5/ubi4vb+//8rk5OR6rbUDABGhTCYjt2/f/s4YM3Tnzp3LIqIAuDf1kAAQZv5Da11mZgHglVIeAJRS3hgTMXPRGGO997KcEACMMaKYFxTzLDOTJu1WxCL5Xkin07GIvH43LLt15swZAbDp6fjTrQsLC+sePXpUstaaRCgppWypVHrHOdc4NTXVWSwW57z3askAURMTE9VSqfJeWA0b7z+4/2HlZSUAQwCAmYmZJQzDBqVUq4gQEclrn6ynp0cPDw/HR49+9MmLqefXqmEIpfiV6yIe8AARrdkB4pf6nZiTOlbaL4AD0jXpB3vb2w8PDQ251zrU1NQkAJBKqRcmnfrdWrs5FaR/FedDEiIAEBJPxEEURTtTxjwDURHea4AEEAJTbCO7i5WyitW4F5/ivzl23rkmR25jbW12bIUhr7jEyXRxLpczAHDs2LHP9rXvm7x4+eIuESER0SJiRIROf3p6x+49u6P8x/l+Ywx+uXkzvcwHQYC2PW0/5XKdN4wxGBkZSYkIj4yMpFKpFI4cPjLQ0dExdv369YZEjEpyL08cMwBcvXrVA/APHz60ANh7HxOTM2LmiUg6OzuJiCwRyfiT8XkCqbAcRtZa7OzrC4koJiJXrVaVcy4W50NrLc6dOydEJG1tbVEURbA2rDIRT09PR4kzLsmtk0XqqaOj4wsRmQAwxczvikhzFEUHwzDs3bJly8X5+XnnnNtORDNBEDzx3m+bnZ39PgiCoWw2e69UKk1qrTNE1Kq1djMzM1/X1AS/NTZvHpiZns4RURwEwVNr7Qvn3PlquXywfsOGwTAMR0SkkkqldlhrN9XU1BSVUuPU1dV1KQzDlNbaAIhFJLbWhpVKRdfW1maIKLLWxlprJqI0EXlr7Z9EFDBzhoi0916Y2RKRr1Qqlpk3ZDKZ2FpbJSJmZuOcYwAvAZS01utFJO2XBsCKiBMRTqfTSsdx3ACgwTnnnXMEoEhEG7PZbF2ytLxSquicywLI0BKaiWhOKdXgvWfnHDPzove+EgRBIwCx1ioRmQHA1tr1ya+o2Xs/75wzRLSOmcU5FzHznHOuLo7j9F9oFz7XDvAOvQAAAABJRU5ErkJggg==" width="24" height="11" style="vertical-align:-2px;margin-right:4px" alt="">';
+var INLETS="St. Marys Inlet|30.70968|-81.42842;St. Johns River Inlet|30.385|-81.3921;St. Augustine Inlet|29.91025|-81.28952;Matanzas Inlet|29.70581|-81.2284;Ponce de Leon Inlet|29.07249|-80.91867;Port Canaveral Inlet|28.407|-80.595;Sebastian Inlet|27.8603|-80.44727;Fort Pierce Inlet|27.47173|-80.29122;St. Lucie Inlet|27.16611|-80.15667;Jupiter Inlet|26.94427|-80.07217;Lake Worth Inlet|26.77222|-80.03722;Boynton Inlet|26.54556|-80.04278;Boca Raton Inlet|26.33591|-80.07115;Hillsboro Inlet|26.2559|-80.0762;Port Everglades Inlet|26.09348|-80.11;Baker\'s Haulover Inlet|25.8997|-80.1242;Government Cut|25.7631|-80.1323;Bear Cut|25.73149|-80.15727;Gordon Pass|26.0931|-81.7981;Big Marco Pass|25.97472|-81.73998;Matanzas Pass|26.45843|-81.95342;Boca Grande Pass|26.71229|-82.25759;Venice Inlet|27.11255|-82.46787;Big Sarasota Pass|27.29418|-82.56608;Egmont Channel|27.5867|-83.0067;Clearwater Pass|27.9628|-82.82899;Hurricane Pass|28.05307|-82.8151;Pensacola Pass|30.326|-87.312;East Pass|30.39972|-86.5159;St. Andrew Bay Pass|30.125|-85.73".split(";").map(function(s){var p=s.split("|");return {n:p[0],lat:+p[1],lon:+p[2]};});
 function renderPiers() {
 var S = STR[state.lang], el = $("locPiers");
 if (!el || !PIERS.length) return;
@@ -481,6 +476,27 @@ var btns = el.querySelectorAll("[data-npi]");
 for (var i = 0; i < btns.length; i++) (function(b) {
   b.addEventListener("click", function() {
     var x = sorted[+b.getAttribute("data-npi")];
+    if (x) setLocation({ name: x.p.n, lat: x.p.lat, lon: x.p.lon });
+  });
+})(btns[i]);
+if (typeof syncSticky === "function") syncSticky();
+}
+function renderInlets() {
+var S = STR[state.lang], el = $("locInlets");
+if (!el) return;
+$("inletLabel").textContent = S.inlets;
+if (!INLETS.length) { el.innerHTML = ""; return; }
+var sorted = INLETS.map(function(p) { return { p: p, d: distMi(p.lat, p.lon, state.loc.lat, state.loc.lon) }; })
+  .sort(function(a, b) { return a.d - b.d; }).slice(0, 3);
+var html = "";
+sorted.forEach(function(x, i) {
+  html += '<button class="piernearest" data-nii="' + i + '"><span class="pname">🌊 ' + escHTML(x.p.n) + '</span><span class="pdist">' + x.d.toFixed(1) + ' ' + escHTML(S.mi) + '</span></button>';
+});
+el.innerHTML = html;
+var btns = el.querySelectorAll("[data-nii]");
+for (var i = 0; i < btns.length; i++) (function(b) {
+  b.addEventListener("click", function() {
+    var x = sorted[+b.getAttribute("data-nii")];
     if (x) setLocation({ name: x.p.n, lat: x.p.lat, lon: x.p.lon });
   });
 })(btns[i]);
@@ -513,6 +529,25 @@ function wirePierSearchBtns(box, pm) {
       if (p) setLocation({ name: p.n, lat: p.lat, lon: p.lon });
     });
   })(btns[i]);
+}
+function matchInlets(ql) {
+if (!ql || ql.length < 2 || !INLETS.length) return [];
+if (ql === "inlet" || ql === "inlets" || ql === "cua" || ql === "c\u1EEDa") return INLETS.slice();
+return INLETS.filter(function(p) { return p.n.toLowerCase().indexOf(ql) >= 0; });
+}
+function inletSearchHTML(im) {
+var html = "";
+im.forEach(function(p, i) { html += '<button data-nii="' + i + '">🌊 ' + escHTML(p.n) + "</button>"; });
+return html;
+}
+function wireInletSearchBtns(box, im) {
+var btns = box.querySelectorAll("[data-nii]");
+for (var i = 0; i < btns.length; i++) (function(b) {
+  b.addEventListener("click", function() {
+    var p = im[+b.getAttribute("data-nii")];
+    if (p) setLocation({ name: p.n, lat: p.lat, lon: p.lon });
+  });
+})(btns[i]);
 }
 
 function escHTML(t) { return String(t).replace(/[&<>"']/g, function(c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
@@ -679,9 +714,10 @@ return;
 }
 var pm = matchPiers(q.trim().toLowerCase());
 
-var phtml = pierSearchHTML(pm);
+var im = matchInlets(q.trim().toLowerCase());
+var phtml = pierSearchHTML(pm) + inletSearchHTML(im);
 
-if (phtml) { box.innerHTML = phtml; wirePierSearchBtns(box, pm); if (typeof syncSticky === "function") syncSticky(); }
+if (phtml) { box.innerHTML = phtml; wirePierSearchBtns(box, pm); wireInletSearchBtns(box, im); if (typeof syncSticky === "function") syncSticky(); }
 
 fetchJSON("https://geocoding-api.open-meteo.com/v1/search?name=" + encodeURIComponent(q) + "&count=6&language=" + state.lang + "&format=json")
 .then(function(j) {
@@ -690,10 +726,10 @@ res.forEach(function(r, i) {
 var label = r.name + (r.admin1 ? ", " + r.admin1 : "") + (r.country_code && r.country_code !== "US" ? " " + r.country_code : "");
 html += '<button data-gi="' + i + '">' + escHTML(label) + "</button>";
 });
-if (!res.length && !pm.length) html = '<div class="locmsg">' + escHTML(S.noResults) + "</div>";
+if (!res.length && !pm.length && !im.length) html = '<div class="locmsg">' + escHTML(S.noResults) + "</div>";
 box.innerHTML = html;
 if (typeof syncSticky === "function") syncSticky();
-wirePierSearchBtns(box, pm);
+wirePierSearchBtns(box, pm); wireInletSearchBtns(box, im);
 var btns = box.querySelectorAll("[data-gi]");
 for (var i = 0; i < btns.length; i++) (function(b) {
 b.addEventListener("click", function() {
@@ -724,6 +760,7 @@ var _ls = lastShore();
 $("locHome").textContent = (_ls && _ls.name) ? "\u2302 " + _ls.name : S.homeBtn;
 renderRecents();
   renderPiers();
+  renderInlets();
 }
 
 /* ================= i18n ================= */
@@ -763,7 +800,7 @@ hourly: "Hour by hour", thHour: "Hour", thScore: "Bite", thSkyWind: "Sky · Wind
 thRain: "Rain", thAirWtr: "Air/Wtr", biteHint: "Tinted rows fall inside a bite window.",
 sugBtn: "💡 Suggest an improvement", sugEmailPh: "Your email (optional \u2014 so I can reply)", sugMsgPh: "What\u2019s your idea to improve the app?", sugSend: "Send", sugEmpty: "Please write your suggestion first.", sugSending: "Sending\u2026", sugThanks: "Thanks! Your suggestion was sent. 🎣", sugFail: "Couldn\u2019t send \u2014 check your connection and try again.",
     piers: "Fishing piers",
-    nearPier: "Nearest pier: {n} ({d} mi)", usePier: "Fish here", keepGps: "Use my GPS", mi: "mi",
+    nearPier: "Nearest pier: {n} ({d} mi)", usePier: "Fish here", keepGps: "Use my GPS", mi: "mi", inlets: "Inlets",
 days: ["SUN","MON","TUE","WED","THU","FRI","SAT"],
 months: ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
 condName: {
@@ -810,7 +847,7 @@ hourly: "Từng giờ trong ngày", thHour: "Giờ", thScore: "Điểm cắn", t
 thRain: "Mưa", thAirWtr: "KK/Nước", biteHint: "Hàng tô màu nằm trong giờ cá cắn.",
 sugBtn: "💡 G\u00F3p \u00FD c\u1EA3i ti\u1EBFn", sugEmailPh: "Email c\u1EE7a b\u1EA1n (kh\u00F4ng b\u1EAFt bu\u1ED9c \u2014 \u0111\u1EC3 t\u00F4i tr\u1EA3 l\u1EDDi)", sugMsgPh: "B\u1EA1n mu\u1ED1n c\u1EA3i ti\u1EBFn g\u00EC cho app?", sugSend: "G\u1EEDi", sugEmpty: "H\u00E3y vi\u1EBFt g\u00F3p \u00FD c\u1EE7a b\u1EA1n tr\u01B0\u1EDBc \u0111\u00E3.", sugSending: "\u0110ang g\u1EEDi\u2026", sugThanks: "C\u1EA3m \u01A1n! G\u00F3p \u00FD c\u1EE7a b\u1EA1n \u0111\u00E3 \u0111\u01B0\u1EE3c g\u1EEDi. 🎣", sugFail: "Kh\u00F4ng g\u1EEDi \u0111\u01B0\u1EE3c \u2014 ki\u1EC3m tra m\u1EA1ng r\u1ED3i th\u1EED l\u1EA1i.",
     piers: "C\u1EA7u c\u00E2u c\u00E1",
-    nearPier: "C\u1EA7u g\u1EA7n nh\u1EA5t: {n} ({d} d\u1EB7m)", usePier: "C\u00E2u \u1EDF \u0111\u00E2y", keepGps: "D\u00F9ng GPS c\u1EE7a t\u00F4i", mi: "d\u1EB7m",
+    nearPier: "C\u1EA7u g\u1EA7n nh\u1EA5t: {n} ({d} d\u1EB7m)", usePier: "C\u00E2u \u1EDF \u0111\u00E2y", keepGps: "D\u00F9ng GPS c\u1EE7a t\u00F4i", mi: "d\u1EB7m", inlets: "C\u1EEDa bi\u1EC3n",
 days: ["CN","T2","T3","T4","T5","T6","T7"],
 months: ["Th1","Th2","Th3","Th4","Th5","Th6","Th7","Th8","Th9","Th10","Th11","Th12"],
 condName: {
@@ -916,7 +953,7 @@ function hx2rgb(h){h=h.replace("#","");if(h.length===3){h=h[0]+h[0]+h[1]+h[1]+h[
 function rgb2hx(r,g,b){function c(x){x=Math.max(0,Math.min(255,Math.round(x)));var s=x.toString(16);return s.length<2?"0"+s:s;}return "#"+c(r)+c(g)+c(b);}
 function shade(hex,p){var c=hx2rgb(hex);if(p>=0){return rgb2hx(c[0]+(255-c[0])*p/100,c[1]+(255-c[1])*p/100,c[2]+(255-c[2])*p/100);}var f=1+p/100;return rgb2hx(c[0]*f,c[1]*f,c[2]*f);}
 function mixc(h1,h2,p){var a=hx2rgb(h1),b=hx2rgb(h2);return rgb2hx(a[0]+(b[0]-a[0])*p/100,a[1]+(b[1]-a[1])*p/100,a[2]+(b[2]-a[2])*p/100);}
-var SNOOK_URI = "data:image/png;base64,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";
+var SNOOK_URI = "data:image/png;base64,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";
 function snookSVG(color, h) {
 var w = Math.round(h * 2.64);
 var st = "display:inline-block;width:" + w + "px;height:" + h + "px;background:" + color + ";" +
