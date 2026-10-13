@@ -45,6 +45,8 @@
   .locresults button { display: block; width: 100%; text-align: left; background: none; border: none; border-bottom: 1px solid #e7dcc2; padding: 8px 4px; font-size: 13px; font-weight: 600; color: #22312b; cursor: pointer; font-family: inherit; }
   .locrow { display: flex; gap: 8px; margin-top: 8px; }
   .locact { flex: 1; font-size: 12px; font-weight: 700; padding: 8px; border-radius: 9px; border: 1px solid #d8c9a8; background: #ede4cc; color: #22312b; cursor: pointer; font-family: inherit; }
+.piersug { background: #eef6f0; border: 1px solid #2e7d5b; border-radius: 10px; padding: 10px 12px; margin-top: 8px; font-size: 13px; text-align: left; color: #22312b; }
+.piersug .locrow { margin-top: 8px; }
   .locchips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
   .locchips:empty { display: none; }
   .locchip { font-size: 12px; font-weight: 700; padding: 6px 10px; border-radius: 20px; border: 1px solid #2e7d5b; background: #fff; color: #2e7d5b; cursor: pointer; font-family: inherit; }
@@ -441,12 +443,11 @@ try { localStorage.setItem("ff_recents", JSON.stringify(r.slice(0, 5))); } catch
 }
 
 var PIERS = [
-  { n: "Juno Beach Pier", lat: 26.87165, lon: -80.0536 },
-  { n: "Lake Worth Pier", lat: 26.63581, lon: -80.05203 },
-  { n: "Deerfield Pier", lat: 26.31662, lon: -80.07553 },
-  { n: "Pompano Pier", lat: 26.23567, lon: -80.08888 },
-  { n: "Anglins Pier", lat: 26.18946, lon: -80.09506 },
-  { n: "Dania Pier", lat: 26.05843, lon: -80.11141 }
+  { n: "Juno Beach Pier", lat: 26.893291, lon: -80.055917 },
+  { n: "Lake Worth Pier", lat: 26.612818, lon: -80.036515 },
+  { n: "Deerfield Pier", lat: 26.316472, lon: -80.07272 },
+  { n: "Pompano Pier", lat: 26.23517, lon: -80.0876 },
+  { n: "Dania Pier", lat: 26.058344, lon: -80.111189 }
 ];
 function renderPiers() {
   var S = STR[state.lang], el = $("locPiers");
@@ -467,6 +468,35 @@ function renderPiers() {
   })(chips[i]);
   if (typeof syncSticky === "function") syncSticky();
 }
+
+function nearestPier(lat, lon, maxMi) {
+  var best = null, bd = maxMi || 2, i, d;
+  for (i = 0; i < PIERS.length; i++) {
+    d = distMi(lat, lon, PIERS[i].lat, PIERS[i].lon);
+    if (d < bd) { bd = d; best = PIERS[i]; }
+  }
+  return best ? { pier: best, dist: bd } : null;
+}
+function matchPiers(ql) {
+  if (!ql || ql.length < 2) return [];
+  if (ql === "pier" || ql === "piers" || ql === "cau" || ql === "\u1EA7u" || ql === "cau ca" || ql === "c\u1EA7u c\u00E1") return PIERS.slice();
+  return PIERS.filter(function(p) { return p.n.toLowerCase().indexOf(ql) >= 0; });
+}
+function pierSearchHTML(pm) {
+  var html = "";
+  pm.forEach(function(p, i) { html += '<button data-pqi="' + i + '">' + "🎣" + ' ' + escHTML(p.n) + "</button>"; });
+  return html;
+}
+function wirePierSearchBtns(box, pm) {
+  var btns = box.querySelectorAll("[data-pqi]");
+  for (var i = 0; i < btns.length; i++) (function(b) {
+    b.addEventListener("click", function() {
+      var p = pm[+b.getAttribute("data-pqi")];
+      if (p) setLocation({ name: p.n, lat: p.lat, lon: p.lon });
+    });
+  })(btns[i]);
+}
+
 function escHTML(t) { return String(t).replace(/[&<>"']/g, function(c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
 
 function pinSVG(s) {
@@ -484,23 +514,38 @@ if (!state.loc.home) saveRecent(state.loc);
 hideLocPanel();
 boot();
 }
+function gpsSetLoc(lat, lon) {
+var S = STR[state.lang];
+fetchJSON("https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=" + lat + "&longitude=" + lon + "&localityLanguage=en")
+  .then(function(j) {
+    var place = j.locality || j.city || "";
+    var st = (j.principalSubdivisionCode || "").split("-").pop();
+    setLocation({ name: place ? place + (st ? ", " + st : "") : S.currentLoc, lat: lat, lon: lon });
+  }).catch(function() { setLocation({ name: S.currentLoc, lat: lat, lon: lon }); });
+}
 function useMyLocation() {
 var S = STR[state.lang];
 locMsg(S.locating);
 if (!navigator.geolocation) { locMsg(S.geoUnsupported); return; }
 navigator.geolocation.getCurrentPosition(function(pos) {
-var acc = pos.coords.accuracy || 1e9;
-if (acc > 2000) { // rough network/IP fix, not real GPS — don't save a wrong spot
-locMsg(S.geoRough.replace("{mi}", Math.max(1, Math.round(acc / 1609))));
-return;
-}
-var lat = pos.coords.latitude, lon = pos.coords.longitude;
-fetchJSON("https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=" + lat + "&longitude=" + lon + "&localityLanguage=en")
-.then(function(j) {
-var place = j.locality || j.city || "";
-var st = (j.principalSubdivisionCode || "").split("-").pop();
-setLocation({ name: place ? place + (st ? ", " + st : "") : S.currentLoc, lat: lat, lon: lon });
-}).catch(function() { setLocation({ name: S.currentLoc, lat: lat, lon: lon }); });
+  var acc = pos.coords.accuracy || 1e9;
+  if (acc > 2000) { // rough network/IP fix, not real GPS — don't save a wrong spot
+    locMsg(S.geoRough.replace("{mi}", Math.max(1, Math.round(acc / 1609))));
+    return;
+  }
+  var lat = pos.coords.latitude, lon = pos.coords.longitude;
+  var np = nearestPier(lat, lon, 2);
+  if (np) { // close to a fishing pier — offer it instead of raw GPS coords
+    locMsg("");
+    var box = $("locResults");
+    box.innerHTML = '<div class="piersug"><div>' + escHTML(S.nearPier.replace("{n}", np.pier.n).replace("{d}", np.dist.toFixed(1))) + '</div>' +
+      '<div class="locrow"><button class="locact" id="npYes">' + escHTML(S.usePier) + '</button><button class="locact" id="npNo">' + escHTML(S.keepGps) + '</button></div></div>';
+    $("npYes").addEventListener("click", function() { setLocation({ name: np.pier.n, lat: np.pier.lat, lon: np.pier.lon }); });
+    $("npNo").addEventListener("click", function() { box.innerHTML = ""; gpsSetLoc(lat, lon); });
+    if (typeof syncSticky === "function") syncSticky();
+    return;
+  }
+  gpsSetLoc(lat, lon);
 }, function() { locMsg(S.geoDenied); }, { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 });
 }
 /* Accept typed coordinates: "26.76, -80.11", "26.76 -80.11", "26.76N 80.11W" */
@@ -614,16 +659,23 @@ setLocationFromCoords(cc.lat, cc.lon);
 });
 return;
 }
+var pm = matchPiers(q.trim().toLowerCase());
+
+var phtml = pierSearchHTML(pm);
+
+if (phtml) { box.innerHTML = phtml; wirePierSearchBtns(box, pm); if (typeof syncSticky === "function") syncSticky(); }
+
 fetchJSON("https://geocoding-api.open-meteo.com/v1/search?name=" + encodeURIComponent(q) + "&count=6&language=" + state.lang + "&format=json")
 .then(function(j) {
-var res = (j && j.results) || [], html = "";
+var res = (j && j.results) || [], html = phtml;
 res.forEach(function(r, i) {
 var label = r.name + (r.admin1 ? ", " + r.admin1 : "") + (r.country_code && r.country_code !== "US" ? " " + r.country_code : "");
 html += '<button data-gi="' + i + '">' + escHTML(label) + "</button>";
 });
-if (!res.length) html = '<div class="locmsg">' + escHTML(S.noResults) + "</div>";
+if (!res.length && !pm.length) html = '<div class="locmsg">' + escHTML(S.noResults) + "</div>";
 box.innerHTML = html;
 if (typeof syncSticky === "function") syncSticky();
+wirePierSearchBtns(box, pm);
 var btns = box.querySelectorAll("[data-gi]");
 for (var i = 0; i < btns.length; i++) (function(b) {
 b.addEventListener("click", function() {
@@ -631,7 +683,7 @@ var r = res[+b.getAttribute("data-gi")];
 if (r) setLocation({ name: r.name + (r.admin1 ? ", " + r.admin1 : ""), lat: r.latitude, lon: r.longitude });
 });
 })(btns[i]);
-}).catch(function() { box.innerHTML = ""; });
+}).catch(function() { if (!phtml) box.innerHTML = ""; });
 }
 function renderRecents() {
 var r = getRecents(), el = $("locRecents"), html = "";
@@ -693,6 +745,7 @@ hourly: "Hour by hour", thHour: "Hour", thScore: "Bite", thSkyWind: "Sky · Wind
 thRain: "Rain", thAirWtr: "Air/Wtr", biteHint: "Tinted rows fall inside a bite window.",
 sugBtn: "💡 Suggest an improvement", sugEmailPh: "Your email (optional \u2014 so I can reply)", sugMsgPh: "What\u2019s your idea to improve the app?", sugSend: "Send", sugEmpty: "Please write your suggestion first.", sugSending: "Sending\u2026", sugThanks: "Thanks! Your suggestion was sent. 🎣", sugFail: "Couldn\u2019t send \u2014 check your connection and try again.",
     piers: "🎣 Fishing piers",
+    nearPier: "🎣 Nearest pier: {n} ({d} mi)", usePier: "Fish here", keepGps: "Use my GPS",
 days: ["SUN","MON","TUE","WED","THU","FRI","SAT"],
 months: ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
 condName: {
@@ -739,6 +792,7 @@ hourly: "Từng giờ trong ngày", thHour: "Giờ", thScore: "Điểm cắn", t
 thRain: "Mưa", thAirWtr: "KK/Nước", biteHint: "Hàng tô màu nằm trong giờ cá cắn.",
 sugBtn: "💡 G\u00F3p \u00FD c\u1EA3i ti\u1EBFn", sugEmailPh: "Email c\u1EE7a b\u1EA1n (kh\u00F4ng b\u1EAFt bu\u1ED9c \u2014 \u0111\u1EC3 t\u00F4i tr\u1EA3 l\u1EDDi)", sugMsgPh: "B\u1EA1n mu\u1ED1n c\u1EA3i ti\u1EBFn g\u00EC cho app?", sugSend: "G\u1EEDi", sugEmpty: "H\u00E3y vi\u1EBFt g\u00F3p \u00FD c\u1EE7a b\u1EA1n tr\u01B0\u1EDBc \u0111\u00E3.", sugSending: "\u0110ang g\u1EEDi\u2026", sugThanks: "C\u1EA3m \u01A1n! G\u00F3p \u00FD c\u1EE7a b\u1EA1n \u0111\u00E3 \u0111\u01B0\u1EE3c g\u1EEDi. 🎣", sugFail: "Kh\u00F4ng g\u1EEDi \u0111\u01B0\u1EE3c \u2014 ki\u1EC3m tra m\u1EA1ng r\u1ED3i th\u1EED l\u1EA1i.",
     piers: "🎣 C\u1EA7u c\u00E2u c\u00E1",
+    nearPier: "🎣 C\u1EA7u g\u1EA7n nh\u1EA5t: {n} ({d} d\u1EB7m)", usePier: "C\u00E2u \u1EDF \u0111\u00E2y", keepGps: "D\u00F9ng GPS c\u1EE7a t\u00F4i",
 days: ["CN","T2","T3","T4","T5","T6","T7"],
 months: ["Th1","Th2","Th3","Th4","Th5","Th6","Th7","Th8","Th9","Th10","Th11","Th12"],
 condName: {
