@@ -48,6 +48,7 @@
   .locchips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
   .locchips:empty { display: none; }
   .locchip { font-size: 12px; font-weight: 700; padding: 6px 10px; border-radius: 20px; border: 1px solid #2e7d5b; background: #fff; color: #2e7d5b; cursor: pointer; font-family: inherit; }
+  .pierlabel { font-size: 11px; font-weight: 700; color: #8a7a52; margin: 10px 0 2px; text-align: left; }
   .locmsg { font-size: 11px; color: #8a7a5f; margin-top: 6px; }
   .locmsg:empty { display: none; }
   .regsn { font-size: 11px; font-weight: 700; color: #8a7a5f; }
@@ -295,6 +296,8 @@
     <div class="locresults" id="locResults"></div>
     <div class="locrow"><button class="locact" id="locGPS"></button><button class="locact" id="locHome"></button></div>
     <div class="locchips" id="locRecents"></div>
+    <div class="pierlabel" id="pierLabel"></div>
+    <div class="locchips" id="locPiers"></div>
     <div class="locmsg" id="locMsg"></div>
   </div>
   </div>
@@ -433,6 +436,34 @@ function saveRecent(loc) {
   var r = getRecents().filter(function(x) { return distMi(x.lat, x.lon, loc.lat, loc.lon) > 1; });
   r.unshift({ name: loc.name, lat: loc.lat, lon: loc.lon });
   try { localStorage.setItem("ff_recents", JSON.stringify(r.slice(0, 5))); } catch (e) {}
+}
+
+var PIERS = [
+  { n: "Juno Beach Pier", lat: 26.87165, lon: -80.0536 },
+  { n: "Lake Worth Pier", lat: 26.63581, lon: -80.05203 },
+  { n: "Deerfield Pier", lat: 26.31662, lon: -80.07553 },
+  { n: "Pompano Pier", lat: 26.23567, lon: -80.08888 },
+  { n: "Anglins Pier", lat: 26.18946, lon: -80.09506 },
+  { n: "Dania Pier", lat: 26.05843, lon: -80.11141 }
+];
+function renderPiers() {
+  var S = STR[state.lang], el = $("locPiers");
+  if (!el) return;
+  $("pierLabel").textContent = S.piers;
+  var sorted = PIERS.slice().sort(function(a, b) {
+    return distMi(a.lat, a.lon, state.loc.lat, state.loc.lon) - distMi(b.lat, b.lon, state.loc.lat, state.loc.lon);
+  });
+  var html = "";
+  sorted.forEach(function(p, i) { html += '<button class="locchip" data-pi="' + i + '">' + "🎣" + ' ' + escHTML(p.n) + "</button>"; });
+  el.innerHTML = html;
+  var chips = el.querySelectorAll("[data-pi]");
+  for (var i = 0; i < chips.length; i++) (function(b) {
+    b.addEventListener("click", function() {
+      var p = sorted[+b.getAttribute("data-pi")];
+      if (p) setLocation({ name: p.n, lat: p.lat, lon: p.lon });
+    });
+  })(chips[i]);
+  if (typeof syncSticky === "function") syncSticky();
 }
 function escHTML(t) { return String(t).replace(/[&<>"']/g, function(c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
 
@@ -620,6 +651,7 @@ function wireLocUI() {
   var _ls = lastShore();
   $("locHome").textContent = (_ls && _ls.name) ? "\u2302 " + _ls.name : S.homeBtn;
   renderRecents();
+  renderPiers();
 }
 
 /* ================= i18n ================= */
@@ -657,6 +689,7 @@ var STR = {
     hourly: "Hour by hour", thHour: "Hour", thScore: "Bite", thSkyWind: "Sky · Wind",
     thRain: "Rain", thAirWtr: "Air/Wtr", biteHint: "Tinted rows fall inside a bite window.",
     sugBtn: "💡 Suggest an improvement", sugEmailPh: "Your email (optional \u2014 so I can reply)", sugMsgPh: "What\u2019s your idea to improve the app?", sugSend: "Send", sugEmpty: "Please write your suggestion first.", sugSending: "Sending\u2026", sugThanks: "Thanks! Your suggestion was sent. 🎣", sugFail: "Couldn\u2019t send \u2014 check your connection and try again.",
+    piers: "🎣 Fishing piers",
     days: ["SUN","MON","TUE","WED","THU","FRI","SAT"],
     months: ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
     condName: {
@@ -701,6 +734,7 @@ var STR = {
     hourly: "Từng giờ trong ngày", thHour: "Giờ", thScore: "Điểm cắn", thSkyWind: "Trời · Gió",
     thRain: "Mưa", thAirWtr: "KK/Nước", biteHint: "Hàng tô màu nằm trong giờ cá cắn.",
     sugBtn: "💡 G\u00F3p \u00FD c\u1EA3i ti\u1EBFn", sugEmailPh: "Email c\u1EE7a b\u1EA1n (kh\u00F4ng b\u1EAFt bu\u1ED9c \u2014 \u0111\u1EC3 t\u00F4i tr\u1EA3 l\u1EDDi)", sugMsgPh: "B\u1EA1n mu\u1ED1n c\u1EA3i ti\u1EBFn g\u00EC cho app?", sugSend: "G\u1EEDi", sugEmpty: "H\u00E3y vi\u1EBFt g\u00F3p \u00FD c\u1EE7a b\u1EA1n tr\u01B0\u1EDBc \u0111\u00E3.", sugSending: "\u0110ang g\u1EEDi\u2026", sugThanks: "C\u1EA3m \u01A1n! G\u00F3p \u00FD c\u1EE7a b\u1EA1n \u0111\u00E3 \u0111\u01B0\u1EE3c g\u1EEDi. 🎣", sugFail: "Kh\u00F4ng g\u1EEDi \u0111\u01B0\u1EE3c \u2014 ki\u1EC3m tra m\u1EA1ng r\u1ED3i th\u1EED l\u1EA1i.",
+    piers: "🎣 C\u1EA7u c\u00E2u c\u00E1",
     days: ["CN","T2","T3","T4","T5","T6","T7"],
     months: ["Th1","Th2","Th3","Th4","Th5","Th6","Th7","Th8","Th9","Th10","Th11","Th12"],
     condName: {
