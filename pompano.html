@@ -1954,8 +1954,7 @@ function renderAll() {
     "</div></div>";
   html += '<div class="tiles">' +
     '<div class="tile"><div class="k">' + _lblWind() + ' ' + S.wind + '</div><div class="v">' + day.wind + (day.gust != null ? " | " + day.gust : "") + " " + day.windDir + "</div></div>" +
-    '<div class="tile"><div class="k">' + _lblWater() + ' ' + S.water + '</div><div class="v">' + (day.water == null ? "\u2014" : day.water.toFixed(1) + "\u00b0F") + "</div></div>" +
-    '<div class="tile"><div class="k">' + _lblSurf() + ' ' + S.surf + '</div><div class="v">' + surfWord(day.waveFt, state.lang) + "</div></div>" +
+    '<div class="tile"><div class="k">' + _lblWater() + ' ' + S.water + '</div><div class="v">' + (day.water == null ? "\u2014" : day.water.toFixed(1) + "\u00b0F") + ' | ' + _lblSurf() + ' ' + surfWord(day.waveFt, state.lang) + "</div></div>" +
     '<div class="tile"><div class="k">' + S.cond + '</div><div class="v">' + cn + "</div></div>" +
     '<div class="tile"><div class="k">' + _lblRain() + ' ' + S.rain + '</div><div class="v">' + day.rain + "%</div></div>" +
     moonTile + sunTile +
