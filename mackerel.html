@@ -42,6 +42,7 @@ white-space: nowrap; margin: 0 2px 8px; }
 .locbtn::after { content: " \25BE"; font-size: 11px; color: #8a7a5f; }
 .locpanel { background: #f4ecda; border: 1px solid #d8c9a8; border-radius: 12px; padding: 10px; margin: -2px 2px 10px; }
 .locsearch { width: 100%; box-sizing: border-box; font-size: 16px; padding: 8px 10px; border-radius: 9px; border: 1px solid #d8c9a8; background: #fff; font-family: inherit; color: #22312b; }
+.locresults { max-height: 230px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
 .locresults button { display: block; width: 100%; text-align: left; background: none; border: none; border-bottom: 1px solid #e7dcc2; padding: 8px 4px; font-size: 13px; font-weight: 600; color: #22312b; cursor: pointer; font-family: inherit; }
 .locrow { display: flex; gap: 8px; margin-top: 8px; }
 .locact { flex: 1; font-size: 12px; font-weight: 700; padding: 8px; border-radius: 9px; border: 1px solid #d8c9a8; background: #ede4cc; color: #22312b; cursor: pointer; font-family: inherit; }
@@ -466,15 +467,20 @@ function renderPiers() {
 var S = STR[state.lang], el = $("locPiers");
 if (!el || !PIERS.length) return;
 $("pierLabel").innerHTML = PIER_ICON + " " + escHTML(S.piers);
-var best = null, bd = 1e9, i, d;
-for (i = 0; i < PIERS.length; i++) {
-  d = distMi(PIERS[i].lat, PIERS[i].lon, state.loc.lat, state.loc.lon);
-  if (d < bd) { bd = d; best = PIERS[i]; }
-}
-el.innerHTML = '<button class="piernearest" id="pierNear"><span>' + PIER_ICON + ' ' + escHTML(best.n) + '</span><span class="pdist">' + bd.toFixed(1) + ' ' + escHTML(S.mi) + '</span></button>';
-$("pierNear").addEventListener("click", function() {
-  setLocation({ name: best.n, lat: best.lat, lon: best.lon });
+var sorted = PIERS.map(function(p) { return { p: p, d: distMi(p.lat, p.lon, state.loc.lat, state.loc.lon) }; })
+  .sort(function(a, b) { return a.d - b.d; }).slice(0, 3);
+var html = "";
+sorted.forEach(function(x, i) {
+  html += '<button class="piernearest" data-npi="' + i + '"><span>' + PIER_ICON + ' ' + escHTML(x.p.n) + '</span><span class="pdist">' + x.d.toFixed(1) + ' ' + escHTML(S.mi) + '</span></button>';
 });
+el.innerHTML = html;
+var btns = el.querySelectorAll("[data-npi]");
+for (var i = 0; i < btns.length; i++) (function(b) {
+  b.addEventListener("click", function() {
+    var x = sorted[+b.getAttribute("data-npi")];
+    if (x) setLocation({ name: x.p.n, lat: x.p.lat, lon: x.p.lon });
+  });
+})(btns[i]);
 if (typeof syncSticky === "function") syncSticky();
 }
 
