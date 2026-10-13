@@ -175,6 +175,8 @@
   .tile .msub { font-size: 9px; font-weight: 700; color: #8a7a5f; margin-top: 2px; white-space: nowrap; }
   .tile .sundrow { display: flex; align-items: stretch; justify-content: center; gap: 10px; }
   .tile .sundiv { width: 1px; background: rgba(90,70,40,.25); }
+  .tile .wsplit { display: flex; align-items: stretch; justify-content: center; }
+  .tile .wsplit .whalf { flex: 1 1 0; }
 
   /* Major / Minor section */
   .moonsec { margin-bottom: 16px; }
@@ -1951,7 +1953,7 @@ var sunTile = '<div class="tile"><div class="sundrow">' +
 "</div></div>";
 html += '<div class="tiles">' +
 '<div class="tile"><div class="k">' + _lblWind() + ' ' + S.wind + '</div><div class="v">' + day.wind + (day.gust != null ? " | " + day.gust : "") + " " + day.windDir + "</div></div>" +
-'<div class="tile"><div class="k">' + _lblWater() + ' ' + S.water + ' | ' + _lblSurf() + ' ' + S.surf + '</div><div class="v">' + (day.water == null ? "\u2014" : day.water.toFixed(1) + "\u00b0F") + '<span style="margin-left:1em">' + surfWord(day.waveFt, state.lang) + "</span></div></div>" +
+'<div class="tile"><div class="wsplit"><div class="whalf"><div class="k">' + _lblWater() + ' ' + S.water + '</div><div class="v">' + (day.water == null ? "\u2014" : day.water.toFixed(1) + "\u00b0F") + '</div></div><div class="sundiv"></div><div class="whalf"><div class="k">' + _lblSurf() + ' ' + S.surf + '</div><div class="v">' + surfWord(day.waveFt, state.lang) + "</div></div></div></div>" +
 '<div class="tile"><div class="k">' + S.cond + '</div><div class="v">' + cn + "</div></div>" +
 '<div class="tile"><div class="k">' + _lblRain() + ' ' + S.rain + '</div><div class="v">' + day.rain + "%</div></div>" +
 moonTile + sunTile +
