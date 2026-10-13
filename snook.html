@@ -51,6 +51,8 @@
   .locchips:empty { display: none; }
   .locchip { font-size: 12px; font-weight: 700; padding: 6px 10px; border-radius: 20px; border: 1px solid #2e7d5b; background: #fff; color: #2e7d5b; cursor: pointer; font-family: inherit; }
   .pierlabel { font-size: 11px; font-weight: 700; color: #8a7a52; margin: 10px 0 2px; text-align: left; }
+.piernearest { display: flex; justify-content: space-between; align-items: center; width: 100%; box-sizing: border-box; font-size: 13px; font-weight: 700; padding: 10px 12px; border-radius: 12px; border: 1px solid #2e7d5b; background: #fff; color: #2e7d5b; cursor: pointer; font-family: inherit; margin-top: 6px; }
+.piernearest .pdist { font-size: 12px; font-weight: 600; color: #8a7a52; white-space: nowrap; margin-left: 8px; }
   .locmsg { font-size: 11px; color: #8a7a5f; margin-top: 6px; }
   .locmsg:empty { display: none; }
   .regsn { font-size: 11px; font-weight: 700; color: #8a7a5f; }
@@ -447,26 +449,36 @@ var PIERS = [
   { n: "Lake Worth Pier", lat: 26.612818, lon: -80.036515 },
   { n: "Deerfield Pier", lat: 26.316472, lon: -80.07272 },
   { n: "Pompano Pier", lat: 26.23517, lon: -80.0876 },
-  { n: "Dania Pier", lat: 26.058344, lon: -80.111189 }
+  { n: "Dania Pier", lat: 26.058344, lon: -80.111189 },
+  { n: "Newport Fishing Pier", lat: 25.930011, lon: -80.120541 },
+  { n: "Venice Fishing Pier", lat: 27.072544, lon: -82.452779 },
+  { n: "Skyway North Pier", lat: 27.63266, lon: -82.665934 },
+  { n: "Skyway South Pier", lat: 27.605569, lon: -82.650613 },
+  { n: "Cocoa Beach Pier", lat: 28.367756, lon: -80.601902 },
+  { n: "Sunglow Pier", lat: 29.14671, lon: -80.964279 },
+  { n: "Daytona Beach Pier", lat: 29.227203, lon: -81.006554 },
+  { n: "Jacksonville Beach Pier", lat: 30.293076, lon: -81.389326 },
+  { n: "M.B. Miller Pier", lat: 30.186604, lon: -85.833921 },
+  { n: "Russell-Fields Pier", lat: 30.215651, lon: -85.877206 },
+  { n: "Pensacola Beach Pier", lat: 30.327339, lon: -87.141922 },
+  { n: "Navarre Beach Pier", lat: 30.375995, lon: -86.863044 },
+  { n: "Okaloosa Island Pier", lat: 30.390465, lon: -86.593264 }
 ];
+var PIER_ICON = '<img src="data:image/png;base64,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" width="30" height="14" style="vertical-align:-3px;margin-right:5px" alt="">';
 function renderPiers() {
-  var S = STR[state.lang], el = $("locPiers");
-  if (!el) return;
-  $("pierLabel").textContent = S.piers;
-  var sorted = PIERS.slice().sort(function(a, b) {
-    return distMi(a.lat, a.lon, state.loc.lat, state.loc.lon) - distMi(b.lat, b.lon, state.loc.lat, state.loc.lon);
-  });
-  var html = "";
-  sorted.forEach(function(p, i) { html += '<button class="locchip" data-pi="' + i + '">' + "🎣" + ' ' + escHTML(p.n) + "</button>"; });
-  el.innerHTML = html;
-  var chips = el.querySelectorAll("[data-pi]");
-  for (var i = 0; i < chips.length; i++) (function(b) {
-    b.addEventListener("click", function() {
-      var p = sorted[+b.getAttribute("data-pi")];
-      if (p) setLocation({ name: p.n, lat: p.lat, lon: p.lon });
-    });
-  })(chips[i]);
-  if (typeof syncSticky === "function") syncSticky();
+var S = STR[state.lang], el = $("locPiers");
+if (!el || !PIERS.length) return;
+$("pierLabel").innerHTML = PIER_ICON + " " + escHTML(S.piers);
+var best = null, bd = 1e9, i, d;
+for (i = 0; i < PIERS.length; i++) {
+  d = distMi(PIERS[i].lat, PIERS[i].lon, state.loc.lat, state.loc.lon);
+  if (d < bd) { bd = d; best = PIERS[i]; }
+}
+el.innerHTML = '<button class="piernearest" id="pierNear"><span>' + PIER_ICON + ' ' + escHTML(best.n) + '</span><span class="pdist">' + bd.toFixed(1) + ' ' + escHTML(S.mi) + '</span></button>';
+$("pierNear").addEventListener("click", function() {
+  setLocation({ name: best.n, lat: best.lat, lon: best.lon });
+});
+if (typeof syncSticky === "function") syncSticky();
 }
 
 function nearestPier(lat, lon, maxMi) {
@@ -484,7 +496,7 @@ function matchPiers(ql) {
 }
 function pierSearchHTML(pm) {
   var html = "";
-  pm.forEach(function(p, i) { html += '<button data-pqi="' + i + '">' + "🎣" + ' ' + escHTML(p.n) + "</button>"; });
+  pm.forEach(function(p, i) { html += '<button data-pqi="' + i + '">' + PIER_ICON + ' ' + escHTML(p.n) + "</button>"; });
   return html;
 }
 function wirePierSearchBtns(box, pm) {
@@ -538,7 +550,7 @@ navigator.geolocation.getCurrentPosition(function(pos) {
   if (np) { // close to a fishing pier — offer it instead of raw GPS coords
     locMsg("");
     var box = $("locResults");
-    box.innerHTML = '<div class="piersug"><div>' + escHTML(S.nearPier.replace("{n}", np.pier.n).replace("{d}", np.dist.toFixed(1))) + '</div>' +
+    box.innerHTML = '<div class="piersug"><div>' + PIER_ICON + ' ' + escHTML(S.nearPier.replace("{n}", np.pier.n).replace("{d}", np.dist.toFixed(1))) + '</div>' +
       '<div class="locrow"><button class="locact" id="npYes">' + escHTML(S.usePier) + '</button><button class="locact" id="npNo">' + escHTML(S.keepGps) + '</button></div></div>';
     $("npYes").addEventListener("click", function() { setLocation({ name: np.pier.n, lat: np.pier.lat, lon: np.pier.lon }); });
     $("npNo").addEventListener("click", function() { box.innerHTML = ""; gpsSetLoc(lat, lon); });
@@ -744,8 +756,8 @@ fullTonight: "Full tonight 🌕",
 hourly: "Hour by hour", thHour: "Hour", thScore: "Bite", thSkyWind: "Sky · Wind",
 thRain: "Rain", thAirWtr: "Air/Wtr", biteHint: "Tinted rows fall inside a bite window.",
 sugBtn: "💡 Suggest an improvement", sugEmailPh: "Your email (optional \u2014 so I can reply)", sugMsgPh: "What\u2019s your idea to improve the app?", sugSend: "Send", sugEmpty: "Please write your suggestion first.", sugSending: "Sending\u2026", sugThanks: "Thanks! Your suggestion was sent. 🎣", sugFail: "Couldn\u2019t send \u2014 check your connection and try again.",
-    piers: "🎣 Fishing piers",
-    nearPier: "🎣 Nearest pier: {n} ({d} mi)", usePier: "Fish here", keepGps: "Use my GPS",
+    piers: "Fishing piers",
+    nearPier: "Nearest pier: {n} ({d} mi)", usePier: "Fish here", keepGps: "Use my GPS", mi: "mi",
 days: ["SUN","MON","TUE","WED","THU","FRI","SAT"],
 months: ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
 condName: {
@@ -791,8 +803,8 @@ fullTonight: "Trăng tròn tối nay 🌕",
 hourly: "Từng giờ trong ngày", thHour: "Giờ", thScore: "Điểm cắn", thSkyWind: "Trời · Gió",
 thRain: "Mưa", thAirWtr: "KK/Nước", biteHint: "Hàng tô màu nằm trong giờ cá cắn.",
 sugBtn: "💡 G\u00F3p \u00FD c\u1EA3i ti\u1EBFn", sugEmailPh: "Email c\u1EE7a b\u1EA1n (kh\u00F4ng b\u1EAFt bu\u1ED9c \u2014 \u0111\u1EC3 t\u00F4i tr\u1EA3 l\u1EDDi)", sugMsgPh: "B\u1EA1n mu\u1ED1n c\u1EA3i ti\u1EBFn g\u00EC cho app?", sugSend: "G\u1EEDi", sugEmpty: "H\u00E3y vi\u1EBFt g\u00F3p \u00FD c\u1EE7a b\u1EA1n tr\u01B0\u1EDBc \u0111\u00E3.", sugSending: "\u0110ang g\u1EEDi\u2026", sugThanks: "C\u1EA3m \u01A1n! G\u00F3p \u00FD c\u1EE7a b\u1EA1n \u0111\u00E3 \u0111\u01B0\u1EE3c g\u1EEDi. 🎣", sugFail: "Kh\u00F4ng g\u1EEDi \u0111\u01B0\u1EE3c \u2014 ki\u1EC3m tra m\u1EA1ng r\u1ED3i th\u1EED l\u1EA1i.",
-    piers: "🎣 C\u1EA7u c\u00E2u c\u00E1",
-    nearPier: "🎣 C\u1EA7u g\u1EA7n nh\u1EA5t: {n} ({d} d\u1EB7m)", usePier: "C\u00E2u \u1EDF \u0111\u00E2y", keepGps: "D\u00F9ng GPS c\u1EE7a t\u00F4i",
+    piers: "C\u1EA7u c\u00E2u c\u00E1",
+    nearPier: "C\u1EA7u g\u1EA7n nh\u1EA5t: {n} ({d} d\u1EB7m)", usePier: "C\u00E2u \u1EDF \u0111\u00E2y", keepGps: "D\u00F9ng GPS c\u1EE7a t\u00F4i", mi: "d\u1EB7m",
 days: ["CN","T2","T3","T4","T5","T6","T7"],
 months: ["Th1","Th2","Th3","Th4","Th5","Th6","Th7","Th8","Th9","Th10","Th11","Th12"],
 condName: {
