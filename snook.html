@@ -730,6 +730,17 @@ function ratingWord(s, lang) {
 var S = STR[lang];
 return s >= 80 ? S.great : s >= 60 ? S.good : s >= 40 ? S.fair : S.poor;
 }
+function bannerScore() {
+  // banner shows the current hour's score on today, whole-day average on future days
+  var dx = state.days[state.sel], s = dx.score;
+  if (state.sel === 0 && dx.hs) {
+    var ch = new Date().getHours();
+    for (var i = 0; i < dx.hs.length; i++) {
+      if (new Date(dx.hs[i].t).getHours() === ch) { s = Math.max(0, Math.min(100, Math.round(dx.hs[i].s))); break; }
+    }
+  }
+  return s;
+}
 function moonPhaseInfo(deg) {
 // deg: MET Norway moonphase — 0=new, 90=first quarter, 180=full, 270=last quarter
 var p = ((((deg % 360) + 360) % 360) / 360);
@@ -1179,7 +1190,7 @@ var refT = best ? best.start.getTime() + 3600000 : date.getTime() + 43200000;
 var wi = hourlyIndex(wx.hourly, refT), mi2 = hourlyIndex(mar.hourly, refT);
 var wv = mar.hourly.wave_height[mi2] * 3.28084;
 days.push({
-date: date, score: dayScore, windows: windows, best: best,
+date: date, score: dayScore, windows: windows, best: best, hs: hs,
 wind: Math.round(wx.hourly.windspeed_10m[wi]),
 windDir: compass(wx.hourly.winddirection_10m[wi]),
 gust: (wx.hourly.wind_gusts_10m && wi >= 0 && wx.hourly.wind_gusts_10m[wi] != null) ? Math.round(wx.hourly.wind_gusts_10m[wi]) : null,
@@ -1698,7 +1709,9 @@ var app = $("app");
 if (!state.ready || !state.days.length) return;
 var d0 = state.days[0];
 var dx = state.days[state.sel];
-var c0 = ratingColor(dx.score);
+var bscore = bannerScore();
+var c0 = ratingColor(bscore);
+state._bh = new Date().getHours();
 function guardScreen(msg, allowOverride) {
 var btn = "", ls = lastShore();
 if (ls && ls.name && (ls.lat !== state.loc.lat || ls.lon !== state.loc.lon))
@@ -1742,12 +1755,12 @@ if (!state.isShore) { app.innerHTML = guardScreen(S.inlandMsg, true); wireBackSh
 
 var html = "";
 // top rating card
-html += '<div class="topcard" style="border-color:' + c0 + '">' +
-'<div class="wm">' + snookSVG(c0, 60) + "</div>" +
-'<div class="row"><div class="badge">' + snookSVG(c0, 20) + "</div>" +
+html += '<div class="topcard" id="topcard" style="border-color:' + c0 + '">' +
+'<div class="wm" id="banwm">' + snookSVG(c0, 60) + "</div>" +
+'<div class="row"><div class="badge" id="banbadge">' + snookSVG(c0, 20) + "</div>" +
 '<div><div class="lbl">' + S.rating + '</div>' +
-'<div class="big">' + ratingWord(dx.score, state.lang).toUpperCase() +
-' <span class="sc" style="color:' + c0 + '">' + dx.score + '/100</span></div>' +
+'<div class="big"><span id="banword">' + ratingWord(bscore, state.lang).toUpperCase() + '</span>' +
+' <span class="sc" id="banscore" style="color:' + c0 + '">' + bscore + '/100</span></div>' +
 '<div class="ddate">' + fullDateStr(dx.date, state.lang) +
 (state.sel === 0 ? ' · <span id="clock">' + clockStr(state.lang) + "</span>" : "") + "</div>" +
 "</div></div>" +
@@ -1870,6 +1883,16 @@ function tick() {
 if (!state.ready) return;
 var clk = $("clock");
 if (clk) clk.textContent = clockStr(state.lang);
+var _nh = new Date().getHours();
+if (state.sel === 0 && _nh !== state._bh) {
+  state._bh = _nh;
+  var _bs = bannerScore(), _bc = ratingColor(_bs);
+  var _bw = $("banword"); if (_bw) _bw.textContent = ratingWord(_bs, state.lang).toUpperCase();
+  var _bn = $("banscore"); if (_bn) { _bn.textContent = _bs + "/100"; _bn.style.color = _bc; }
+  var _bt = $("topcard"); if (_bt) _bt.style.borderColor = _bc;
+  var _bg = $("banbadge"); if (_bg) _bg.innerHTML = snookSVG(_bc, 20);
+  var _bm = $("banwm"); if (_bm) _bm.innerHTML = snookSVG(_bc, 60);
+}
 var mc = $("moonCd");
 if (mc) mc.textContent = moonCountdownHTML();
 var tc = $("tideCd");
