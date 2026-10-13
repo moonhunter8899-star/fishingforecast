@@ -769,7 +769,7 @@ en: {
 loading: "Checking snook conditions…",
 rating: "SNOOK BITE RATING", today: "TODAY",
 pickDay: "Pick a day", best: "★ BEST", bestWeek: "BEST DAY THIS WEEK", goDay: "GO DAY",
-goFish: "BEST TIME TO FISH", inFish: function(d) { return "in " + d; }, nowFish: "NOW", gotAway: "The one that got away! 🎣", wind: "WIND", water: "WATER", cond: "CONDITION", rain: "RAIN", moon: "MOON", sunrise: "SUNRISE", sunset: "SUNSET", catch: "Catch",
+goFish: "BEST TIME TO FISH", inFish: function(d) { return "in " + d; }, nowFish: "NOW", gotAway: "The one that got away! 🎣", wind: "WIND", water: "WATER", surf: "SURF", calm: "Calm", moderate: "Moderate", rough: "Rough", cond: "CONDITION", rain: "RAIN", moon: "MOON", sunrise: "SUNRISE", sunset: "SUNSET", catch: "Catch",
 searchPh: "Enter a beach, an inlet, or coordinates…", useMyLoc: "Use my location", homeBtn: "⌂ Jupiter Inlet",
 locating: "Locating…", geoDenied: "Location unavailable — check permission", geoUnsupported: "Geolocation not supported",
 currentLoc: "Current location", checkRegs: "Check local fishing regulations", regDis: "Info only, not legal advice \u2014 we are not responsible for your actions. Always verify current regulations yourself.", noResults: "No places found", resolvingLink: "Resolving map link\u2026", linkFail: "Couldn\u2019t read that map link \u2014 try coordinates like 26.76, -80.11",
@@ -816,7 +816,7 @@ vi: {
 loading: "Đang kiểm tra điều kiện câu snook…",
 rating: "ĐIỂM CẮN CÂU SNOOK", today: "HÔM NAY",
 pickDay: "Chọn ngày", best: "★ ĐẸP NHẤT", bestWeek: "NGÀY ĐẸP NHẤT TUẦN", goDay: "ĐI NGAY",
-goFish: "GIỜ CÂU TỐT NHẤT", inFish: function(d) { return "sau " + d; }, nowFish: "BÂY GIỜ", gotAway: "Cá chạy mất tiêu rồi! 🎣", wind: "GIÓ", water: "NƯỚC", cond: "THỜI TIẾT", rain: "MƯA", moon: "TRĂNG", sunrise: "BÌNH MINH", sunset: "HOÀNG HÔN", catch: "Cá câu được",
+goFish: "GIỜ CÂU TỐT NHẤT", inFish: function(d) { return "sau " + d; }, nowFish: "BÂY GIỜ", gotAway: "Cá chạy mất tiêu rồi! 🎣", wind: "GIÓ", water: "NƯỚC", surf: "SÓNG", calm: "Êm", moderate: "Vừa", rough: "Động", cond: "THỜI TIẾT", rain: "MƯA", moon: "TRĂNG", sunrise: "BÌNH MINH", sunset: "HOÀNG HÔN", catch: "Cá câu được",
 searchPh: "Nhập bãi biển, cửa lạch hoặc tọa độ…", useMyLoc: "Vị trí của tôi", homeBtn: "⌂ Jupiter Inlet",
 locating: "Đang định vị…", geoDenied: "Không lấy được vị trí — kiểm tra quyền", geoUnsupported: "Thiết bị không hỗ trợ định vị",
 currentLoc: "Vị trí hiện tại", checkRegs: "Kiểm tra quy định câu cá địa phương", regDis: "Chỉ để tham khảo, không phải tư vấn pháp lý \u2014 chúng tôi không chịu trách nhiệm về hành động của bạn. Hãy tự kiểm tra quy định hiện hành.", noResults: "Không tìm thấy địa điểm", resolvingLink: "Đang mở liên kết bản đồ\u2026", linkFail: "Không đọc được liên kết \u2014 thử tọa độ, ví dụ 26.76, -80.11",
@@ -894,7 +894,6 @@ var S = STR[lang];
 return s >= 80 ? S.great : s >= 60 ? S.good : s >= 40 ? S.fair : S.poor;
 }
 function bannerScore() {
-  // banner shows the current hour's score on today, whole-day average on future days
   var dx = state.days[state.sel], s = dx.score;
   if (state.sel === 0 && dx.hs) {
     var ch = new Date().getHours();
@@ -904,8 +903,12 @@ function bannerScore() {
   }
   return s;
 }
+function surfWord(ft, lang) {
+var S = STR[lang];
+if (ft == null || isNaN(ft)) return "\u2014";
+return ft < 2 ? S.calm : ft <= 3 ? S.moderate : S.rough;
+}
 function moonPhaseInfo(deg) {
-// deg: MET Norway moonphase — 0=new, 90=first quarter, 180=full, 270=last quarter
 var p = ((((deg % 360) + 360) % 360) / 360);
 var th = 2 * Math.PI * p;
 var illum = (1 - Math.cos(th)) / 2;
@@ -1078,6 +1081,10 @@ return _wsvg('<path d="M4 10 h12 a2.8 2.8 0 1 0-2.8-2.8"/>' +
 function _lblWater() {
 return _wsvg('<path d="M16 5 C16 5 9 14 9 19 a7 7 0 0 0 14 0 C23 14 16 5 16 5 Z"/>', 1.05);
 }
+function _lblSurf() {
+return _wsvg('<path d="M4 13 q4-5 8 0 t8 0 t8 0"/>' +
+'<path d="M4 21 q4-5 8 0 t8 0 t8 0"/>', 1.05);
+}
 function _lblRain() {
 return _wsvg(_wcloudSm() + _wrain([12, 16.5, 21], 25.5), 1.05);
 }
@@ -1140,7 +1147,6 @@ var u = "https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?begin_date=" 
 return fetchJSON(u).then(function(j) {
 var out = [];
 (j.predictions || []).forEach(function(p) {
-// "2026-10-09 15:21" local station time
 var m = /^(\d+)-(\d+)-(\d+) (\d+):(\d+)$/.exec(p.t);
 if (!m) return;
 out.push({ t: new Date(+m[1], +m[2] - 1, +m[3], +m[4], +m[5]).getTime(), type: p.type, v: parseFloat(p.v) });
@@ -1150,14 +1156,10 @@ return out;
 });
 }
 function loadMoonDay(lat, lon, date) {
-// MET Norway sunrise API — the same moon source the Muse app uses.
-// high_moon/low_moon -> Major (+/-1h); moonrise/moonset -> Minor (+/-30min).
-// Times requested in UTC (+00:00) so daylight-saving can't shift them.
 var u = "https://api.met.no/weatherapi/sunrise/3.0/moon?lat=" + lat + "&lon=" + lon +
 "&date=" + ymdDash(date) + "&offset=" + encodeURIComponent("+00:00");
 return fetchJSON(u).then(function(j) {
 var p = (j && j.properties) || {}, wins = [];
-// moonphase: phase angle in degrees (0=new, 90=first quarter, 180=full, 270=last quarter)
 try {
 state.moonPhase = state.moonPhase || {};
 if (p.moonphase != null && !isNaN(+p.moonphase)) state.moonPhase[ymdDash(date)] = +p.moonphase;
@@ -1176,7 +1178,6 @@ return wins;
 }
 function atHourly(hourly, isoIdx, key) { return hourly[key][isoIdx]; }
 function hourlyIndex(hourly, ms) {
-// hourly.time entries "2026-10-09T14:00" local
 var best = 0, bd = 1e15;
 for (var i = 0; i < hourly.time.length; i++) {
 var t = new Date(hourly.time[i]).getTime();
@@ -1186,9 +1187,6 @@ if (d < bd) { bd = d; best = i; }
 return best;
 }
 function tideAt(ms) {
-// Cosine interpolation between hilo events: tides rise/fall fastest
-// mid-tide and flatten at highs/lows, so the chart renders as a smooth
-// natural curve instead of angular straight segments.
 var T = state.tides;
 if (!T.length) return 0;
 if (ms <= T[0].t) return T[0].v;
@@ -1222,7 +1220,6 @@ var mm = wx.precipitation ? wx.precipitation[wi] : 0;
 if (mm >= 2.5) s -= 30; else if (mm >= 0.5) s -= 15; else if (mm > 0) s -= 5;
 var wt = mar.sea_surface_temperature[mi];
 if (wt != null && !isNaN(wt)) {
-// Angler consensus: feeding drops off below ~70 (cliff); prime ~75-85.
 if (wt >= 72 && wt <= 84) s -= 0;
 else if ((wt >= 70 && wt < 72) || (wt > 84 && wt <= 88)) s -= 10;
 else if ((wt >= 65 && wt < 70) || (wt > 88 && wt <= 90)) s -= 18;
@@ -1230,21 +1227,16 @@ else s -= 28;
 }
 var wv = mar.wave_height[mi] * 3.28084; // ft
 if (!isNaN(wv)) {
-// Snook are structure fish — surf height barely matters.
 if (wv <= 4) s -= 0;
 else if (wv <= 5) s -= 10;
 else if (wv <= 6) s -= 20;
 else s -= 32;
 }
-// Snook feed hard at night around inlet and dock lights.
 var isDayH = (wx.is_day && wx.is_day[wi] != null) ? wx.is_day[wi] : 1;
 if (isDayH === 0) s += 8;
 return Math.max(0, Math.min(100, Math.round(s)));
 }
 function tideAdj(ms) {
-// Snook: +8 if the next tide event is a Low (outgoing flushes bait past
-// inlets and jetties), +2 if a High.
-// -8 within 0.5h of an event (slack), +2 within 1h, +6 within 3h (mid-tide flow).
 var T = state.tides;
 if (!T.length) return 0;
 var next = null, nearest = 1e15, i, d;
@@ -1258,7 +1250,6 @@ if (nearest <= 1800000) a -= 8; else if (nearest <= 3600000) a += 2; else if (ne
 return Math.max(-6, Math.min(14, a));
 }
 function pressureAdj(wi) {
-// Falling pressure ahead of a front often turns the feed on; rapid swings shut it down.
 var p = state.wx.hourly.pressure_msl;
 if (!p || p[wi] == null || wi < 3 || p[wi - 3] == null) return 0;
 var dp = p[wi] - p[wi - 3]; // hPa per 3h
@@ -1269,7 +1260,6 @@ if (dp <= 3) return -2;
 return -6;
 }
 function swellAdj(mi) {
-// Long-period swell = clean, organized water; short chop = washing machine.
 var sp = state.mar.hourly.swell_wave_period ? state.mar.hourly.swell_wave_period[mi] : null;
 if (sp == null || isNaN(sp)) return 0;
 if (sp >= 9) return 3;
@@ -1281,7 +1271,6 @@ function adjHourScore(wi, mi, ms) {
 return hourScore(wi, mi) + tideAdj(ms) + pressureAdj(wi) + swellAdj(mi);
 }
 function windowMoonBoost(startMs, endMs) {
-// (any Major overlap ? 10 : any Minor overlap ? 5 : 0) + (Low/outgoing tide event in window ? 7 : 0)
 var b = 0, minor = false, i;
 for (i = 0; i < state.moon.length; i++) {
 var w = state.moon[i];
@@ -1302,7 +1291,6 @@ var days = [];
 var now = new Date();
 for (var d = 0; d < 7; d++) {
 var date = new Date(now.getFullYear(), now.getMonth(), now.getDate() + d);
-// tide-adjusted hourly scores for this date (spot-local hours)
 var hs = [];
 for (var i = 0; i < wx.hourly.time.length; i++) {
 var dt = new Date(wx.hourly.time[i]);
@@ -1312,8 +1300,6 @@ var mi = hourlyIndex(mar.hourly, dt.getTime());
 hs.push({ t: dt.getTime(), s: adjHourScore(i, mi, dt.getTime()) });
 }
 }
-// day score = rounded mean of the 06:00-22:00 pool (else all hours) — no moon boost.
-// Snook's dusk/night bite counts: they feed hard after dark around lights.
 var pool = hs.filter(function(h) { var hh = new Date(h.t).getHours(); return hh >= 6 && hh <= 22; });
 if (!pool.length) pool = hs;
 var dayScore = 0;
@@ -1322,7 +1308,6 @@ var sum = 0;
 pool.forEach(function(h) { sum += h.s; });
 dayScore = Math.max(0, Math.min(100, Math.round(sum / pool.length)));
 }
-// bite windows: local maxima of hourly scores (>=40, >=2h apart, top 4), +/-1h each
 var peaks = [];
 for (var k = 1; k < hs.length - 1; k++) {
 if (hs[k].s >= hs[k-1].s && hs[k].s >= hs[k+1].s && hs[k].s >= 40) {
@@ -1348,7 +1333,6 @@ return { start: new Date(st), end: new Date(en), score: sc };
 windows.sort(function(a, b) { return a.start - b.start; });
 var best = null;
 windows.forEach(function(w) { if (!best || w.score > best.score) best = w; });
-// weather tiles at best-window peak (or noon)
 var refT = best ? best.start.getTime() + 3600000 : date.getTime() + 43200000;
 var wi = hourlyIndex(wx.hourly, refT), mi2 = hourlyIndex(mar.hourly, refT);
 var wv = mar.hourly.wave_height[mi2] * 3.28084;
@@ -1370,7 +1354,6 @@ return days;
 }
 /* ================= render ================= */
 function moonScore(w) {
-// App's solunarRatingForWindow: tide-adjusted hourly score at the window + 10 (Major) / 5 (Minor), capped at 100.
 if (w._score == null) {
 try {
 var wi = hourlyIndex(state.wx.hourly, w.center), mi = hourlyIndex(state.mar.hourly, w.center);
@@ -1443,7 +1426,6 @@ var mn = Math.min.apply(null, vs), mx = Math.max.apply(null, vs);
 if (mx - mn < 0.3) { mx += 0.15; mn -= 0.15; }
 function X(t) { return pL + (t - d0) / 86400000 * (W - pL - pR); }
 function Y(v) { return pT + (1 - (v - mn) / (mx - mn)) * (H - pT - pB); }
-// Catmull-Rom -> cubic Bezier for a smooth tide curve
 function smoothPath() {
 var d = "M" + X(pts[0][0]).toFixed(1) + "," + Y(pts[0][1]).toFixed(1);
 for (var i = 0; i < pts.length - 1; i++) {
@@ -1466,9 +1448,7 @@ svg += '<defs><linearGradient id="tideg" x1="0" y1="0" x2="0" y2="1">' +
 '<stop offset=".6" stop-color="#14b8a6" stop-opacity=".10"/>' +
 '<stop offset="1" stop-color="#14b8a6" stop-opacity=".03"/>' +
 "</linearGradient></defs>";
-// soft panel backdrop so the chart sits gently on the warm-sand theme
 svg += '<rect x="0" y="0" width="' + W + '" height="' + H + '" rx="14" fill="#f8f2e3"/>';
-// shade bite windows
 (day.windows || []).forEach(function(w, i) {
 var isBest = day.best && w.start.getTime() === day.best.start.getTime();
 svg += '<rect x="' + X(w.start.getTime()).toFixed(1) + '" y="' + (pT - 4) + '" width="' +
@@ -1478,22 +1458,18 @@ svg += '<rect x="' + X(w.start.getTime()).toFixed(1) + '" y="' + (pT - 4) + '" w
 svg += '<path d="' + line + " L" + X(d1).toFixed(1) + "," + (H - pB) + " L" + X(d0).toFixed(1) + "," + (H - pB) +
 ' Z" fill="url(#tideg)" stroke="none"/>';
 svg += '<path d="' + line + '" fill="none" stroke="#14b8a6" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"/>';
-// high / low dots
 state.tides.forEach(function(e) {
 if (e.t < d0 || e.t > d1) return;
 svg += '<circle cx="' + X(e.t).toFixed(1) + '" cy="' + Y(e.v).toFixed(1) +
 '" r="4.5" fill="#fff" stroke="#0f766e" stroke-width="2"/>';
 });
-// now line
 var now = Date.now();
 state.tideScale = null;
 if (now >= d0 && now <= d1) {
 svg += '<line x1="' + X(now).toFixed(1) + '" y1="' + (pT - 6) + '" x2="' + X(now).toFixed(1) + '" y2="' + (H - pB) +
 '" stroke="#d9a441" stroke-width="1.75" stroke-dasharray="5,4" stroke-linecap="round"/>';
-// remember the chart scale so the live fish marker can be repositioned as time passes
 state.tideScale = { d0: d0, mn: mn, mx: mx, W: W, H: H, pL: pL, pR: pR, pT: pT, pB: pB };
 }
-// best-bite marker
 if (day.best) {
 var bt = day.best.start.getTime() + 3600000, bv = tideAt(bt);
 svg += '<circle cx="' + X(bt).toFixed(1) + '" cy="' + (Y(bv) - 13).toFixed(1) +
@@ -1501,7 +1477,6 @@ svg += '<circle cx="' + X(bt).toFixed(1) + '" cy="' + (Y(bv) - 13).toFixed(1) +
 svg += '<text x="' + X(bt).toFixed(1) + '" y="' + (Y(bv) - 9.5).toFixed(1) +
 '" text-anchor="middle" font-size="10">🎣</text>';
 }
-// Major bite markers: small rating-colored fish on the curve at each Major window's midpoint
 var fcol = ratingColor(day.score);
 state.moon.forEach(function(w, mi) {
 if (w.type !== "major") return;
@@ -1512,8 +1487,6 @@ if (now >= w.start && now <= w.end) {
 svg += '<circle cx="' + mx.toFixed(1) + '" cy="' + my.toFixed(1) + '" r="15" fill="none" stroke="' + fcol +
 '" stroke-width="2" opacity="0.55"/>';
 }
-// Tien's snook silhouette, tinted by the rating color: white silhouette as
-// an SVG mask over a rating-colored rect.
 var iw = 34, ih = 13;
 var mxx = (mx - iw / 2).toFixed(1), myy = (my - ih / 2).toFixed(1);
 var mkid = "snkm" + mi;
@@ -1521,11 +1494,6 @@ svg += '<mask id="' + mkid + '" maskUnits="userSpaceOnUse" x="' + mxx + '" y="' 
 '<image href="' + SNOOK_URI + '" x="' + mxx + '" y="' + myy + '" width="' + iw + '" height="' + ih + '"/></mask>' +
 '<rect x="' + mxx + '" y="' + myy + '" width="' + iw + '" height="' + ih + '" fill="' + fcol + '" mask="url(#' + mkid + ')"/>';
 });
-// live fishing-rod marker riding the tide curve at the current time.
-// Cartoon rod inspired by Tien's reference photo: brown tapered blank angled
-// up-right, dark grip, spinning reel, 3 line guides, line hanging from the tip
-// to a pink bobber + hook. Rating number above in rating color, live time below it.
-// rod number follows the current hour (the rod itself only draws on today)
 var rscore = bannerScore(), rfcol = ratingColor(rscore);
 if (state.tideScale) {
 var fxx = X(now), fyy = Y(tideAt(now));
@@ -1547,7 +1515,6 @@ svg += '<g id="tiderod" transform="translate(' + fxx.toFixed(1) + ',' + fyy.toFi
 '<circle cx="5.5" cy="-1.1" r="2" fill="#f472a0" stroke="#161616" stroke-width="1"/>' +
 '<path d="M3.5,-0.5 L3.5,3.5 Q3.5,6 1,6 Q-1,6 -1,4" stroke="#161616" stroke-width="1.4" fill="none" stroke-linecap="round"/></g></g>';
 }
-// x labels — 12h style in both languages
 var S = STR[state.lang];
 [["12a", 0], ["6a", 6], ["12p", 12], ["6p", 18]].forEach(function(l) {
 var lab = l[0];
@@ -1904,7 +1871,6 @@ var f = $("findOther"); if (f) f.hidden = false;
 }
 if (!state.isOcean) { app.innerHTML = guardScreen(S.freshMsg); wireBackShore(); return; }
 if (!state.isShore) { app.innerHTML = guardScreen(S.inlandMsg, true); wireBackShore(); return; }
-  // watch.html glance snapshot — today's key numbers, refreshed on every load
   try {
     var _gd = state.days[0], _now = Date.now();
     var _nw = function(t) { var b = null; state.moon.forEach(function(w) { if (w.type !== t || w.end <= _now) return; if (!b || w.start < b.start) b = w; }); return b; };
@@ -1923,7 +1889,6 @@ if (!state.isShore) { app.innerHTML = guardScreen(S.inlandMsg, true); wireBackSh
   } catch (e) {}
 
 var html = "";
-// top rating card
 html += '<div class="topcard" id="topcard" style="border-color:' + c0 + '">' +
 '<div class="wm" id="banwm">' + snookSVG(c0, 60) + "</div>" +
 '<div class="row"><div class="badge" id="banbadge">' + snookSVG(c0, 20) + "</div>" +
@@ -1934,7 +1899,6 @@ html += '<div class="topcard" id="topcard" style="border-color:' + c0 + '">' +
 (state.sel === 0 ? ' · <span id="clock">' + clockStr(state.lang) + "</span>" : "") + "</div>" +
 "</div></div>" +
 "</div>";
-// pick-a-day strip
 var bestIdx = 0;
 state.days.forEach(function(d, i) { if (d.score > state.days[bestIdx].score) bestIdx = i; });
 html += '<div class="pick"><span class="ph">' + S.pickDay + "</span>" +
@@ -1954,7 +1918,6 @@ html += '<div class="' + cls + '" data-day="' + i + '"' +
 '<div class="dow2">' + ratingWord(d.score, state.lang) + "</div></div>";
 });
 html += "</div>";
-// slim go-fish band: best window hours, vanishes once the window passes
 var gfD = state.days[state.sel], gfW = gfD.best, gfNow = Date.now(), gfHTML = "";
 if (gfW && gfW.end.getTime() > gfNow) {
 var gfIn = "";
@@ -1967,7 +1930,6 @@ gfHTML = '<div class="gofish" id="gofish" data-end="' + gfW.end.getTime() + '">'
 snookSVG("#b3541e", 20) + "<span><b>" + S.goFish + "</b> \u00b7 " + trange(gfW.start, gfW.end, state.lang) + "</span>" + gfIn + "</div>";
 }
 html += gfHTML;
-// day card
 var day = state.days[state.sel];
 var dc = ratingColor(day.score);
 html += '<div class="card" style="border-color:' + dc + '">';
@@ -1990,17 +1952,16 @@ var sunTile = '<div class="tile"><div class="sundrow">' +
 html += '<div class="tiles">' +
 '<div class="tile"><div class="k">' + _lblWind() + ' ' + S.wind + '</div><div class="v">' + day.wind + (day.gust != null ? " | " + day.gust : "") + " " + day.windDir + "</div></div>" +
 '<div class="tile"><div class="k">' + _lblWater() + ' ' + S.water + '</div><div class="v">' + (day.water == null ? "\u2014" : day.water.toFixed(1) + "\u00b0F") + "</div></div>" +
+'<div class="tile"><div class="k">' + _lblSurf() + ' ' + S.surf + '</div><div class="v">' + surfWord(day.waveFt, state.lang) + "</div></div>" +
 '<div class="tile"><div class="k">' + S.cond + '</div><div class="v">' + cn + "</div></div>" +
 '<div class="tile"><div class="k">' + _lblRain() + ' ' + S.rain + '</div><div class="v">' + day.rain + "%</div></div>" +
 moonTile + sunTile +
 "</div>";
-// live precipitation radar with the day's score pinned at the spot
 html += '<div class="radarcap"><div class="radarmap" id="radarmap"></div>' +
 '<div class="radarbar"><span class="seg"><button id="modeWind" class="on">' + S.wind + '</button><button id="modeRadar">' + S.radar + '</button></span>' +
 '<span id="radarFoot" class="radarfoot"></span>' +
 '<span class="radarattr" id="radarAttr">\u00a9 OpenStreetMap \u00b7 RainViewer</span>' +
 '<button class="radarplay" id="radarPlay" hidden>\u25b6</button></div></div>';
-// major/minor — past windows disappear; countdown keeps pointing at the next bite
 var moonRows = moonRowsHTML(day);
 var moonSec = "";
 if (moonRows) {
@@ -2015,7 +1976,6 @@ moonSec = '<div class="moonsec"><div class="mh">' + S.moonTitle + "</div>" +
 '<p class="cdline">' + S.moonNote + "</p></div>";
 }
 html += moonSec;
-// tide
 html += '<div class="tidesec"><div class="th">🌊 ' + S.tide + " · " +
 (state.sel === 0 ? S.todayWord : S.days[day.date.getDay()] + " " + day.date.getDate()) + "</div>" +
 (state.tides.length
@@ -2023,11 +1983,9 @@ html += '<div class="tidesec"><div class="th">🌊 ' + S.tide + " · " +
 tideSVG(day) + '<div class="tchips">' + tideChipsHTML(day) + "</div>"
 : '<p class="cdline">' + (state.noStation ? S.tideNoneNear : S.tideNote) + "</p>") + "</div>";
 html += "</div>";
-// hour-by-hour card for the selected day, after the tide chart
 html += hourlyHTML(day);
 app.innerHTML = html;
 syncPastRows();
-// wire buttons
 var pills = app.querySelectorAll("[data-day]");
 for (var i = 0; i < pills.length; i++) {
 (function(el) {
@@ -2082,20 +2040,15 @@ if (gi) gi.textContent = SS.inFish(durText(+gi.getAttribute("data-start") - gfn,
 }
 }
 renderHeader();
-// if the phone's real clock has rolled past the rendered day (page left open
-// across midnight), silently refetch so the rod, countdowns and scores match
-// the real current day — never a stale or wrongly-placed marker
 var nowMs = Date.now();
 if (!state.loading && state.tideScale &&
 (nowMs < state.tideScale.d0 || nowMs >= state.tideScale.d0 + 86400000)) {
 startLoad();
 return;
 }
-// move the live tide-chart rod every 30s so it rides the curve with the real time
 syncPastRows();
 if (++__tfN % 30 === 0) moveTideFish();
 }
-// repositions the #tiderod marker along the tide curve to the current time
 var __tfN = 0;
 function moveTideFish() {
 var t = document.getElementById("tiderod"), sc = state.tideScale;
@@ -2128,7 +2081,6 @@ last.end = Math.max(last.end, w.end);
 });
 return out;
 }
-// Forecast for the selected location (Jupiter Inlet by default).
 function startLoad() {
 var L = state.loc;
 var lat = L.lat, lon = L.lon, station = L.station;
@@ -2143,8 +2095,6 @@ for (var i = 0; i < 8; i++) {
 var dt = new Date(); dt.setDate(dt.getDate() + i);
 moonPs.push(loadMoonDay(lat, lon, dt));
 }
-// Each source is independent: weather+marine are essential, but tides and moon
-// degrade gracefully (quiet note instead of a full-page error).
 Promise.all([
 loadWeather(lat, lon).catch(function(e) { return { _err: e }; }),
 loadMarine(lat, lon).catch(function(e) { return { _err: e }; }),
