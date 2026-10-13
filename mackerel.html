@@ -1321,10 +1321,12 @@ svg += '<mask id="' + mkid + '" maskUnits="userSpaceOnUse" x="' + mxx + '" y="' 
 '<image href="' + MACK_URI + '" x="' + mxx + '" y="' + myy + '" width="' + iw + '" height="' + ih + '"/></mask>' +
 '<rect x="' + mxx + '" y="' + myy + '" width="' + iw + '" height="' + ih + '" fill="' + fcol + '" mask="url(#' + mkid + ')"/>';
 });
+// rod number follows the current hour (the rod itself only draws on today)
+var rscore = bannerScore(), rfcol = ratingColor(rscore);
 if (state.tideScale) {
 var fxx = X(now), fyy = Y(tideAt(now));
 svg += '<g id="tiderod" transform="translate(' + fxx.toFixed(1) + ',' + fyy.toFixed(1) + ')">' +
-'<text x="0" y="-34" text-anchor="middle" font-size="13" font-weight="700" fill="' + fcol + '">' + day.score + '</text>' +
+'<text id="rodscore" x="0" y="-34" text-anchor="middle" font-size="13" font-weight="700" fill="' + rfcol + '">' + rscore + '</text>' +
 '<text id="rodtim" x="0" y="-21" text-anchor="middle" font-size="9.5" font-weight="700" fill="#8a7a5f">' + clockStr(state.lang) + '</text>' +
 '<g transform="scale(0.49)">' +
 '<path d="M-17.5,17.5 L-9.5,9.5" stroke="#161616" stroke-width="8.6" stroke-linecap="round"/>' +
@@ -1801,6 +1803,7 @@ if (state.sel === 0 && _nh !== state._bh) {
   var _bt = $("topcard"); if (_bt) _bt.style.borderColor = _bc;
   var _bg = $("banbadge"); if (_bg) _bg.innerHTML = fishSVG(_bc, 40, 76);
   var _bm = $("banwm"); if (_bm) _bm.innerHTML = fishSVG(_bc, 110);
+  var _rs = $("rodscore"); if (_rs) { _rs.textContent = _bs; _rs.setAttribute("fill", _bc); }
 }
 var mc = $("moonCd");
 if (mc) mc.textContent = moonCountdownHTML();
