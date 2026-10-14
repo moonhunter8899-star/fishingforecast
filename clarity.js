@@ -190,3 +190,33 @@ function waterLevelMod(anomalyFt) {
   if (anomalyFt <= -0.4) return -2; // running low
   return 0;
 }
+
+function withTimeout(promise, ms) {
+  // Rejects if promise doesn't settle in ms. The underlying fetch keeps
+  // running but its late result is ignored.
+  return Promise.race([
+    promise,
+    new Promise(function(_, reject) {
+      setTimeout(function() { reject(new Error("timeout")); }, ms);
+    })
+  ]);
+}
+
+function rebuildScores(species) {
+  // (Re)build day scores from current state. Idempotent: buildDays makes
+  // fresh day objects, so re-applying adjustments is safe.
+  var bi = hourlyIndex(state.mar.hourly, Date.now());
+  state.days = buildDays(state.wx, state.mar);
+  if (state.clarity && state.days.length) {
+    var _cm = clarityMod(state.clarity.kd, state.clarity.ageDays, species,
+      (state.mar.hourly.wave_height[bi] || 0) * 3.28084);
+    if (_cm) state.days[0].score = Math.max(0, Math.min(100, state.days[0].score + _cm));
+  }
+  if (state.waterlevel && state.days.length) {
+    var _wl = waterLevelMod(state.waterlevel.anomalyFt);
+    var _wld = distMi(state.loc.lat, state.loc.lon, COOPS_LAT, COOPS_LON);
+    if (_wld > 60) _wl = 0; else if (_wld > 30) _wl = Math.round(_wl / 2);
+    if (_wl) state.days[0].score = Math.max(0, Math.min(100, state.days[0].score + _wl));
+  }
+  applySeasonalBoosts(species);
+}
