@@ -462,17 +462,18 @@ try { localStorage.setItem("ff_recents", JSON.stringify(r.slice(0, 5))); } catch
 }
 
 var PIERS="Juno Beach Pier|26.89329|-80.05592;Lake Worth Pier|26.61282|-80.03651;Deerfield Pier|26.31647|-80.07272;Pompano Pier|26.23517|-80.083;Dania Pier|26.05834|-80.11119;Newport Fishing Pier|25.93001|-80.12054;Venice Fishing Pier|27.07254|-82.45278;Skyway North Pier|27.63266|-82.66593;Skyway South Pier|27.60557|-82.65061;Cocoa Beach Pier|28.36776|-80.6019;Sunglow Pier|29.14671|-80.96428;Daytona Beach Pier|29.2272|-80.999;Jacksonville Beach Pier|30.29308|-81.38933;M.B. Miller Pier|30.1866|-85.83392;Russell-Fields Pier|30.21565|-85.87721;Pensacola Beach Pier|30.32734|-87.14192;Navarre Beach Pier|30.37599|-86.86304;Okaloosa Island Pier|30.39046|-86.59326".split(";").map(function(s){var p=s.split("|");return {n:p[0],lat:+p[1],lon:+p[2]};});
-var PIER_ICON = '<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACQAAAARCAYAAAC1tw6GAAAEmUlEQVR42sVVTWtVVxRde59z3rt5eSaaaCJWYoWqqcaIeakfMTUUJTxTJwqWFKROigMn1hYR2sDDjjvpDwgdawbOnFjUgBMRLUIMTYm0TZTU0Jcv8z7uPfec3UFuShqj0A7sggMX1tnstdfZe1/gLaFQKDAAnDhxYm93d/cPFy5c2JZQhP8JGgBaW1v76+vrJZ/Pf7BS6FvHcuKTJ0+2HDhw4Fp7e3vtWvfU2xI0PDwMABgYGIiDIEBdXd3o48eP4zVtXAPLNvo1OEqO/w+xuHv3LgNQ5XKZ3hT8z4xEnoh8wtOKw0QkzOxXiSMAVCgUmIh8wq+ORaFQ4MHBwcUgCCr/dhK+7Ovr61o1BQQAPT09W48fP/7NoUOHGlbxDAD5fL6vt7f3/BoFEwCcOnXq0tmzZ68sF7iW/SthAMS5XO5ec3Pzz93d3Tfm5uYyALyIUDabrY6Njb0/Ojr61f79+79taWl5Xi6XDRFJHMeqqalp8cdbtz5/ubi4vb+//8rk5OR6rbUDABGhTCYjt2/f/s4YM3Tnzp3LIqIAuDf1kAAQZv5Da11mZgHglVIeAJRS3hgTMXPRGGO997KcEACMMaKYFxTzLDOTJu1WxCL5Xkin07GIvH43LLt15swZAbDp6fjTrQsLC+sePXpUstaaRCgppWypVHrHOdc4NTXVWSwW57z3askAURMTE9VSqfJeWA0b7z+4/2HlZSUAQwCAmYmZJQzDBqVUq4gQEclrn6ynp0cPDw/HR49+9MmLqefXqmEIpfiV6yIe8AARrdkB4pf6nZiTOlbaL4AD0jXpB3vb2w8PDQ251zrU1NQkAJBKqRcmnfrdWrs5FaR/FedDEiIAEBJPxEEURTtTxjwDURHea4AEEAJTbCO7i5WyitW4F5/ivzl23rkmR25jbW12bIUhr7jEyXRxLpczAHDs2LHP9rXvm7x4+eIuESER0SJiRIROf3p6x+49u6P8x/l+Ywx+uXkzvcwHQYC2PW0/5XKdN4wxGBkZSYkIj4yMpFKpFI4cPjLQ0dExdv369YZEjEpyL08cMwBcvXrVA/APHz60ANh7HxOTM2LmiUg6OzuJiCwRyfiT8XkCqbAcRtZa7OzrC4koJiJXrVaVcy4W50NrLc6dOydEJG1tbVEURbA2rDIRT09PR4kzLsmtk0XqqaOj4wsRmQAwxczvikhzFEUHwzDs3bJly8X5+XnnnNtORDNBEDzx3m+bnZ39PgiCoWw2e69UKk1qrTNE1Kq1djMzM1/X1AS/NTZvHpiZns4RURwEwVNr7Qvn3PlquXywfsOGwTAMR0SkkkqldlhrN9XU1BSVUuPU1dV1KQzDlNbaAIhFJLbWhpVKRdfW1maIKLLWxlprJqI0EXlr7Z9EFDBzhoi0916Y2RKRr1Qqlpk3ZDKZ2FpbJSJmZuOcYwAvAZS01utFJO2XBsCKiBMRTqfTSsdx3ACgwTnnnXMEoEhEG7PZbF2ytLxSquicywLI0BKaiWhOKdXgvWfnHDPzove+EgRBIwCx1ioRmQHA1tr1ya+o2Xs/75wzRLSOmcU5FzHznHOuLo7j9F9oFz7XDvAOvQAAAABJRU5ErkJggg==" width="24" height="11" style="vertical-align:-2px;margin-right:4px" alt="">';
+function pierIcon() { return _wsvg('<path d="M4 9 h24"/><path d="M9 9 v10 M16 9 v12 M23 9 v10"/><path d="M4 27 q4-3 8 0 t8 0 t8 0"/>', 1.15); }
+function inletIcon() { return _wsvg('<path d="M6 6 v20 M26 6 v20"/><path d="M10 13 q3-2.5 6 0 t6 0"/><path d="M10 20 q3-2.5 6 0 t6 0"/>', 1.15); }
 var INLETS="St. Marys Inlet|30.70968|-81.42842;St. Johns River Inlet|30.385|-81.3921;St. Augustine Inlet|29.91025|-81.28952;Matanzas Inlet|29.70581|-81.2284;Ponce de Leon Inlet|29.07249|-80.91867;Port Canaveral Inlet|28.407|-80.595;Sebastian Inlet|27.8603|-80.44727;Fort Pierce Inlet|27.47173|-80.29122;St. Lucie Inlet|27.16611|-80.15667;Jupiter Inlet|26.94427|-80.07217;Lake Worth Inlet|26.77222|-80.03722;Boynton Inlet|26.54556|-80.04278;Boca Raton Inlet|26.33591|-80.07115;Hillsboro Inlet|26.2559|-80.0762;Port Everglades Inlet|26.09348|-80.11;Baker\'s Haulover Inlet|25.8997|-80.1242;Government Cut|25.7631|-80.1323;Bear Cut|25.73149|-80.15727;Gordon Pass|26.0931|-81.7981;Big Marco Pass|25.97472|-81.73998;Matanzas Pass|26.45843|-81.95342;Boca Grande Pass|26.71229|-82.25759;Venice Inlet|27.11255|-82.46787;Big Sarasota Pass|27.29418|-82.56608;Egmont Channel|27.5867|-83.0067;Clearwater Pass|27.9628|-82.82899;Hurricane Pass|28.05307|-82.8151;Pensacola Pass|30.326|-87.312;East Pass|30.39972|-86.5159;St. Andrew Bay Pass|30.125|-85.73".split(";").map(function(s){var p=s.split("|");return {n:p[0],lat:+p[1],lon:+p[2]};});
 function renderPiers() {
 var S = STR[state.lang], el = $("locPiers");
 if (!el || !PIERS.length) return;
-$("pierLabel").innerHTML = PIER_ICON + " " + escHTML(S.piers);
+$("pierLabel").innerHTML = pierIcon() + " " + escHTML(S.piers);
 var sorted = PIERS.map(function(p) { return { p: p, d: distMi(p.lat, p.lon, state.loc.lat, state.loc.lon) }; })
   .sort(function(a, b) { return a.d - b.d; }).slice(0, 3);
 var html = "";
 sorted.forEach(function(x, i) {
-  html += '<button class="piernearest" data-npi="' + i + '"><span>' + PIER_ICON + ' ' + escHTML(x.p.n) + '</span><span class="pdist">' + x.d.toFixed(1) + ' ' + escHTML(S.mi) + '</span></button>';
+  html += '<button class="piernearest" data-npi="' + i + '"><span>' + pierIcon() + ' ' + escHTML(x.p.n) + '</span><span class="pdist">' + x.d.toFixed(1) + ' ' + escHTML(S.mi) + '</span></button>';
 });
 el.innerHTML = html;
 var btns = el.querySelectorAll("[data-npi]");
@@ -487,13 +488,13 @@ if (typeof syncSticky === "function") syncSticky();
 function renderInlets() {
 var S = STR[state.lang], el = $("locInlets");
 if (!el) return;
-$("inletLabel").textContent = S.inlets;
+$("inletLabel").innerHTML = inletIcon() + " " + escHTML(S.inlets);
 if (!INLETS.length) { el.innerHTML = ""; return; }
 var sorted = INLETS.map(function(p) { return { p: p, d: distMi(p.lat, p.lon, state.loc.lat, state.loc.lon) }; })
   .sort(function(a, b) { return a.d - b.d; }).slice(0, 3);
 var html = "";
 sorted.forEach(function(x, i) {
-  html += '<button class="piernearest" data-nii="' + i + '"><span class="pname">🌊 ' + escHTML(x.p.n) + '</span><span class="pdist">' + x.d.toFixed(1) + ' ' + escHTML(S.mi) + '</span></button>';
+  html += '<button class="piernearest" data-nii="' + i + '"><span class="pname">" + inletIcon() + " ' + escHTML(x.p.n) + '</span><span class="pdist">' + x.d.toFixed(1) + ' ' + escHTML(S.mi) + '</span></button>';
 });
 el.innerHTML = html;
 var btns = el.querySelectorAll("[data-nii]");
@@ -521,7 +522,7 @@ function matchPiers(ql) {
 }
 function pierSearchHTML(pm) {
   var html = "";
-  pm.forEach(function(p, i) { html += '<button data-pqi="' + i + '">' + PIER_ICON + ' ' + escHTML(p.n) + "</button>"; });
+  pm.forEach(function(p, i) { html += '<button data-pqi="' + i + '">' + pierIcon() + ' ' + escHTML(p.n) + "</button>"; });
   return html;
 }
 function wirePierSearchBtns(box, pm) {
@@ -540,7 +541,7 @@ return INLETS.filter(function(p) { return p.n.toLowerCase().indexOf(ql) >= 0; })
 }
 function inletSearchHTML(im) {
 var html = "";
-im.forEach(function(p, i) { html += '<button data-nii="' + i + '">🌊 ' + escHTML(p.n) + "</button>"; });
+im.forEach(function(p, i) { html += '<button data-nii="' + i + '">" + inletIcon() + " ' + escHTML(p.n) + "</button>"; });
 return html;
 }
 function wireInletSearchBtns(box, im) {
@@ -594,7 +595,7 @@ navigator.geolocation.getCurrentPosition(function(pos) {
   if (np) { // close to a fishing pier — offer it instead of raw GPS coords
     locMsg("");
     var box = $("locResults");
-    box.innerHTML = '<div class="piersug"><div>' + PIER_ICON + ' ' + escHTML(S.nearPier.replace("{n}", np.pier.n).replace("{d}", np.dist.toFixed(1))) + '</div>' +
+    box.innerHTML = '<div class="piersug"><div>' + pierIcon() + ' ' + escHTML(S.nearPier.replace("{n}", np.pier.n).replace("{d}", np.dist.toFixed(1))) + '</div>' +
       '<div class="locrow"><button class="locact" id="npYes">' + escHTML(S.usePier) + '</button><button class="locact" id="npNo">' + escHTML(S.keepGps) + '</button></div></div>';
     $("npYes").addEventListener("click", function() { setLocation({ name: np.pier.n, lat: np.pier.lat, lon: np.pier.lon }); });
     $("npNo").addEventListener("click", function() { box.innerHTML = ""; gpsSetLoc(lat, lon); });
