@@ -1,15 +1,25 @@
 // clarity.js — satellite water clarity (Kd490) for Fishing Forecast
 // Loads via the Cloudflare worker (BUOY_PROXY). Silent null on any failure.
+// Source: NOAA CoastWatch ERDDAP (coastwatch.noaa.gov), VIIRS Kd490.
+// Chain: freshest 750m daily -> 750m US-sector dailies -> gapfilled 2km daily -> 4km weekly.
+var CLARITY_SOURCES = [
+  { id: "noaacwNPPVIIRSkd490SectorVYDaily", maxAge: 7 },     // 750m NRT daily, freshest
+  { id: "noaacwN20VIIRSkd490SectorUSDaily", maxAge: 14 },    // 750m NRT daily (NOAA-20)
+  { id: "noaacwN21VIIRSkd490SectorUSDaily", maxAge: 14 },    // 750m NRT daily (NOAA-21)
+  { id: "noaacwNPPN20S3AkdSCIDINEOF2kmDaily", maxAge: 30 },  // 2km gapfilled daily
+  { id: "noaacwNPPVIIRSkd490Weekly", maxAge: 45 }            // 4km weekly fallback
+];
 function loadClarity(lat, lon) {
-  // Kd490 in m^-1 (lower = clearer). Tries NRT daily (~3-day latency),
-  // falls back to weekly composite. Uses median of valid 4km cells in a box.
+  // Kd490 in m^-1 (lower = clearer). Tries sources freshest-first,
+  // uses median of valid cells in a ~0.24° box around the spot.
   if (typeof BUOY_PROXY === "undefined" || !BUOY_PROXY) return Promise.resolve(null);
   var px = BUOY_PROXY.replace(/\/$/, "") + "/?url=";
-  function boxURL(dataset, d) {
-    var q = "kd_490%5B(last):1:(last)%5D%5B(0.0):1:(0.0)%5D" +
-      "%5B(" + (lat - d).toFixed(2) + "):1:(" + (lat + d).toFixed(2) + ")%5D" +
-      "%5B(" + (lon - d).toFixed(2) + "):1:(" + (lon + d).toFixed(2) + ")%5D";
-    return "https://coastwatch.pfeg.noaa.gov/erddap/griddap/" + dataset + ".json?" + q;
+  var ERDDAP = "https://coastwatch.noaa.gov/erddap/griddap/";
+  function boxURL(id, d) {
+    var q = "kd_490%5B(last)%5D%5B(0)%5D" +
+      "%5B(" + (lat - d).toFixed(2) + "):(" + (lat + d).toFixed(2) + ")%5D" +
+      "%5B(" + (lon - d).toFixed(2) + "):(" + (lon + d).toFixed(2) + ")%5D";
+    return ERDDAP + id + ".json?" + q;
   }
   function parseClarity(text, maxAgeDays) {
     try {
@@ -27,15 +37,16 @@ function loadClarity(lat, lon) {
       return { kd: vals[Math.floor(vals.length / 2)], ageDays: ageDays };
     } catch (e) { return null; }
   }
-  function get(url, maxAge) {
-    return fetch(px + encodeURIComponent(url)).then(function(r) {
+  function get(src) {
+    return fetch(px + encodeURIComponent(boxURL(src.id, 0.12))).then(function(r) {
       if (!r.ok) throw 0; return r.text();
-    }).then(function(t) { return parseClarity(t, maxAge); });
+    }).then(function(t) { return parseClarity(t, src.maxAge); });
   }
-  return get(boxURL("nesdisVHNkd490Daily", 0.12), 7).then(function(c) {
-    if (c) return c;
-    return get(boxURL("nesdisVHNkd490Weekly", 0.12), 21);
-  }).catch(function() { return null; });
+  var p = Promise.resolve(null);
+  CLARITY_SOURCES.forEach(function(src) {
+    p = p.then(function(c) { return c ? c : get(src).catch(function() { return null; }); });
+  });
+  return p.catch(function() { return null; });
 }
 function clarityMod(kd, ageDays, species) {
   // Species-specific clarity scoring. Small modifier; halve weight if data is stale.
