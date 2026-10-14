@@ -223,10 +223,9 @@ function openModal() {
   h += '<button id="ffSnapClose" aria-label="close">✕</button>';
   h += "<h2>📸 " + s.mTitle + "</h2>";
   h += '<div class="ffRow"><label>' + s.photo + '</label>';
-  h += '<div id="ffSnapPhotoBox"><span>' + s.take + " / " + s.upload + '</span></div>';
-  h += '<div class="ffBtns" style="margin-top:8px"><button class="ffChip" id="ffCam">📷 ' + s.take + '</button>';
+  h += '<div id="ffSnapPhotoBox"><span>' + s.upload + '</span></div>';
+  h += '<div class="ffBtns" style="margin-top:8px">';
   h += '<button class="ffChip" id="ffUp">🖼 ' + s.upload + '</button></div></div>';
-  h += '<input type="file" id="ffFileCam" accept="image/*" capture="environment" hidden>';
   h += '<input type="file" id="ffFileUp" accept="image/*" hidden>';
   h += '<div class="ffRow"><label>' + s.species + '</label><div class="ffBtns" id="ffSpecies"></div></div>';
   h += '<div class="ffRow"><label>' + s.count + '</label><div class="ffStep">';
@@ -269,10 +268,8 @@ function openModal() {
   $("ffPlus").addEventListener("click", function () { cur.count = Math.min(99, cur.count + 1); $("ffCountN").textContent = cur.count; renderPreview(); });
 
   // photo
-  $("ffCam").addEventListener("click", function () { $("ffFileCam").click(); });
   $("ffUp").addEventListener("click", function () { $("ffFileUp").click(); });
   $("ffSnapPhotoBox").addEventListener("click", function () { $("ffFileUp").click(); });
-  $("ffFileCam").addEventListener("change", function () { loadPhoto(this.files[0]); this.value = ""; });
   $("ffFileUp").addEventListener("change", function () { loadPhoto(this.files[0]); this.value = ""; });
 
   // spot
