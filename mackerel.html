@@ -2064,9 +2064,6 @@ loadMarine(lat, lon).catch(function(e) { return { _err: e }; }),
 (station ? loadTides(station, fromD, toD).catch(function() { return []; }) : Promise.resolve([])),
 Promise.all(moonPs),
 
-loadBuoy(lat, lon).catch(function() { return null; }),
-loadClarity(lat, lon).catch(function() { return null; }),
-loadWaterLevel().catch(function() { return null; })
 ])
 .then(function(r) {
 try {
@@ -2075,35 +2072,38 @@ var wx = r[0], mar = r[1];
 state.wx = wx; state.mar = mar;
 state.isOcean = mar.hourly.sea_surface_temperature.some(function(v) { return v != null && !isNaN(v); });
 state.isShore = state.isOcean && ((mar.hourly.wave_height || []).some(function(v) { return v != null && !isNaN(v); }));
-state.buoy = r[4];
-state.clarity = r[5];
-state.waterlevel = r[6];
-if (state.buoy) {
-var bi = hourlyIndex(mar.hourly, Date.now());
-if (state.buoy.wtmp != null) mar.hourly.sea_surface_temperature[bi] = state.buoy.wtmp;
-if (state.buoy.wvht != null) mar.hourly.wave_height[bi] = state.buoy.wvht;
-}
-if (state.isShore) { try { localStorage.setItem("ff_last_shore", JSON.stringify({ name: state.loc.name, lat: state.loc.lat, lon: state.loc.lon })); } catch (e) {} }
+// ---- Phase 1: core forecast renders immediately ----
+state.buoy = null; state.clarity = null; state.waterlevel = null;
 state.tides = r[2];
 var all = [];
 r[3].forEach(function(arr) { arr.forEach(function(w) { all.push(w); }); });
 state.moon = dedupeMoon(all);
-state.days = buildDays(wx, mar);
-if (state.clarity && state.days.length) {
-  var _cm = clarityMod(state.clarity.kd, state.clarity.ageDays, "mackerel", (mar.hourly.wave_height[bi] || 0) * 3.28084);
-  if (_cm) state.days[0].score = Math.max(0, Math.min(100, state.days[0].score + _cm));
-}
-if (state.waterlevel && state.days.length) {
-  var _wl = waterLevelMod(state.waterlevel.anomalyFt);
-  var _wld = distMi(state.loc.lat, state.loc.lon, COOPS_LAT, COOPS_LON);
-  if (_wld > 60) _wl = 0; else if (_wld > 30) _wl = Math.round(_wl / 2);
-  if (_wl) state.days[0].score = Math.max(0, Math.min(100, state.days[0].score + _wl));
-}
-applySeasonalBoosts("mackerel");
+if (state.isShore) { try { localStorage.setItem("ff_last_shore", JSON.stringify({ name: state.loc.name, lat: state.loc.lat, lon: state.loc.lon })); } catch (e) {} }
+var myLoad = Date.now() + Math.random();
+state.loadId = myLoad;
+rebuildScores("mackerel");
 state.sel = 0;
 state.ready = true; state.loading = false;
 state.updatedAt = new Date();
 renderAll();
+// ---- Phase 2: slow auxiliaries layer in as they arrive ----
+function auxLayer(promise, apply) {
+  withTimeout(promise, 15000).catch(function() { return null; }).then(function(v) {
+    if (!v || state.loadId !== myLoad || !state.ready) return;
+    apply(v);
+    rebuildScores("mackerel");
+    state.updatedAt = new Date();
+    renderAll();
+  });
+}
+auxLayer(loadBuoy(lat, lon), function(b) {
+  state.buoy = b;
+  var bi2 = hourlyIndex(state.mar.hourly, Date.now());
+  if (b.wtmp != null) state.mar.hourly.sea_surface_temperature[bi2] = b.wtmp;
+  if (b.wvht != null) state.mar.hourly.wave_height[bi2] = b.wvht;
+});
+auxLayer(loadClarity(lat, lon), function(cl) { state.clarity = cl; });
+auxLayer(loadWaterLevel(), function(wl) { state.waterlevel = wl; });
 } catch (e) { state.loading = false; showError(); }
 })
 .catch(function() { state.loading = false; showError(); });
