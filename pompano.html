@@ -492,7 +492,7 @@ function renderInlets() {
     .sort(function(a, b) { return a.d - b.d; }).slice(0, 3);
   var html = "";
   sorted.forEach(function(x, i) {
-    html += '<button class="piernearest" data-nii="' + i + '"><span class="pname">" + inletIcon() + " ' + escHTML(x.p.n) + '</span><span class="pdist">' + x.d.toFixed(1) + ' ' + escHTML(S.mi) + '</span></button>';
+    html += '<button class="piernearest" data-nii="' + i + '"><span class="pname">' + inletIcon() + ' ' + escHTML(x.p.n) + '</span><span class="pdist">' + x.d.toFixed(1) + ' ' + escHTML(S.mi) + '</span></button>';
   });
   el.innerHTML = html;
   var btns = el.querySelectorAll("[data-nii]");
@@ -539,7 +539,7 @@ function matchInlets(ql) {
 }
 function inletSearchHTML(im) {
   var html = "";
-  im.forEach(function(p, i) { html += '<button data-nii="' + i + '">" + inletIcon() + " ' + escHTML(p.n) + "</button>"; });
+  im.forEach(function(p, i) { html += '<button data-nii="' + i + '">' + inletIcon() + ' ' + escHTML(p.n) + "</button>"; });
   return html;
 }
 function wireInletSearchBtns(box, im) {
