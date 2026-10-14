@@ -75,3 +75,118 @@ function clarityMod(kd, ageDays, species, surfFt) {
   if (ageDays > 7) m = Math.round(m / 2);
   return m;
 }
+
+// ---- Seasonal & event scoring helpers (shared by all species pages) ----
+// Mullet run, cold-front pulse, and water-level anomaly. All fail-safe:
+// any missing data returns 0/null and the forecast continues without it.
+
+function mulletRunBoost(date) {
+  // Fall mullet run: Sep 15 - Nov 15, peaking in October.
+  // Returns {snook, mackerel} point boosts, or null outside the run.
+  var m = date.getMonth() + 1, d = date.getDate();
+  var inRun = (m === 9 && d >= 15) || (m === 10) || (m === 11 && d <= 15);
+  if (!inRun) return null;
+  var peak = (m === 10);
+  return { snook: peak ? 6 : 4, mackerel: peak ? 5 : 3 };
+}
+
+function detectFronts() {
+  // Cold-front passage days from: pressure trough + northerly wind shift + temp drop.
+  // Uses state.wx.hourly (includes past_days history when the page requests it).
+  var h = (typeof state !== "undefined" && state.wx) ? state.wx.hourly : null;
+  if (!h || !h.time || !h.pressure_msl || !h.winddirection_10m || !h.temperature_2m) return [];
+  var days = {};
+  for (var i = 0; i < h.time.length; i++) {
+    var dt = new Date(h.time[i]);
+    var k = dt.getFullYear() + "-" + dt.getMonth() + "-" + dt.getDate();
+    var g = days[k];
+    if (!g) g = days[k] = { minP: 1e9, maxP: -1e9, sumT: 0, nT: 0, north: 0, nW: 0 };
+    var p = h.pressure_msl[i];
+    if (p != null && !isNaN(p)) { if (p < g.minP) g.minP = p; if (p > g.maxP) g.maxP = p; }
+    var t = h.temperature_2m[i];
+    if (t != null && !isNaN(t)) { g.sumT += t; g.nT++; }
+    var wd = h.winddirection_10m[i];
+    if (wd != null && !isNaN(wd)) { g.nW++; if (wd >= 315 || wd <= 67.5) g.north++; }
+  }
+  var keys = Object.keys(days).sort();
+  var fronts = [];
+  for (var j = 1; j < keys.length; j++) {
+    var prev = days[keys[j - 1]], cur = days[keys[j]];
+    if (!prev.nT || !cur.nT || !cur.nW) continue;
+    var trough = prev.maxP - cur.minP;
+    var tempDrop = (prev.sumT / prev.nT) - (cur.sumT / cur.nT);
+    var northFrac = cur.north / cur.nW;
+    if (trough >= 4 && tempDrop >= 4 && northFrac >= 0.5) {
+      var parts = keys[j].split("-");
+      fronts.push(new Date(+parts[0], +parts[1], +parts[2]));
+    }
+  }
+  return fronts;
+}
+
+function frontPulseBoost(date, fronts) {
+  // Pompano's #1 trigger per FL guides: +5/+3/+2 on days 1-3 after a cold front.
+  var best = 0;
+  for (var i = 0; i < fronts.length; i++) {
+    var dd = Math.round((date - fronts[i]) / 86400000);
+    if (dd === 1) best = Math.max(best, 5);
+    else if (dd === 2) best = Math.max(best, 3);
+    else if (dd === 3) best = Math.max(best, 2);
+  }
+  return best;
+}
+
+function applySeasonalBoosts(species) {
+  // Mullet-run + post-front pulse. Call after buildDays(); adjusts state.days scores.
+  if (typeof state === "undefined" || !state.days || !state.days.length) return;
+  var fronts = (species === "pompano") ? detectFronts() : [];
+  var now = new Date();
+  for (var i = 0; i < state.days.length; i++) {
+    var date = new Date(now.getFullYear(), now.getMonth(), now.getDate() + i);
+    var b = 0;
+    var mr = mulletRunBoost(date);
+    if (mr) b += (species === "snook") ? mr.snook : (species === "mackerel" ? mr.mackerel : 0);
+    if (species === "pompano") b += frontPulseBoost(date, fronts);
+    if (b) state.days[i].score = Math.max(0, Math.min(100, state.days[i].score + b));
+  }
+}
+
+// ---- Water-level anomaly (NOAA CO-OPS, station 8722670 Lake Worth Pier) ----
+var COOPS_LAT = 26.612, COOPS_LON = -80.034;
+
+function loadWaterLevel() {
+  // Observed minus predicted water level (ft), mean over the last ~6h.
+  // Positive = wind-stacked; negative = blown out. Null on any failure.
+  if (typeof BUOY_PROXY === "undefined" || !BUOY_PROXY) return Promise.resolve(null);
+  var px = BUOY_PROXY.replace(/\/$/, "") + "/?url=";
+  function coops(product) {
+    var u = "https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?product=" + product +
+      "&station=8722670&datum=MLLW&time_zone=gmt&units=english&format=json&date=recent";
+    return fetch(px + encodeURIComponent(u)).then(function(r) {
+      if (!r.ok) throw 0; return r.json();
+    });
+  }
+  return Promise.all([coops("water_level"), coops("predictions")]).then(function(res) {
+    var ob = {}, pr = {};
+    (res[0].data || []).forEach(function(d) { if (d.v) ob[d.t] = parseFloat(d.v); });
+    (res[1].predictions || []).forEach(function(d) { pr[d.t] = parseFloat(d.v); });
+    var anoms = [];
+    for (var t in ob) {
+      if (pr[t] != null && !isNaN(pr[t])) anoms.push({ t: t, a: ob[t] - pr[t] });
+    }
+    if (anoms.length < 12) return null;
+    anoms.sort(function(x, y) { return x.t < y.t ? -1 : 1; });
+    var tail = anoms.slice(-60), sum = 0;
+    tail.forEach(function(x) { sum += x.a; });
+    return { anomalyFt: sum / tail.length };
+  }).catch(function() { return null; });
+}
+
+function waterLevelMod(anomalyFt) {
+  if (anomalyFt == null || isNaN(anomalyFt)) return 0;
+  if (anomalyFt >= 1.0) return -2;  // stacked way high, surf blown out
+  if (anomalyFt >= 0.4) return 2;   // nicely stacked, bait pushed inshore
+  if (anomalyFt <= -1.0) return -4; // blown out, troughs drained
+  if (anomalyFt <= -0.4) return -2; // running low
+  return 0;
+}
