@@ -14,7 +14,8 @@
 
 const ALLOW = [
   { host: 'www.ndbc.noaa.gov', prefix: '/data/realtime2/' },       // buoy observations
-  { host: 'coastwatch.pfeg.noaa.gov', prefix: '/erddap/' },        // satellite SST/chlorophyll
+  { host: 'coastwatch.noaa.gov', prefix: '/erddap/' },               // satellite Kd490 (water clarity)
+  { host: 'coastwatch.pfeg.noaa.gov', prefix: '/erddap/' },        // legacy CoastWatch host
 ];
 
 const CATCH_SPECIES = ['pompano', 'snook', 'mackerel'];
