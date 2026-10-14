@@ -13,6 +13,7 @@
 //   NOTE: repo is public — reports carry no name/device/photo, spot only.
 
 const ALLOW = [
+  { host: 'api.tidesandcurrents.noaa.gov', prefix: '/api/prod/datagetter' }, // CO-OPS water level
   { host: 'www.ndbc.noaa.gov', prefix: '/data/realtime2/' },       // buoy observations
   { host: 'coastwatch.noaa.gov', prefix: '/erddap/' },               // satellite Kd490 (water clarity)
   { host: 'coastwatch.pfeg.noaa.gov', prefix: '/erddap/' },        // legacy CoastWatch host
