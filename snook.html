@@ -338,6 +338,7 @@
 </div>
 <script src="buoys.js"></script>
 <script src="clarity.js"></script>
+<script src="snap.js"></script>
 <script>
 "use strict";
 /* Fixed header: spacer keeps page flow; sync after panel toggles/resize */
@@ -443,6 +444,7 @@ function loadBuoy(lat,lon){if(!BUOY_PROXY)return Promise.resolve(null);var b=nea
 function resolveLoc(l) {
 l.station = nearestStation(l.lat, l.lon);
 l.home = distMi(l.lat, l.lon, PIN.lat, PIN.lon) < 30;
+l.inFL = l.lat >= 24.3 && l.lat <= 31.1 && l.lon >= -87.8 && l.lon <= -79.8; // FWC rules are statewide in FL waters
 return l;
 }
 function getSavedLoc() {
@@ -1618,7 +1620,7 @@ $("refBtn").textContent = S.refresh;
 $("backBtn").textContent = S.back;
 $("locGPS2").textContent = S.currentLoc;
 $("locChange").textContent = S.chgLoc;
-$("rules").innerHTML = (state.loc.home ? S.rules + " " + seasonPillHTML() : '<span class="regsn">' + S.checkRegs + "</span>") + '<div class="regdis">' + S.regDis + '<a class="frlink" href="https://app.fishrulesapp.com/regulations/28687?species=Snook%20(all%20species)" target="_blank" rel="noopener">Fish Rules \u2192</a></div>';
+$("rules").innerHTML = (state.loc.inFL ? S.rules + " " + seasonPillHTML() : '<span class="regsn">' + S.checkRegs + "</span>") + '<div class="regdis">' + S.regDis + '<a class="frlink" href="https://app.fishrulesapp.com/regulations/28687?species=Snook%20(all%20species)" target="_blank" rel="noopener">Fish Rules \u2192</a></div>';
 if (typeof syncSticky === "function") syncSticky();
 }
 
