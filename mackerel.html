@@ -1133,7 +1133,7 @@ function loadWeather(lat, lon) {
 var u = "https://api.open-meteo.com/v1/forecast?latitude=" + lat + "&longitude=" + lon +
 "&hourly=temperature_2m,precipitation_probability,precipitation,windspeed_10m,winddirection_10m,wind_gusts_10m,weather_code,is_day,pressure_msl" +
 "&daily=temperature_2m_max,temperature_2m_min,weather_code,precipitation_probability_max,sunrise,sunset" +
-"&timezone=auto&forecast_days=7&temperature_unit=fahrenheit&windspeed_unit=mph";
+"&timezone=auto&forecast_days=7&past_days=2&temperature_unit=fahrenheit&windspeed_unit=mph";
 return fetchJSON(u);
 }
 function loadMarine(lat, lon) {
@@ -2065,7 +2065,8 @@ loadMarine(lat, lon).catch(function(e) { return { _err: e }; }),
 Promise.all(moonPs),
 
 loadBuoy(lat, lon).catch(function() { return null; }),
-loadClarity(lat, lon).catch(function() { return null; })
+loadClarity(lat, lon).catch(function() { return null; }),
+loadWaterLevel().catch(function() { return null; })
 ])
 .then(function(r) {
 try {
@@ -2076,6 +2077,7 @@ state.isOcean = mar.hourly.sea_surface_temperature.some(function(v) { return v !
 state.isShore = state.isOcean && ((mar.hourly.wave_height || []).some(function(v) { return v != null && !isNaN(v); }));
 state.buoy = r[4];
 state.clarity = r[5];
+state.waterlevel = r[6];
 if (state.buoy) {
 var bi = hourlyIndex(mar.hourly, Date.now());
 if (state.buoy.wtmp != null) mar.hourly.sea_surface_temperature[bi] = state.buoy.wtmp;
@@ -2091,6 +2093,13 @@ if (state.clarity && state.days.length) {
   var _cm = clarityMod(state.clarity.kd, state.clarity.ageDays, "mackerel", (mar.hourly.wave_height[bi] || 0) * 3.28084);
   if (_cm) state.days[0].score = Math.max(0, Math.min(100, state.days[0].score + _cm));
 }
+if (state.waterlevel && state.days.length) {
+  var _wl = waterLevelMod(state.waterlevel.anomalyFt);
+  var _wld = distMi(state.loc.lat, state.loc.lon, COOPS_LAT, COOPS_LON);
+  if (_wld > 60) _wl = 0; else if (_wld > 30) _wl = Math.round(_wl / 2);
+  if (_wl) state.days[0].score = Math.max(0, Math.min(100, state.days[0].score + _wl));
+}
+applySeasonalBoosts("mackerel");
 state.sel = 0;
 state.ready = true; state.loading = false;
 state.updatedAt = new Date();
