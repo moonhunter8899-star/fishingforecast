@@ -48,8 +48,10 @@ function loadClarity(lat, lon) {
   });
   return p.catch(function() { return null; });
 }
-function clarityMod(kd, ageDays, species) {
+function clarityMod(kd, ageDays, species, surfFt) {
   // Species-specific clarity scoring. Small modifier; halve weight if data is stale.
+  // surfFt (optional): current surf height in feet — surf stirs sand in the
+  // shallows, so the beach runs murkier than the satellite's offshore reading.
   if (kd == null) return 0;
   var m = 0;
   if (species === "snook") {
@@ -60,6 +62,15 @@ function clarityMod(kd, ageDays, species) {
     else if (kd < 0.35) m = 0;
     else if (kd < 0.7) m = species === "mackerel" ? -3 : -2;
     else m = species === "mackerel" ? -5 : -4;
+  }
+  if (surfFt != null && !isNaN(surfFt)) {
+    if (species === "snook") {
+      if (surfFt > 3) m = Math.max(m, 1);        // churned shallows help ambush
+    } else if (surfFt > 3) {
+      m = Math.min(m, -2);                        // rough: beach churned whatever the satellite says
+    } else if (surfFt >= 2) {
+      m = Math.min(m, 0);                         // moderate: clear-water bonus doesn't reach the beach
+    }
   }
   if (ageDays > 7) m = Math.round(m / 2);
   return m;
