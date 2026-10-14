@@ -770,7 +770,7 @@ en: {
 loading: "Checking mackerel conditions…",
 rating: "SPANISH MACKEREL BITE RATING", today: "TODAY",
 pickDay: "Pick a day", best: "★ BEST", bestWeek: "BEST DAY THIS WEEK", goDay: "GO DAY",
-goFish: "BEST TIME TO FISH", inFish: function(d) { return "in " + d; }, nowFish: "NOW", gotAway: "The one that got away! 🎣", wind: "WIND", water: "WATER", surf: "SURF", calm: "Calm", moderate: "Moderate", rough: "Rough", cond: "CONDITION", rain: "RAIN", clarity: "CLARITY", clrClear: "Clear", clrStained: "Stained", clrMurky: "Murky", moon: "MOON", sunrise: "SUNRISE", sunset: "SUNSET", catch: "Catch",
+goFish: "BEST TIME TO FISH", inFish: function(d) { return "in " + d; }, nowFish: "NOW", gotAway: "The one that got away! 🎣", wind: "WIND", water: "WATER", surf: "SURF", calm: "Calm", moderate: "Moderate", rough: "Rough", cond: "CONDITION", rain: "RAIN", clarity: "CLARITY", clrClear: "Clear", clrStained: "Stained", clrMurky: "Murky", clrToday: "today", clrDay: "day", clrDays: "days", moon: "MOON", sunrise: "SUNRISE", sunset: "SUNSET", catch: "Catch",
 searchPh: "Enter a beach, an inlet, or coordinates…", useMyLoc: "Use my location", homeBtn: "⌂ Jupiter Inlet",
 locating: "Locating…", geoDenied: "Location unavailable — check permission", geoUnsupported: "Geolocation not supported",
 currentLoc: "Current location", checkRegs: "Check local fishing regulations", regDis: "Info only, not legal advice \u2014 we are not responsible for your actions. Always verify current regulations yourself.", noResults: "No places found", resolvingLink: "Resolving map link\u2026", linkFail: "Couldn\u2019t read that map link \u2014 try coordinates like 26.76, -80.11",
@@ -816,7 +816,7 @@ vi: {
 loading: "Đang kiểm tra điều kiện câu cá…",
 rating: "ĐIỂM CẮN CÂU CÁ THU", today: "HÔM NAY",
 pickDay: "Chọn ngày", best: "★ ĐẸP NHẤT", bestWeek: "NGÀY ĐẸP NHẤT TUẦN", goDay: "ĐI NGAY",
-goFish: "GIỜ CÂU TỐT NHẤT", inFish: function(d) { return "sau " + d; }, nowFish: "BÂY GIỜ", gotAway: "Cá chạy mất tiêu rồi! 🎣", wind: "GIÓ", water: "NƯỚC", surf: "SÓNG", calm: "Êm", moderate: "Vừa", rough: "Động", cond: "THỜI TIẾT", rain: "MƯA", clarity: "ĐỘ TRONG", clrClear: "Trong", clrStained: "Hơi đục", clrMurky: "Đục", moon: "TRĂNG", sunrise: "BÌNH MINH", sunset: "HOÀNG HÔN", catch: "Cá câu được",
+goFish: "GIỜ CÂU TỐT NHẤT", inFish: function(d) { return "sau " + d; }, nowFish: "BÂY GIỜ", gotAway: "Cá chạy mất tiêu rồi! 🎣", wind: "GIÓ", water: "NƯỚC", surf: "SÓNG", calm: "Êm", moderate: "Vừa", rough: "Động", cond: "THỜI TIẾT", rain: "MƯA", clarity: "ĐỘ TRONG", clrClear: "Trong", clrStained: "Hơi đục", clrMurky: "Đục", clrToday: "hôm nay", clrDay: "ngày", clrDays: "ngày", moon: "TRĂNG", sunrise: "BÌNH MINH", sunset: "HOÀNG HÔN", catch: "Cá câu được",
 searchPh: "Nhập bãi biển, cửa lạch hoặc tọa độ…", useMyLoc: "Vị trí của tôi", homeBtn: "⌂ Jupiter Inlet",
 locating: "Đang định vị…", geoDenied: "Không lấy được vị trí — kiểm tra quyền", geoUnsupported: "Thiết bị không hỗ trợ định vị",
 currentLoc: "Vị trí hiện tại", checkRegs: "Kiểm tra quy định câu cá địa phương", regDis: "Chỉ để tham khảo, không phải tư vấn pháp lý \u2014 chúng tôi không chịu trách nhiệm về hành động của bạn. Hãy tự kiểm tra quy định hiện hành.", noResults: "Không tìm thấy địa điểm", resolvingLink: "Đang mở liên kết bản đồ\u2026", linkFail: "Không đọc được liên kết \u2014 thử tọa độ, ví dụ 26.76, -80.11",
@@ -1921,7 +1921,11 @@ function clarityTileVal() {
 // Satellite snapshot = today's water only; future days show —.
 if (state.sel !== 0 || !state.clarity || state.clarity.kd == null) return "\u2014";
 var kd = state.clarity.kd;
-return kd < 0.15 ? S.clrClear : kd < 0.35 ? S.clrStained : S.clrMurky;
+var w = kd < 0.15 ? S.clrClear : kd < 0.35 ? S.clrStained : S.clrMurky;
+var a = state.clarity.ageDays;
+if (a == null || isNaN(a)) return w;
+var age = a <= 0 ? S.clrToday : a + " " + (a === 1 ? S.clrDay : S.clrDays);
+return w + " (" + age + ")";
 }
 html += '<div class="tiles">' +
 '<div class="tile"><div class="k">' + _lblWind() + ' ' + S.wind + '</div><div class="v">' + day.wind + (day.gust != null ? " | " + day.gust : "") + " " + day.windDir + "</div></div>" +
