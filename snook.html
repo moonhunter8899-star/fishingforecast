@@ -2128,7 +2128,7 @@ r[3].forEach(function(arr) { arr.forEach(function(w) { all.push(w); }); });
 state.moon = dedupeMoon(all);
 state.days = buildDays(wx, mar);
 if (state.clarity && state.days.length) {
-  var _cm = clarityMod(state.clarity.kd, state.clarity.ageDays, "snook");
+  var _cm = clarityMod(state.clarity.kd, state.clarity.ageDays, "snook", (mar.hourly.wave_height[bi] || 0) * 3.28084);
   if (_cm) state.days[0].score = Math.max(0, Math.min(100, state.days[0].score + _cm));
 }
 state.sel = 0;
