@@ -1903,19 +1903,16 @@ html += '<div class="topcard" id="topcard" style="border-color:' + c0 + '">' +
 (state.sel === 0 ? ' · <span id="clock">' + clockStr(state.lang) + "</span>" : "") + "</div>" +
 "</div></div>" +
 "</div>";
-var bestIdx = 0;
-state.days.forEach(function(d, i) { if (d.score > state.days[bestIdx].score) bestIdx = i; });
 html += '<div class="pick"><span class="ph">' + S.pickDay + "</span>" +
 '<span class="pr">' + S.months[d0.date.getMonth()] + " " + d0.date.getDate() + " – " +
 S.months[state.days[6].date.getMonth()] + " " + state.days[6].date.getDate() + "</span></div>";
 html += '<div class="strip">';
 state.days.forEach(function(d, i) {
 var c = ratingColor(d.score);
-var cls = "dpill" + (i === state.sel ? " sel" : "") + (i === bestIdx ? " best" : "");
+var cls = "dpill" + (i === state.sel ? " sel" : "");
 var dw = i === 0 ? S.todayWord.toUpperCase() : S.days[d.date.getDay()];
 html += '<div class="' + cls + '" data-day="' + i + '"' +
 (i === state.sel ? ' style="background:' + c + '"' : "") + ">" +
-(i === bestIdx ? '<span class="bestbadge">' + S.best + "</span>" : "") +
 '<div class="dw">' + dw + '</div><div class="dn">' + d.date.getDate() + "</div>" +
 '<div style="margin:2px 0">' + snookSVG(i === state.sel ? "#ffffff" : c, 15) + "</div>" +
 '<div class="dsc" style="color:' + (i === state.sel ? "#fff" : c) + '">' + d.score + "</div>" +
