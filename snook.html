@@ -570,13 +570,17 @@ var _locSearchFocusAt = 0;
 document.addEventListener("focusin", function(e) {
   if (e.target && e.target.id === "locSearch") _locSearchFocusAt = Date.now();
 });
-window.addEventListener("scroll", function() {
+function _maybeCollapseLoc() {
   var p = $("locPanel"), q = $("locSearch");
   if (!p || p.hidden) return;
   if (Date.now() - _locSearchFocusAt < 1200) return; // ignore keyboard auto-scroll
   if (q && q.value) return; // don't discard an in-progress search
   hideLocPanel();
-}, { passive: true });
+}
+window.addEventListener("scroll", _maybeCollapseLoc, { passive: true });
+document.addEventListener("scroll", _maybeCollapseLoc, { passive: true, capture: true });
+window.addEventListener("touchmove", _maybeCollapseLoc, { passive: true });
+window.addEventListener("wheel", _maybeCollapseLoc, { passive: true });
 function setLocation(loc) {
 state.loc = resolveLoc({ name: loc.name, lat: loc.lat, lon: loc.lon });
 try { localStorage.setItem("ff_loc", JSON.stringify({ name: state.loc.name, lat: state.loc.lat, lon: state.loc.lon })); } catch (e) {}
