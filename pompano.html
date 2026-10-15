@@ -606,17 +606,6 @@ function useMyLocation() {
       return;
     }
     var lat = pos.coords.latitude, lon = pos.coords.longitude;
-    var np = nearestPier(lat, lon, 2);
-    if (np) { // close to a fishing pier — offer it instead of raw GPS coords
-      locMsg("");
-      var box = $("locResults");
-      box.innerHTML = '<div class="piersug"><div>' + pierIcon() + ' ' + escHTML(S.nearPier.replace("{n}", np.pier.n).replace("{d}", np.dist.toFixed(1))) + '</div>' +
-        '<div class="locrow"><button class="locact" id="npYes">' + escHTML(S.usePier) + '</button><button class="locact" id="npNo">' + escHTML(S.keepGps) + '</button></div></div>';
-      $("npYes").addEventListener("click", function() { setLocation({ name: np.pier.n, lat: np.pier.lat, lon: np.pier.lon }); });
-      $("npNo").addEventListener("click", function() { box.innerHTML = ""; gpsSetLoc(lat, lon); });
-      if (typeof syncSticky === "function") syncSticky();
-      return;
-    }
     gpsSetLoc(lat, lon);
   }, function() { locMsg(S.geoDenied); }, { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 });
 }
