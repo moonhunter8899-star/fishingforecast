@@ -336,6 +336,7 @@
 </div>
 <script src="buoys.js"></script>
 <script src="clarity.js"></script>
+<script src="shore.js"></script>
 <script>
 "use strict";
 /* Fixed header: spacer keeps page flow; sync after panel toggles/resize */
@@ -2123,7 +2124,7 @@ function startLoad() {
         var wx = r[0], mar = r[1];
         state.wx = wx; state.mar = mar;
         state.isOcean = mar.hourly.sea_surface_temperature.some(function(v) { return v != null && !isNaN(v); });
-state.isShore = state.isOcean && ((mar.hourly.wave_height || []).some(function(v) { return v != null && !isNaN(v); }));
+state.isShore = state.isOcean && ((mar.hourly.wave_height || []).some(function(v) { return v != null && !isNaN(v); })) && (typeof shoreOk !== "function" || shoreOk(lat, lon));
 // ---- Phase 1: core forecast renders immediately ----
 state.buoy = null; state.clarity = null; state.waterlevel = null;
 state.tides = r[2];
