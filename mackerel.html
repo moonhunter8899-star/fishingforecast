@@ -1921,6 +1921,7 @@ var kd = state.clarity.kd;
 var w = kd < 0.15 ? S.clrClear : kd < 0.35 ? S.clrStained : S.clrMurky;
 var a = state.clarity.ageDays;
 if (a == null || isNaN(a)) return w;
+a = Math.round(a);
 var age = a <= 0 ? S.clrToday : a + " " + (a === 1 ? S.clrDay : S.clrDays);
 return w + " (" + age + ")";
 }
