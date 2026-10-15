@@ -565,6 +565,12 @@ return '<svg width="' + s + '" height="' + Math.round(s * 1.25) + '" viewBox="0 
 }
 function locMsg(t) { var el = $("locMsg"); if (el) el.textContent = t || ""; }
 function hideLocPanel() { var p = $("locPanel"); if (p) p.hidden = true; syncSticky(); }
+// Auto-collapse the location panel when the user scrolls away from it.
+// Skipped while typing in the search box (keyboard pop can shift the viewport).
+window.addEventListener("scroll", function() {
+  var p = $("locPanel");
+  if (p && !p.hidden && document.activeElement !== $("locSearch")) hideLocPanel();
+}, { passive: true });
 function setLocation(loc) {
 state.loc = resolveLoc({ name: loc.name, lat: loc.lat, lon: loc.lon });
 try { localStorage.setItem("ff_loc", JSON.stringify({ name: state.loc.name, lat: state.loc.lat, lon: state.loc.lon })); } catch (e) {}
