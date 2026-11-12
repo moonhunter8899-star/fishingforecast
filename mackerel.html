@@ -171,6 +171,11 @@ font-family: "Public Sans", sans-serif; font-size: 14px; font-weight: 800; white
 .tile .k { font-size: 9px; font-weight: 700; letter-spacing: .06em; color: #8a7a5f; text-transform: uppercase; }
 .tile .v { font-family: "Fraunces", serif; font-size: 15px; font-weight: 800; margin-top: 3px; white-space: nowrap; }
 .tile .v svg { vertical-align: -4px; }
+  .wind-arrow { display: inline-block; transform: rotate(var(--r, 0deg)); vertical-align: -2px; }
+  .wind-arrow svg { display: block; animation: windsway 2.6s ease-in-out infinite alternate; }
+  @keyframes windsway { from { transform: rotate(-7deg) translateY(.5px); } to { transform: rotate(7deg) translateY(-.5px); } }
+  @media (prefers-reduced-motion: reduce) { .wind-arrow svg { animation: none; } }
+
 .tile .msub { font-size: 9px; font-weight: 700; color: #8a7a5f; margin-top: 2px; white-space: nowrap; }
 .tile .sundrow { display: flex; align-items: stretch; justify-content: center; gap: 10px; }
 .tile .sundiv { width: 1px; background: rgba(90,70,40,.25); }
@@ -873,6 +878,13 @@ function compass(deg) {
 var dirs = ["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSW","SW","WSW","W","WNW","NW","NNW"];
 return dirs[Math.round(deg / 22.5) % 16];
 }
+function windArrow(deg) {
+  // Sleek two-tone dart pointing where the wind blows TO (meteo deg is where it comes FROM).
+  if (deg == null || isNaN(deg)) return "";
+  var r = (deg + 180) % 360;
+  return '<span class="wind-arrow" style="--r:' + r + 'deg"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M12 2.5 L12 16.4 L5.5 20 Z" fill="#0f6b6b"/><path d="M12 2.5 L18.5 20 L12 16.4 Z" fill="#b98a2e"/></svg></span>';
+}
+
 function tstr(d, lang) { // 12h in both languages, e.g. "7:35p"
 var h = d.getHours(), ap = h >= 12 ? "p" : "a";
 h = h % 12; if (h === 0) h = 12;
@@ -1352,6 +1364,7 @@ days.push({
 date: date, score: dayScore, windows: windows, best: best, hs: hs,
 wind: Math.round(wx.hourly.windspeed_10m[wi]),
 windDir: compass(wx.hourly.winddirection_10m[wi]),
+      windDeg: wx.hourly.winddirection_10m[wi],
 gust: (wx.hourly.wind_gusts_10m && wi >= 0 && wx.hourly.wind_gusts_10m[wi] != null) ? Math.round(wx.hourly.wind_gusts_10m[wi]) : null,
 water: (function(w){ return (w == null || isNaN(w)) ? null : Math.round(w * 10) / 10; })(mar.hourly.sea_surface_temperature[mi2]),
 waveFt: Math.round(wv * 10) / 10,
@@ -1571,7 +1584,7 @@ var isDay = (wx.is_day && wx.is_day[i] != null) ? wx.is_day[i] : 1;
 var wsp = Math.round(wx.windspeed_10m[i]);
 var wdir = compass(wx.winddirection_10m[i]);
 var gst = (wx.wind_gusts_10m && wx.wind_gusts_10m[i] != null) ? Math.round(wx.wind_gusts_10m[i]) : null;
-var sky = condIcon(code, isDay) + " " + wsp + (gst != null ? " | " + gst : "") + " " + wdir;
+var sky = condIcon(code, isDay) + " " + wsp + (gst != null ? " | " + gst : "") + " " + windArrow(wx.winddirection_10m[i]) + " " + wdir;
 var rp = wx.precipitation_probability[i];
 var air = Math.round(wx.temperature_2m[i]);
 var wtr = mar.sea_surface_temperature[mi];
@@ -1656,7 +1669,7 @@ function windFoot() {
 var ft = $("radarFoot");
 if (ft && mapMode === "wind" && state.days.length) {
 var d = state.days[state.sel];
-ft.textContent = STR[state.lang].wind + " \u00b7 " + d.wind + " mph " + d.windDir;
+ft.innerHTML = STR[state.lang].wind + " \u00b7 " + d.wind + " mph " + windArrow(d.windDeg) + " " + d.windDir;
 }
 }
 
@@ -1858,7 +1871,7 @@ bestEnd: _bb ? new Date(_bb.end).getTime() : null,
 tideH: _th == null ? null : Math.round(_th * 10) / 10,
 tideDir: _th == null ? 0 : (tideAt(_now + 1800000) > _th ? 1 : -1),
 nextMajor: _mj ? _mj.start : null, nextMinor: _mn ? _mn.start : null,
-wind: _gd.wind, gust: _gd.gust, windDir: _gd.windDir, rain: _gd.rain
+wind: _gd.wind, gust: _gd.gust, windDir: _gd.windDir, windDeg: _gd.windDeg, rain: _gd.rain
 }));
 } catch (e) {}
 
@@ -1932,7 +1945,7 @@ var age = a <= 0 ? S.clrToday : a + " " + (a === 1 ? S.clrDay : S.clrDays);
 return w + " (" + age + ")";
 }
 html += '<div class="tiles">' +
-'<div class="tile"><div class="k">' + _lblWind() + ' ' + S.wind + '</div><div class="v">' + day.wind + (day.gust != null ? " | " + day.gust : "") + " " + day.windDir + "</div></div>" +
+'<div class="tile"><div class="k">' + _lblWind() + ' ' + S.wind + '</div><div class="v">' + day.wind + (day.gust != null ? " | " + day.gust : "") + " " + windArrow(day.windDeg) + " " + day.windDir + "</div></div>" +
 '<div class="tile"><div class="wsplit"><div class="whalf"><div class="k">' + _lblWater() + ' ' + S.water + '</div><div class="v">' + (day.water == null ? "\u2014" : Math.round(day.water) + "\u00b0F") + '</div></div><div class="sundiv"></div><div class="whalf"><div class="k">' + _lblSurf() + ' ' + S.surf + '</div><div class="v">' + surfWord(day.waveFt, state.lang) + "</div></div></div></div>" +
 '<div class="tile"><div class="k">' + S.cond + '</div><div class="v">' + cn + "</div></div>" +
 '<div class="tile"><div class="wsplit"><div class="whalf"><div class="k">' + _lblRain() + ' ' + S.rain + '</div><div class="v">' + day.rain + '%</div></div><div class="sundiv"></div><div class="whalf"><div class="k">' + _lblClarity() + ' ' + S.clarity + '</div><div class="v">' + clarityTileVal() + "</div></div></div></div>" +
