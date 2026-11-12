@@ -1575,7 +1575,7 @@ var sky = condIcon(code, isDay) + " " + wsp + (gst != null ? " | " + gst : "") +
 var rp = wx.precipitation_probability[i];
 var air = Math.round(wx.temperature_2m[i]);
 var wtr = mar.sea_surface_temperature[mi];
-var wtrS = (wtr == null || isNaN(wtr)) ? "—" : (Math.round(wtr * 10) / 10) + "°";
+var wtrS = (wtr == null || isNaN(wtr)) ? "—" : Math.round(wtr) + "°";
 var inbite = false;
 (day.windows || []).forEach(function(w) {
 if (ms >= w.start.getTime() && ms < w.end.getTime()) inbite = true;
