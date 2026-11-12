@@ -1722,7 +1722,7 @@ p.lat += uy * step / pxA; p.lon += ux * step / pxL;
 var q = map.latLngToContainerPoint([p.lat, p.lon]);
 var dx = ux * pxL, dy = -uy * pxA, dl = Math.sqrt(dx * dx + dy * dy) || 1;
 var nx = dx / dl, ny = dy / dl;
-var AL = 11 + sp * 0.12, HS = 4.5;
+var AL = 12 + sp * 0.13, HS = 5;
 var hx = q.x, hy = q.y;
 var tx = hx - nx * AL, ty = hy - ny * AL;
 var bx = hx - nx * HS, by = hy - ny * HS;
@@ -1731,14 +1731,15 @@ var fade = Math.min(1, p.age / 25) * Math.min(1, (p.max - p.age) / 25);
 var a = (0.55 + Math.min(0.4, sp / 50)) * fade;
 for (var pass = 0; pass < 2; pass++) {
 var halo = pass === 0;
-ctx.strokeStyle = halo ? "rgba(255,255,255," + (a * 0.85).toFixed(3) + ")" : "rgba(143,149,155," + a.toFixed(3) + ")";
-ctx.fillStyle = ctx.strokeStyle;
-ctx.lineWidth = halo ? 3.6 : 1.6;
+var hs2 = halo ? HS * 1.35 : HS; // halo head a touch wider so the color sits inside it
+ctx.strokeStyle = halo ? "rgba(255,255,255," + (a * 0.85).toFixed(3) + ")" : "rgba(15,107,107," + a.toFixed(3) + ")";
+ctx.lineWidth = halo ? 3.8 : 1.7;
 ctx.beginPath(); ctx.moveTo(tx, ty); ctx.lineTo(bx, by); ctx.stroke();
+ctx.fillStyle = halo ? "rgba(255,255,255," + (a * 0.85).toFixed(3) + ")" : "rgba(185,138,46," + a.toFixed(3) + ")";
 ctx.beginPath();
 ctx.moveTo(hx, hy);
-ctx.lineTo(bx + pxn * HS * 0.62, by + pyn * HS * 0.62);
-ctx.lineTo(bx - pxn * HS * 0.62, by - pyn * HS * 0.62);
+ctx.lineTo(bx + pxn * hs2 * 0.62, by + pyn * hs2 * 0.62);
+ctx.lineTo(bx - pxn * hs2 * 0.62, by - pyn * hs2 * 0.62);
 ctx.closePath(); ctx.fill();
 }
 }
