@@ -298,7 +298,6 @@
     </div>
     <div class="hdBtns">
       <a class="langbtn watchlink" href="index.html" id="backBtn">‹ Home</a>
-      <a class="langbtn watchlink" href="watch.html" title="Apple Watch version">⌚</a>
       <button class="langbtn" id="langBtn" title="Language / Ngôn ngữ"></button>
       <button class="refresh" id="refBtn">Refresh</button>
     </div>
@@ -1707,6 +1706,15 @@ function windFoot() {
   }
 }
 
+// Windy-style speed colors (sp is mph): calm teal -> green -> yellow-green -> gold -> orange -> red.
+function windColor(sp) {
+  if (sp < 6) return "15,107,107";
+  if (sp < 12) return "60,160,120";
+  if (sp < 17) return "168,200,60";
+  if (sp < 23) return "185,138,46";
+  if (sp < 29) return "220,120,40";
+  return "210,70,50";
+}
 function startWind() {
   stopWind();
   if (!windCanvas || !radarMap || !windGrid) return;
@@ -1726,7 +1734,7 @@ function startWind() {
     return [g[i00][0] * w00 + g[i00 + 1][0] * w10 + g[i00 + N][0] * w01 + g[i00 + N + 1][0] * w11,
             g[i00][1] * w00 + g[i00 + 1][1] * w10 + g[i00 + N][1] * w01 + g[i00 + N + 1][1] * w11];
   }
-  var P = [], COUNT = 150;
+  var P = [], COUNT = 200;
   function spawn(p) {
     var b = map.getBounds();
     p.lat = b.getSouth() + Math.random() * (b.getNorth() - b.getSouth());
@@ -1756,26 +1764,22 @@ function startWind() {
       var q = map.latLngToContainerPoint([p.lat, p.lon]);
       var dx = ux * pxL, dy = -uy * pxA, dl = Math.sqrt(dx * dx + dy * dy) || 1;
       var nx = dx / dl, ny = dy / dl;
-      var AL = 12 + sp * 0.13, HS = 5;
+      var AL = 16 + sp * 0.16;
       var hx = q.x, hy = q.y;
       var tx = hx - nx * AL, ty = hy - ny * AL;
-      var bx = hx - nx * HS, by = hy - ny * HS;
-      var pxn = -ny, pyn = nx;
       var fade = Math.min(1, p.age / 25) * Math.min(1, (p.max - p.age) / 25);
       var a = (0.55 + Math.min(0.4, sp / 50)) * fade;
-      for (var pass = 0; pass < 2; pass++) {
-        var halo = pass === 0;
-        var hs2 = halo ? HS * 1.35 : HS; // halo head a touch wider so the color sits inside it
-        ctx.strokeStyle = halo ? "rgba(255,255,255," + (a * 0.85).toFixed(3) + ")" : "rgba(15,107,107," + a.toFixed(3) + ")";
-        ctx.lineWidth = halo ? 3.8 : 1.7;
-        ctx.beginPath(); ctx.moveTo(tx, ty); ctx.lineTo(bx, by); ctx.stroke();
-        ctx.fillStyle = halo ? "rgba(255,255,255," + (a * 0.85).toFixed(3) + ")" : "rgba(185,138,46," + a.toFixed(3) + ")";
-        ctx.beginPath();
-        ctx.moveTo(hx, hy);
-        ctx.lineTo(bx + pxn * hs2 * 0.62, by + pyn * hs2 * 0.62);
-        ctx.lineTo(bx - pxn * hs2 * 0.62, by - pyn * hs2 * 0.62);
-        ctx.closePath(); ctx.fill();
-      }
+      var col = windColor(sp);
+      // Speed-colored streak fading toward the tail, soft white underlay so colors read on the map
+      ctx.strokeStyle = "rgba(255,255,255," + (a * 0.75).toFixed(3) + ")";
+      ctx.lineWidth = 3.2;
+      ctx.beginPath(); ctx.moveTo(tx, ty); ctx.lineTo(hx, hy); ctx.stroke();
+      var g = ctx.createLinearGradient(tx, ty, hx, hy);
+      g.addColorStop(0, "rgba(" + col + ",0)");
+      g.addColorStop(1, "rgba(" + col + "," + a.toFixed(3) + ")");
+      ctx.strokeStyle = g;
+      ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(tx, ty); ctx.lineTo(hx, hy); ctx.stroke();
     }
   }
   windRAF = requestAnimationFrame(frame);
