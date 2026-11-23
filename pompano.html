@@ -1374,8 +1374,9 @@ function buildDays(wx, mar) {
     windows.sort(function(a, b) { return a.start - b.start; });
     var best = null;
     windows.forEach(function(w) { if (!best || w.score > best.score) best = w; });
-    // weather tiles at best-window peak (or noon)
-    var refT = best ? best.start.getTime() + 3600000 : date.getTime() + 43200000;
+    // weather tiles: today uses the current hour so tiles match right now; other days use the best-window peak (or noon)
+    var isToday = d === 0;
+    var refT = isToday ? Date.now() : (best ? best.start.getTime() + 3600000 : date.getTime() + 43200000);
     var wi = hourlyIndex(wx.hourly, refT), mi2 = hourlyIndex(mar.hourly, refT);
     var wv = mar.hourly.wave_height[mi2] * 3.28084;
     days.push({
@@ -1388,7 +1389,7 @@ function buildDays(wx, mar) {
       waveFt: Math.round(wv * 10) / 10,
       condCode: wx.hourly.weather_code[wi],
       condDay: (wx.hourly.is_day && wx.hourly.is_day[wi] != null) ? wx.hourly.is_day[wi] : 1,
-      rain: wx.daily.precipitation_probability_max[d],
+      rain: (isToday && wx.hourly.precipitation_probability && wx.hourly.precipitation_probability[wi] != null) ? wx.hourly.precipitation_probability[wi] : wx.daily.precipitation_probability_max[d],
       sunrise: (wx.daily.sunrise && wx.daily.sunrise[d]) ? new Date(wx.daily.sunrise[d]) : null,
       sunset: (wx.daily.sunset && wx.daily.sunset[d]) ? new Date(wx.daily.sunset[d]) : null
     });
@@ -2221,6 +2222,7 @@ $("sugSend").addEventListener("click", function() {
 });
 
 $("refBtn").addEventListener("click", function() { boot(); });
+
 $("locName").addEventListener("click", function() {
   var p = $("locPanel"); p.hidden = !p.hidden; syncSticky();
   if (!p.hidden) { wireLocUI(); setTimeout(function() { $("locSearch").focus(); }, 60); }
