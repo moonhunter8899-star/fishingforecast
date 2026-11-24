@@ -1371,9 +1371,9 @@ water: (function(w){ return (w == null || isNaN(w)) ? null : Math.round(w * 10) 
 waveFt: Math.round(wv * 10) / 10,
 condCode: wx.hourly.weather_code[wi],
 condDay: (wx.hourly.is_day && wx.hourly.is_day[wi] != null) ? wx.hourly.is_day[wi] : 1,
-rain: (isToday && wx.hourly.precipitation_probability && wx.hourly.precipitation_probability[wi] != null) ? wx.hourly.precipitation_probability[wi] : wx.daily.precipitation_probability_max[d],
-sunrise: (wx.daily.sunrise && wx.daily.sunrise[d]) ? new Date(wx.daily.sunrise[d]) : null,
-sunset: (wx.daily.sunset && wx.daily.sunset[d]) ? new Date(wx.daily.sunset[d]) : null
+rain: (isToday && wx.hourly.precipitation_probability && wx.hourly.precipitation_probability[wi] != null) ? wx.hourly.precipitation_probability[wi] : wx.daily.precipitation_probability_max[d + 2],
+sunrise: (wx.daily.sunrise && wx.daily.sunrise[d + 2]) ? new Date(wx.daily.sunrise[d + 2]) : null,
+sunset: (wx.daily.sunset && wx.daily.sunset[d + 2]) ? new Date(wx.daily.sunset[d + 2]) : null
 });
 }
 return days;
